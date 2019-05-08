@@ -1,6 +1,6 @@
 ## sqlmap-wx
 sqlmap GUI, using wxpython4.0  
-under in development.  
+under development.  
 
 #### INSTALLATION
 1. **REQUIRED**  
@@ -22,6 +22,5 @@ under in development.
 5. 感谢[sqm](https://github.com/kxcode/gui-for-sqlmap)带来的灵感, 其作者: [KINGX](https://github.com/kxcode) (sqm UI 使用的是python2 + tkinter)  
 
 #### REFERENCE
-1. wxpython教程: https://wiki.wxpython.org/  
-                 http://zetcode.com/wxpython/  
+1. wxpython教程: https://wiki.wxpython.org/ , http://zetcode.com/wxpython/  
 2. wxpython API: https://wxpython.org/Phoenix/docs/html/index.html  
