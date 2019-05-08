@@ -11,6 +11,7 @@ from pathlib import Path
 from subprocess import Popen
 from urllib.parse import urlparse
 import requests
+import wx
 
 IS_POSIX = True if OS_NAME == 'posix' else False
 QUOTE = "'%s'" if OS_NAME == 'posix' else '"%s"'  # dos下只能用双引号
@@ -22,50 +23,116 @@ class Handler(object):
     frame: wx.Frame
     '''
     self.w = frame
-    # m = self.w._notebook不能写在这, 因为还没初始化完呢...
+    # m = self.w._notebook不能写在这, 因为还没初始化完, _notebook还不存在
 
   def build_all(self, event):
-    # _target = self._get_target()
+    _target = self._get_target()
 
     self._collect_opts()
     _opts_list = (
-      self._setting_opts + self._request_opts
-      + self._enumeration_opts  + self._file_opts  + self._other_opts
+      self._setting_opts + self._request_opts +
+      self._enumeration_opts + self._file_opts + self._other_opts
     )
 
-    _final_line = ''.join(_opts_list)
+    _final_line = _target + ''.join(_opts_list)
     # print(_final_line)
     if _final_line is not None:
       self.w._cmd_entry.SetValue(_final_line.strip())
 
   def run_cmdline(self, event):
-    '''
-    TODO: 该考虑win
-    '''
     _sqlmap_opts = self.w._cmd_entry.GetValue().strip()
     if IS_POSIX:
-      # self.w.main_notebook.next_page()
-      _cmdline_str = ''.join(('sqlmap ', _sqlmap_opts, '\n'))
-      print(_cmdline_str)
-      # if _cmdline_str:
-        # # self.m._page2_cmdline_str_label.set_text("running: " + _cmdline_str)
-        # self.m._page2_terminal.feed_child(_cmdline_str, len(_cmdline_str))
-        # self.m._page2_terminal.grab_focus()
+      _cmdline_str = '/usr/bin/env xterm -hold -e sqlmap %s' % _sqlmap_opts
+    else:
+      _cmdline_str = 'start cmd /k sqlmap %s' % _sqlmap_opts
+
+    # print(_cmdline_str)
+    Popen(_cmdline_str, shell = True)
+
+  def set_file_entry_text(self, event, data):
+    '''
+    data: [file_entry, 'title of chooser']
+    '''
+    if len(data) > 1:   # 选择目录
+      dialog = wx.DirDialog(self.w, message=data[1])
+    else:
+      dialog = wx.FileDialog(self.w, message="选择文件")
+
+    with dialog:
+      if dialog.ShowModal() == wx.ID_OK:
+        data[0].SetValue(dialog.GetPath())
+        data[0].SetFocus()
+
+  def clear_log_view_buffer(self, event):
+    self.w._page3_log_view.SetValue(
+      'sqlmap的运行记录都放在这: %s\n' % (Path.home() / '.sqlmap/output'))
+
+  def _get_url_dir(self):
+    '''
+    return: pathlib.Path
+    '''
+    _load_url = self.w._url_combobox.GetValue()
+
+    if _load_url:
+      if not _load_url.startswith('http'):
+        _load_url = 'http://%s' % _load_url
+
+      _load_host = urlparse(_load_url).netloc
+
+      return Path.home() / '.sqlmap/output' / _load_host
+
+  def _log_view_insert(self, file_path):
+    '''
+    file_path: pathlib.Path
+               sqlmap库中dataToOutFile默认utf8写入
+    '''
+    try:
+      with file_path.open(encoding = 'utf8') as _f:
+        _line_list_tmp = _f.readlines()
+        if _line_list_tmp:
+          for _line_tmp in _line_list_tmp:
+            self.w._page3_log_view.write(_line_tmp)
+        else:
+          self.w._page3_log_view.write('%s: 空文件' % file_path)
+    except EnvironmentError as e:
+      self.w._page3_log_view.write(str(e))
+    finally:
+      self.w._page3_log_view.write(
+        time.strftime('\n%Y-%m-%d %R:%S: ----------我是分割线----------\n',
+                      time.localtime()))
+
+      self.w._page3_log_view.SetFocus()
+      _mark = self.w._page3_log_view.GetInsertionPoint()
+      wx.CallAfter(self.w._page3_log_view.ShowPosition, _mark)
+
+  def read_log_file(self, event):
+    _base_dir = self._get_url_dir()
+
+    if _base_dir:
+      _log_file_path = _base_dir / 'log'
+      self._log_view_insert(_log_file_path)
+
+  def read_target_file(self, event):
+    _base_dir = self._get_url_dir()
+
+    if _base_dir:
+      _target_file_path = _base_dir / 'target.txt'
+      self._log_view_insert(_target_file_path)
 
   def _get_target(self):
     w = self.w
-    _current_pagenum = self.w._target_notebook.GetSelection()
-    _target_list = [("-u ", w._url_combobox.get_child().GetValue),
-                    ("-l ", w._burp_logfile.GetValue),
-                    ("-r ", w._request_file.GetValue),
-                    ("-m ", w._bulkfile.GetValue),
-                    ("-c ", w._configfile.GetValue),
-                    ("-x ", w._sitemap_url.GetValue),
-                    ("-g ", w._google_dork.GetValue)]
+    _pagenum = self.w._target_notebook.GetSelection()
+    _target_list = [("-u ", w._url_combobox),
+                    ("-l ", w._burp_logfile),
+                    ("-r ", w._request_file),
+                    ("-m ", w._bulkfile),
+                    ("-c ", w._configfile),
+                    ("-x ", w._sitemap_url),
+                    ("-g ", w._google_dork)]
 
-    _target_tmp = _target_list[_current_pagenum][1]().strip()
+    _target_tmp = _target_list[_pagenum][1].GetValue().strip()
     if _target_tmp:
-      return _target_list[_current_pagenum][0] + QUOTE % _target_tmp
+      return _target_list[_pagenum][0] + QUOTE % _target_tmp
     else:
       return ''
 
@@ -213,8 +280,10 @@ class Handler(object):
       self._get_text_from_entry("--tmp-path=",
                                 m._file_os_access_tmp_path_ckbtn,
                                 m._file_os_access_tmp_path_entry),
-      # self._get_text_only_ckbtn(m._file_os_registry_reg_combobox.get_active_id(),
-                                # m._file_os_registry_reg_ckbtn),
+      self._get_text_only_ckbtn(
+        m._file_os_registry_reg_choice.GetString(
+          m._file_os_registry_reg_choice.GetSelection()),
+        m._file_os_registry_reg_ckbtn),
       self._get_text_from_entry("--reg-key=",
                                 m._file_os_registry_reg_ckbtn,
                                 m._file_os_registry_reg_key_entry),
@@ -451,7 +520,7 @@ class Handler(object):
                                 m._inject_area_param_exclude_entry),
       self._get_text_from_entry("--dbms=",
                                 m._inject_area_dbms_ckbtn,
-                                m._inject_area_dbms_entry),
+                                m._inject_area_dbms_combobox),
       self._get_text_from_entry("--dbms-cred=",
                                 m._inject_area_dbms_cred_ckbtn,
                                 m._inject_area_dbms_cred_entry),
@@ -536,7 +605,7 @@ class Handler(object):
                                 m._general_area_batch_ckbtn),
       self._get_text_only_ckbtn("--wizard",
                                 m._page1_misc_wizard_ckbtn),
-      # self._get_tampers(),
+      self._get_tampers(),
     ]
 
   def _get_http_proxy_cred(self):
@@ -563,7 +632,20 @@ class Handler(object):
     return ''
 
   def _get_tampers(self):
-    pass
+    '''
+    简单处理
+    '''
+    m = self.w._notebook
+    _tamper_textbuffer = m._tamper_area_tamper_view.GetValue()
+    _tampers = ''
+
+    for _tamper_tmp in _tamper_textbuffer.splitlines():
+      if _tamper_tmp.strip():
+        _tampers = _tampers + _tamper_tmp.strip() + ','
+
+    if _tampers:
+      return " --tamper=" + QUOTE % _tampers.rstrip(',')
+    return ''
 
   def _get_text_from_scale(self, opt_str, ckbtn, scale):
     if ckbtn.IsChecked():
@@ -576,7 +658,7 @@ class Handler(object):
     return ''
 
   def _get_text_from_entry(self, opt_str, ckbtn, entry, quote = QUOTE):
-    _entry_str = entry.GetValue().strip()
+    _entry_str = str(entry.GetValue()).strip()
     if ckbtn.IsChecked() and _entry_str:
 
       if quote:
