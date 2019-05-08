@@ -18,39 +18,69 @@ tc = wx.TextCtrl
 class Window(wx.Frame):
   def __init__(self, parent):
     super().__init__(parent, title = 'sqlmap-wx', size = (300, 400))
-    self.Bind(wx.EVT_MENU, self.onExit)
-    accel_tbl = wx.AcceleratorTable([(wx.ACCEL_CTRL, ord('Q'), wx.ID_EXIT),
-                                     (wx.ACCEL_CTRL, ord('W'), wx.ID_EXIT)])
-    self.SetAcceleratorTable(accel_tbl)
-
     self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
 
     self.initUI()
+    self.make_accels()  # 要先初始化完后, 才能设全局键
 
   # @profile
   def initUI(self):
     vbox = wx.BoxSizer(wx.VERTICAL)
     self.build_page_target()
 
-    _main_notebook = wx.Notebook(self)
-    page1 = self.build_page1(_main_notebook)
-    page2 = self.build_page2(_main_notebook)
-    page3 = self.build_page3(_main_notebook)
-    page4 = self.build_page4(_main_notebook)
-    page5 = self.build_page5(_main_notebook)
-    page6 = self.build_page6(_main_notebook)
+    self.main_notebook = wx.Notebook(self)
+    page1 = self.build_page1(self.main_notebook)
+    page2 = self.build_page2(self.main_notebook)
+    page3 = self.build_page3(self.main_notebook)
+    page4 = self.build_page4(self.main_notebook)
+    page5 = self.build_page5(self.main_notebook)
+    page6 = self.build_page6(self.main_notebook)
 
-    _main_notebook.AddPage(page1, '选项区(&1)')
-    _main_notebook.AddPage(page2, '输出区(&2)')
-    _main_notebook.AddPage(page3, '日志区(&3)')
-    _main_notebook.AddPage(page4, 'API区(&4)')
-    _main_notebook.AddPage(page5, '帮助(&H)')
-    _main_notebook.AddPage(page6, '关于')
+    self.main_notebook.AddPage(page1, '选项区(&1)')
+    self.main_notebook.AddPage(page2, '输出区(&2)')
+    self.main_notebook.AddPage(page3, '日志区(&3)')
+    self.main_notebook.AddPage(page4, 'API区(&4)')
+    self.main_notebook.AddPage(page5, '帮助(&H)')
+    self.main_notebook.AddPage(page6, '关于')
 
     vbox.Add(self._target_notebook, flag = wx.EXPAND)
-    vbox.Add(_main_notebook, proportion = 1, flag = wx.EXPAND)
+    vbox.Add(self.main_notebook, proportion = 1, flag = wx.EXPAND)
     # 很重要! Fit重新校正布局(包括子页面)
     self.SetSizerAndFit(vbox)
+
+  def make_accels(self):
+    '''
+    https://www.blog.pythonlibrary.org/2017/09/28/wxpython-all-about-accelerators/
+    只有最后一次的SetAcceleratorTable会生效
+    '''
+    self.Bind(wx.EVT_MENU, self.onExit, id = wx.ID_EXIT)
+    self.accel_entries = [(wx.ACCEL_CTRL, ord('Q'), wx.ID_EXIT),
+                          (wx.ACCEL_CTRL, ord('W'), wx.ID_EXIT)]
+
+    main_note_ks = ['1', '2', '3', '4', 'H']
+    for i in range(len(main_note_ks)):
+      pageid = self.main_notebook.GetPage(i).GetId()
+
+      self.accel_entries.append((wx.ACCEL_ALT, ord(main_note_ks[i]), pageid))
+      self.Bind(
+        wx.EVT_MENU,
+        lambda evt, page = i: self.main_notebook.ChangeSelection(page),
+        id = pageid)
+
+    _note_keys = ['Q', 'W', 'E', 'R', 'T']
+    for i in range(len(_note_keys)):
+      pageid = self._notebook.GetPage(i).GetId()
+
+      self.accel_entries.append((wx.ACCEL_ALT, ord(_note_keys[i]), pageid))
+      self.Bind(
+        wx.EVT_MENU,
+        lambda evt, page = i:
+          self._notebook.ChangeSelection(page)
+            if self.main_notebook.GetSelection() == 0 else evt.Skip(),
+        id = pageid)
+
+    accel_tbl = wx.AcceleratorTable(self.accel_entries)
+    self.SetAcceleratorTable(accel_tbl)
 
   def clear_all_entry(self, event):
     m = self._notebook
@@ -268,8 +298,8 @@ class Window(wx.Frame):
 
     _about_str = '''
     1. VERSION: 0.1
-       2019年 05月 08日 星期三 16:25:37 CST
-       required: python3.5+, wxPython4.0.4, sqlmap(require: python2.6+)
+       2019年 05月 08日 星期三 20:59:42 CST
+       required: python3.5+, wxPython4.0+, sqlmap(require: python2.6+)
        作者: needle wang ( needlewang2011@gmail.com )\n
     2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
     3. wxpython教程: https://wiki.wxpython.org/

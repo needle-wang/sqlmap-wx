@@ -34,8 +34,22 @@ class Page1Notebook(wx.Notebook):
     self.AddPage(page1_setting, '测试(&Q)')
     self.AddPage(page1_request, '请求(&W)')
     self.AddPage(page1_enumeration, '枚举(&E)')
-    self.AddPage(page1_file, '文件(&E)')
+    self.AddPage(page1_file, '文件(&R)')
     self.AddPage(page1_other, '其他(&T)')
+
+  def optimize_area_controller(self, event):
+    if self._optimize_area_turn_all_ckbtn.IsChecked():
+      self._optimize_area_predict_ckbtn.SetValue(False)
+      self._optimize_area_keep_alive_ckbtn.SetValue(False)
+      self._optimize_area_null_connect_ckbtn.SetValue(False)
+
+      self._optimize_area_predict_ckbtn.Disable()
+      self._optimize_area_keep_alive_ckbtn.Disable()
+      self._optimize_area_null_connect_ckbtn.Disable()
+    else:
+      self._optimize_area_predict_ckbtn.Enable()
+      self._optimize_area_keep_alive_ckbtn.Enable()
+      self._optimize_area_null_connect_ckbtn.Enable()
 
   def build_page1_other(self):
     p = wx.Panel(self)
@@ -107,7 +121,7 @@ class Page1Notebook(wx.Notebook):
 
     row4 = wx.BoxSizer()
     self._page1_misc_answers_ckbtn = cb(_page1_other_misc_area, label = '设置交互时的问题答案:')
-    self._page1_misc_answers_entry = tc(_page1_other_misc_area)
+    self._page1_misc_answers_entry = tc(_page1_other_misc_area, value = 'quit=N,follow=N')
     self._page1_misc_alert_ckbtn = cb(_page1_other_misc_area, label = '发现注入时运行本地命令:')
     self._page1_misc_alert_entry = tc(_page1_other_misc_area)
     self._page1_misc_gpage_ckbtn = cb(_page1_other_misc_area, label = 'GOOGLEDORK时的页码')
@@ -122,7 +136,7 @@ class Page1Notebook(wx.Notebook):
 
     row5 = wx.BoxSizer()
     self._page1_misc_z_ckbtn = cb(_page1_other_misc_area, label = '使用短的助记符')
-    self._page1_misc_z_entry = tc(_page1_other_misc_area)
+    self._page1_misc_z_entry = tc(_page1_other_misc_area, value = 'flu,bat,ban,tec=EU...')
 
     row5.Add(self._page1_misc_z_ckbtn, border)
     row5.Add(self._page1_misc_z_entry, proportion_border)
@@ -190,7 +204,7 @@ class Page1Notebook(wx.Notebook):
 
     row4 = wx.BoxSizer()
     self._page1_general_charset_ckbtn = cb(_page1_other_general_area, label = '盲注所用的字符集合')
-    self._page1_general_charset_entry = tc(_page1_other_general_area)
+    self._page1_general_charset_entry = tc(_page1_other_general_area, value = '0123456789abcdef')
     self._page1_general_encoding_ckbtn = cb(_page1_other_general_area, label = '字符编码(用于数据获取)')
     self._page1_general_encoding_entry = tc(_page1_other_general_area)
 
@@ -227,7 +241,7 @@ class Page1Notebook(wx.Notebook):
     self._page1_general_dump_format_ckbtn = cb(_page1_other_general_area, label = 'dump结果的文件格式')
     self._page1_general_dump_format_entry = tc(_page1_other_general_area)
     self._page1_general_csv_del_ckbtn = cb(_page1_other_general_area, label = '(csv文件的)分隔符')
-    self._page1_general_csv_del_entry = tc(_page1_other_general_area)
+    self._page1_general_csv_del_entry = tc(_page1_other_general_area, value = ',')
 
     row6.Add(self._page1_general_dump_format_ckbtn, border)
     row6.Add(self._page1_general_dump_format_entry, border)
@@ -471,15 +485,17 @@ class Page1Notebook(wx.Notebook):
     file_read_area = wx.StaticBoxSizer(wx.VERTICAL, panel, '读取远程文件')
     _file_read_area = file_read_area.GetStaticBox()
 
-    border = wx.SizerFlags().Border(wx.LEFT | wx.RIGHT, 10)
-    proportion_border = wx.SizerFlags(1).Border(wx.LEFT | wx.RIGHT, 10)
+    border = wx.SizerFlags().Border(wx.LEFT | wx.RIGHT, 5)
 
     row1 = wx.BoxSizer()
     self._file_read_area_file_read_ckbtn = cb(_file_read_area, label = '远程文件路径(--file-read=)')
-    self._file_read_area_file_read_entry = tc(_file_read_area)
+    self._file_read_area_file_read_entry = tc(_file_read_area, value = '/etc/passwd')
+    self._file_read_area_file_read_btn = wx.Button(_file_read_area, label = '查看')
+    self._file_read_area_file_read_btn.Bind(wx.EVT_BUTTON, self._handlers.read_dumped_file)
 
     row1.Add(self._file_read_area_file_read_ckbtn, border)
-    row1.Add(self._file_read_area_file_read_entry, proportion_border)
+    row1.Add(self._file_read_area_file_read_entry, proportion = 1)
+    row1.Add(self._file_read_area_file_read_btn, border)
 
     spacing = wx.SizerFlags().Expand().Border(wx.TOP | wx.BOTTOM, 6)
     file_read_area.Add(row1, spacing)
@@ -849,7 +865,7 @@ class Page1Notebook(wx.Notebook):
     self._request_area_ignore_redirects_ckbtn = cb(_request_custom_area, label = '忽略重定向')
     self._request_area_ignore_timeouts_ckbtn = cb(_request_custom_area, label = '忽略连接超时')
     self._request_area_ignore_code_ckbtn = cb(_request_custom_area, label = '忽略错误型状态码:')
-    self._request_area_ignore_code_entry = tc(_request_custom_area)
+    self._request_area_ignore_code_entry = tc(_request_custom_area, value = '401')
     self._request_area_skip_urlencode_ckbtn = cb(_request_custom_area, label = 'payload不使用url编码')
     self._request_area_force_ssl_ckbtn = cb(_request_custom_area, label = '强制使用HTTPS')
     self._request_area_chunked_ckbtn = cb(_request_custom_area, label = '用Chunked编码发送POST请求')
@@ -868,9 +884,9 @@ class Page1Notebook(wx.Notebook):
     self._request_area_delay_ckbtn = cb(_request_custom_area, label = '请求间隔(秒)')
     self._request_area_delay_entry = tc(_request_custom_area)
     self._request_area_timeout_ckbtn = cb(_request_custom_area, label = '几秒超时')
-    self._request_area_timeout_entry = tc(_request_custom_area)
+    self._request_area_timeout_entry = tc(_request_custom_area, value = '30')
     self._request_area_retries_ckbtn = cb(_request_custom_area, label = '超时重试次数')
-    self._request_area_retries_entry = tc(_request_custom_area)
+    self._request_area_retries_entry = tc(_request_custom_area, value = '3')
     self._request_area_randomize_ckbtn = cb(_request_custom_area, label = '指定要随机改变值的参数')
     self._request_area_randomize_entry = tc(_request_custom_area)
 
@@ -1123,20 +1139,6 @@ class Page1Notebook(wx.Notebook):
     optimize_area.Add(self._optimize_area_null_connect_ckbtn, spacing)
 
     return optimize_area
-
-  def optimize_area_controller(self, event):
-    if self._optimize_area_turn_all_ckbtn.IsChecked():
-      self._optimize_area_predict_ckbtn.SetValue(False)
-      self._optimize_area_keep_alive_ckbtn.SetValue(False)
-      self._optimize_area_null_connect_ckbtn.SetValue(False)
-
-      self._optimize_area_predict_ckbtn.Disable()
-      self._optimize_area_keep_alive_ckbtn.Disable()
-      self._optimize_area_null_connect_ckbtn.Disable()
-    else:
-      self._optimize_area_predict_ckbtn.Enable()
-      self._optimize_area_keep_alive_ckbtn.Enable()
-      self._optimize_area_null_connect_ckbtn.Enable()
 
   def build_page1_setting_tamper(self, panel):
     tamper_area = wx.StaticBoxSizer(wx.VERTICAL, panel, 'tamper脚本')

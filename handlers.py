@@ -46,6 +46,7 @@ class Handler(object):
     else:
       _cmdline_str = 'start cmd /k sqlmap %s' % _sqlmap_opts
 
+    # self.w.main_notebook.ChangeSelection(1)
     # print(_cmdline_str)
     Popen(_cmdline_str, shell = True)
 
@@ -118,6 +119,22 @@ class Handler(object):
     if _base_dir:
       _target_file_path = _base_dir / 'target.txt'
       self._log_view_insert(_target_file_path)
+
+  def read_dumped_file(self, event):
+    self.w.main_notebook.ChangeSelection(2)
+    m = self.w._notebook
+
+    _base_dir = self._get_url_dir()
+    _load_file = m._file_read_area_file_read_entry.GetValue()
+
+    if _base_dir and _load_file:
+      # 不能用os.sep, 因为是依据远程OS的sep而定
+      # 沿用sqlmap库中的filePathToSafeString函数
+      _load_file = (_load_file.replace("/", "_").replace("\\", "_")
+                              .replace(" ", "_").replace(":", "_"))
+
+      _dumped_file_path = _base_dir / 'files' / _load_file
+      self._log_view_insert(_dumped_file_path)
 
   def _get_target(self):
     w = self.w
