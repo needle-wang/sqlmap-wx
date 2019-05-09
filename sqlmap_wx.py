@@ -4,15 +4,19 @@
 
 from subprocess import Popen, PIPE
 from threading import Thread
-import wx
+
+from widgets import TextCtrl, wx, Panel, btn, cb, cbb, nb, st, tc
+from widgets import VERTICAL, EXPAND, ALL, ALIGN_CENTER
+
 from page1_notebook import Page1Notebook
-from widgets import TextCtrl
 from handlers import Handler
-cb = wx.CheckBox
-cbb = wx.ComboBox
-sl = wx.Slider
-st = wx.StaticText
-tc = wx.TextCtrl
+
+BoxSizer = wx.BoxSizer
+GridSizer = wx.GridSizer
+StaticBoxSizer = wx.StaticBoxSizer
+
+SizerFlags = wx.SizerFlags
+EVT_BUTTON = wx.EVT_BUTTON
 
 
 class Window(wx.Frame):
@@ -21,14 +25,14 @@ class Window(wx.Frame):
     self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
 
     self.initUI()
-    self.make_accels()  # 要先初始化完后, 才能设全局键
+    # self.make_accels()  # 要先初始化完后, 才能设全局键
 
   # @profile
   def initUI(self):
-    vbox = wx.BoxSizer(wx.VERTICAL)
+    vbox = BoxSizer(VERTICAL)
     self.build_page_target()
 
-    self.main_notebook = wx.Notebook(self)
+    self.main_notebook = nb(self)
     page1 = self.build_page1(self.main_notebook)
     page2 = self.build_page2(self.main_notebook)
     page3 = self.build_page3(self.main_notebook)
@@ -43,8 +47,8 @@ class Window(wx.Frame):
     self.main_notebook.AddPage(page5, '帮助(&H)')
     self.main_notebook.AddPage(page6, '关于')
 
-    vbox.Add(self._target_notebook, flag = wx.EXPAND)
-    vbox.Add(self.main_notebook, proportion = 1, flag = wx.EXPAND)
+    vbox.Add(self._target_notebook, flag = EXPAND)
+    vbox.Add(self.main_notebook, proportion = 1, flag = EXPAND)
     # 很重要! Fit重新校正布局(包括子页面)
     self.SetSizerAndFit(vbox)
 
@@ -87,7 +91,7 @@ class Window(wx.Frame):
     for _i in dir(m):
       if _i.endswith('entry'):
         _tmp_entry = getattr(m, _i)
-        if isinstance(_tmp_entry, wx.TextCtrl):
+        if isinstance(_tmp_entry, tc):
           _tmp_entry.SetValue('')
 
   def unselect_all_ckbtn(self, event):
@@ -95,7 +99,7 @@ class Window(wx.Frame):
     for _i in dir(m):
       if _i.endswith('ckbtn'):
         _tmp_ckbtn = getattr(m, _i)
-        if isinstance(_tmp_ckbtn, wx.CheckBox):
+        if isinstance(_tmp_ckbtn, cb):
           _tmp_ckbtn.SetValue(False)
     for _i in m._enum_area_opts_ckbtns:
       for _j in _i:
@@ -107,18 +111,18 @@ class Window(wx.Frame):
 
   def build_page_target(self):
     # gtk3下的正确的高度!
-    # self.a = wx.Notebook(self, size = (400, 68))
-    # b = wx.TextCtrl(a, size = (-1, 36))
-    self._target_notebook = wx.Notebook(self, size = (-1, 68))
+    # self.a = nb(self, size = (400, 68))
+    # b = tc(a, size = (-1, 36))
+    self._target_notebook = nb(self, size = (-1, 68))
 
     self._url_combobox = cbb(self._target_notebook, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
 
-    p2 = wx.Panel(self._target_notebook)
-    hbox2 = wx.BoxSizer()
+    p2 = Panel(self._target_notebook)
+    hbox2 = BoxSizer()
     self._burp_logfile = tc(p2)
-    self._burp_logfile_chooser = wx.Button(p2, label = '打开')
+    self._burp_logfile_chooser = btn(p2, label = '打开')
     self._burp_logfile_chooser.Bind(
-      wx.EVT_BUTTON,
+      EVT_BUTTON,
       lambda evt, data = [self._burp_logfile]:
         self._handlers.set_file_entry_text(evt, data))
 
@@ -126,12 +130,12 @@ class Window(wx.Frame):
     hbox2.Add(self._burp_logfile_chooser)
     p2.SetSizerAndFit(hbox2)
 
-    p3 = wx.Panel(self._target_notebook)
-    hbox3 = wx.BoxSizer()
+    p3 = Panel(self._target_notebook)
+    hbox3 = BoxSizer()
     self._request_file = tc(p3)
-    self._request_file_chooser = wx.Button(p3, label = '打开')
+    self._request_file_chooser = btn(p3, label = '打开')
     self._request_file_chooser.Bind(
-      wx.EVT_BUTTON,
+      EVT_BUTTON,
       lambda evt, data = [self._request_file]:
         self._handlers.set_file_entry_text(evt, data))
 
@@ -139,12 +143,12 @@ class Window(wx.Frame):
     hbox3.Add(self._request_file_chooser)
     p3.SetSizerAndFit(hbox3)
 
-    p4 = wx.Panel(self._target_notebook)
-    hbox4 = wx.BoxSizer()
+    p4 = Panel(self._target_notebook)
+    hbox4 = BoxSizer()
     self._bulkfile = tc(p4)
-    self._bulkfile_chooser = wx.Button(p4, label = '打开')
+    self._bulkfile_chooser = btn(p4, label = '打开')
     self._bulkfile_chooser.Bind(
-      wx.EVT_BUTTON,
+      EVT_BUTTON,
       lambda evt, data = [self._bulkfile]:
         self._handlers.set_file_entry_text(evt, data))
 
@@ -152,12 +156,12 @@ class Window(wx.Frame):
     hbox4.Add(self._bulkfile_chooser)
     p4.SetSizerAndFit(hbox4)
 
-    p5 = wx.Panel(self._target_notebook)
-    hbox5 = wx.BoxSizer()
+    p5 = Panel(self._target_notebook)
+    hbox5 = BoxSizer()
     self._configfile = tc(p5)
-    self._configfile_chooser = wx.Button(p5, label = '打开')
+    self._configfile_chooser = btn(p5, label = '打开')
     self._configfile_chooser.Bind(
-      wx.EVT_BUTTON,
+      EVT_BUTTON,
       lambda evt, data = [self._configfile]:
         self._handlers.set_file_entry_text(evt, data))
 
@@ -177,50 +181,50 @@ class Window(wx.Frame):
     self._target_notebook.AddPage(self._google_dork, 'GOOGLEDORK')
 
   def build_page1(self, parent):
-    p = wx.Panel(parent)
-    vbox = wx.BoxSizer(wx.VERTICAL)
+    p = Panel(parent)
+    vbox = BoxSizer(VERTICAL)
 
     # sqlmap命令语句
-    cmd_area = wx.StaticBoxSizer(wx.VERTICAL, p, 'A.收集选项 的结果显示在这:')
+    cmd_area = StaticBoxSizer(VERTICAL, p, 'A.收集选项 的结果显示在这:')
     _cmd_area = cmd_area.GetStaticBox()
 
     self._cmd_entry = TextCtrl(_cmd_area)
 
-    cmd_area.Add(self._cmd_entry, flag = wx.EXPAND)
+    cmd_area.Add(self._cmd_entry, flag = EXPAND)
 
     # 主构造区
     self._notebook = Page1Notebook(p, self._handlers)
 
     # 构造与执行
-    grid = wx.GridSizer(1, 4, 0, 0)
-    _build_button = wx.Button(p, label = 'A.收集选项(&A)')
-    _build_button.Bind(wx.EVT_BUTTON, self._handlers.build_all)
+    grid = GridSizer(1, 4, 0, 0)
+    _build_button = btn(p, label = 'A.收集选项(&A)')
+    _build_button.Bind(EVT_BUTTON, self._handlers.build_all)
     # 用于改善ui的使用体验
-    _unselect_all_btn = wx.Button(p, label = '反选所有复选框(&S)')
-    _unselect_all_btn.Bind(wx.EVT_BUTTON, self.unselect_all_ckbtn)
-    _clear_all_entry = wx.Button(p, label = '清空所有输入框(&D)')
-    _clear_all_entry.Bind(wx.EVT_BUTTON, self.clear_all_entry)
-    _run_button = wx.Button(p, label = 'B.开始(&F)')
-    _run_button.Bind(wx.EVT_BUTTON, self._handlers.run_cmdline)
+    _unselect_all_btn = btn(p, label = '反选所有复选框(&S)')
+    _unselect_all_btn.Bind(EVT_BUTTON, self.unselect_all_ckbtn)
+    _clear_all_entry = btn(p, label = '清空所有输入框(&D)')
+    _clear_all_entry.Bind(EVT_BUTTON, self.clear_all_entry)
+    _run_button = btn(p, label = 'B.开始(&F)')
+    _run_button.Bind(EVT_BUTTON, self._handlers.run_cmdline)
 
-    grid.Add(_build_button, flag = wx.ALIGN_CENTER)
-    grid.Add(_unselect_all_btn, flag = wx.ALIGN_CENTER)
-    grid.Add(_clear_all_entry, flag = wx.ALIGN_CENTER)
-    grid.Add(_run_button, flag = wx.ALIGN_CENTER)
+    grid.Add(_build_button, flag = ALIGN_CENTER)
+    grid.Add(_unselect_all_btn, flag = ALIGN_CENTER)
+    grid.Add(_clear_all_entry, flag = ALIGN_CENTER)
+    grid.Add(_run_button, flag = ALIGN_CENTER)
 
-    vbox.Add(cmd_area, flag = wx.EXPAND)
-    vbox.Add(self._notebook, proportion = 1, flag = wx.EXPAND)
-    vbox.Add(grid, flag = wx.EXPAND)
+    vbox.Add(cmd_area, flag = EXPAND)
+    vbox.Add(self._notebook, proportion = 1, flag = EXPAND)
+    vbox.Add(grid, flag = EXPAND)
     p.SetSizerAndFit(vbox)
     return p
 
   def build_page2(self, parent):
-    p = wx.Panel(parent)
+    p = Panel(parent)
     return p
 
   def build_page3(self, parent):
-    p = wx.Panel(parent)
-    vbox = wx.BoxSizer(wx.VERTICAL)
+    p = Panel(parent)
+    vbox = BoxSizer(VERTICAL)
     # 多行文本框的默认size太小了
     # 默认高度太低, 不指定个高度, 会报 滚动条相关的size 警告
     self._page3_log_view = tc(p,
@@ -228,38 +232,38 @@ class Window(wx.Frame):
                               style = wx.TE_MULTILINE | wx.TE_READONLY)
     self._handlers.clear_log_view_buffer(None)
 
-    grid = wx.GridSizer(1, 3, 0, 0)
-    _page3_read_target_btn = wx.Button(p, label = '查看target文件')
-    _page3_clear_btn = wx.Button(p, label = '清空(&C)')
-    _page3_read_log_btn = wx.Button(p, label = '查看log文件')
+    grid = GridSizer(1, 3, 0, 0)
+    _page3_read_target_btn = btn(p, label = '查看target文件')
+    _page3_clear_btn = btn(p, label = '清空(&C)')
+    _page3_read_log_btn = btn(p, label = '查看log文件')
 
-    _page3_read_target_btn.Bind(wx.EVT_BUTTON, self._handlers.read_target_file)
-    _page3_clear_btn.Bind(wx.EVT_BUTTON, self._handlers.clear_log_view_buffer)
-    _page3_read_log_btn.Bind(wx.EVT_BUTTON, self._handlers.read_log_file)
+    _page3_read_target_btn.Bind(EVT_BUTTON, self._handlers.read_target_file)
+    _page3_clear_btn.Bind(EVT_BUTTON, self._handlers.clear_log_view_buffer)
+    _page3_read_log_btn.Bind(EVT_BUTTON, self._handlers.read_log_file)
 
-    grid.Add(_page3_read_target_btn, flag = wx.ALIGN_CENTER)
-    grid.Add(_page3_clear_btn, flag = wx.ALIGN_CENTER)
-    grid.Add(_page3_read_log_btn, flag = wx.ALIGN_CENTER)
+    grid.Add(_page3_read_target_btn, flag = ALIGN_CENTER)
+    grid.Add(_page3_clear_btn, flag = ALIGN_CENTER)
+    grid.Add(_page3_read_log_btn, flag = ALIGN_CENTER)
 
-    vbox.Add(self._page3_log_view, proportion = 1, flag = wx.EXPAND | wx.ALL, border = 10)
-    vbox.Add(grid, flag = wx.EXPAND)
+    vbox.Add(self._page3_log_view, proportion = 1, flag = EXPAND | ALL, border = 10)
+    vbox.Add(grid, flag = EXPAND)
     p.SetSizerAndFit(vbox)
     return p
 
   def build_page4(self, parent):
-    p = wx.Panel(parent)
+    p = Panel(parent)
 
     return p
 
   def build_page5(self, parent):
-    p = wx.Panel(parent)
-    vbox = wx.BoxSizer(wx.VERTICAL)
+    p = Panel(parent)
+    vbox = BoxSizer(VERTICAL)
     # 多行文本框的默认size太小了
     # 默认高度太低, 不指定个高度, 会报 滚动条相关的size 警告
     self._page5_manual_view = tc(p,
                                  size = (-1, 300),
                                  style = wx.TE_MULTILINE | wx.TE_READONLY)
-    vbox.Add(self._page5_manual_view, proportion = 1, flag = wx.EXPAND | wx.ALL, border = 10)
+    vbox.Add(self._page5_manual_view, proportion = 1, flag = EXPAND | ALL, border = 10)
 
     # 使用线程 填充 帮助标签, 加快启动速度
     t = Thread(target = self._set_manual_view,
@@ -293,8 +297,8 @@ class Window(wx.Frame):
       wx.CallAfter(textbuffer.ShowPosition, 0)
 
   def build_page6(self, parent):
-    p = wx.Panel(parent)
-    vbox = wx.BoxSizer(wx.VERTICAL)
+    p = Panel(parent)
+    vbox = BoxSizer(VERTICAL)
 
     _about_str = '''
     1. VERSION: 0.1
@@ -307,11 +311,11 @@ class Window(wx.Frame):
     4. wxpython API: https://wxpython.org/Phoenix/docs/html/index.html\n\n
     5. 感谢sqm带来的灵感, 其作者: KINGX ( https://github.com/kxcode ), sqm UI 使用的是python2 + tkinter
     '''
-    hbox = wx.BoxSizer()
+    hbox = BoxSizer()
     _page6_about = st(p, label = _about_str)
     # 完全居中!
-    hbox.Add(_page6_about, flag = wx.ALIGN_CENTER)
-    vbox.Add(hbox, proportion = 1, flag = wx.ALIGN_CENTER)
+    hbox.Add(_page6_about, flag = ALIGN_CENTER)
+    vbox.Add(hbox, proportion = 1, flag = ALIGN_CENTER)
 
     p.SetSizerAndFit(vbox)
     return p
