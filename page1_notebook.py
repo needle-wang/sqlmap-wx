@@ -34,7 +34,7 @@ class Page1Notebook(nb):
     page1_other = self.build_page1_other()
 
     self.AddPage(page1_setting, '测试(&Q)')
-    self.AddPage(page1_request, '请求(&W)')
+    self.AddPage(page1_request, '请求(_W)')
     self.AddPage(page1_enumeration, '枚举(&E)')
     self.AddPage(page1_file, '文件(&R)')
     self.AddPage(page1_other, '其他(&T)')
@@ -150,7 +150,8 @@ class Page1Notebook(nb):
     page1_other_misc_area.Add(row4, spacing)
     page1_other_misc_area.Add(row5, spacing)
     # 最后一行总是会变矮~, 添加一个无用的widget, 抵消一下~
-    _dummy = btn(_page1_other_misc_area, label = '我是一个无用的按钮, 不用管我')
+    _dummy = btn(_page1_other_misc_area,
+                 label = '一个无用按钮, 如果报GTK警告, 应该是我没显示出来')
     _dummy.Disable()
     page1_other_misc_area.Add(_dummy, spacing)
 
@@ -566,14 +567,13 @@ class Page1Notebook(nb):
     _runsql_area = runsql_area.GetStaticBox()
 
     border = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
-    proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 10)
 
     row1 = BoxSizer()
     self._runsql_area_sql_query_ckbtn = cb(_runsql_area, label = 'SQL语句:')
     self._runsql_area_sql_query_entry = tc(_runsql_area)
 
     row1.Add(self._runsql_area_sql_query_ckbtn, border)
-    row1.Add(self._runsql_area_sql_query_entry, proportion_border)
+    row1.Add(self._runsql_area_sql_query_entry, proportion = 1, flag = RIGHT, border = 10)
 
     row2 = BoxSizer()
     self._runsql_area_sql_shell_ckbtn = cb(_runsql_area, label = '打开个SQL交互shell')
@@ -601,7 +601,6 @@ class Page1Notebook(nb):
     _meta_area = meta_area.GetStaticBox()
 
     border = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
-    proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 10)
 
     row1 = BoxSizer()
     self._meta_area_D_ckbtn = cb(_meta_area, label = '指定库名')
@@ -614,13 +613,13 @@ class Page1Notebook(nb):
     self._meta_area_U_entry = tc(_meta_area)
 
     row1.Add(self._meta_area_D_ckbtn, border)
-    row1.Add(self._meta_area_D_entry, proportion_border)
+    row1.Add(self._meta_area_D_entry, proportion = 1)
     row1.Add(self._meta_area_T_ckbtn, border)
-    row1.Add(self._meta_area_T_entry, proportion_border)
+    row1.Add(self._meta_area_T_entry, proportion = 1)
     row1.Add(self._meta_area_C_ckbtn, border)
-    row1.Add(self._meta_area_C_entry, proportion_border)
+    row1.Add(self._meta_area_C_entry, proportion = 1)
     row1.Add(self._meta_area_U_ckbtn, border)
-    row1.Add(self._meta_area_U_entry, proportion_border)
+    row1.Add(self._meta_area_U_entry, proportion = 1, flag = RIGHT, border = 10)
 
     row2 = BoxSizer()
     self._meta_area_X_ckbtn = cb(_meta_area, label = '排除标志符')
@@ -629,16 +628,16 @@ class Page1Notebook(nb):
     self._meta_area_pivot_entry = tc(_meta_area)
 
     row2.Add(self._meta_area_X_ckbtn, border)
-    row2.Add(self._meta_area_X_entry, border)
+    row2.Add(self._meta_area_X_entry)
     row2.Add(self._meta_area_pivot_ckbtn, border)
-    row2.Add(self._meta_area_pivot_entry, border)
+    row2.Add(self._meta_area_pivot_entry)
 
     row3 = BoxSizer()
     self._meta_area_where_ckbtn = cb(_meta_area, label = 'where子句')
     self._meta_area_where_entry = tc(_meta_area)
 
     row3.Add(self._meta_area_where_ckbtn, border)
-    row3.Add(self._meta_area_where_entry, proportion_border)
+    row3.Add(self._meta_area_where_entry, proportion = 1, flag = RIGHT, border = 10)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 6)
     meta_area.Add(row1, spacing)
@@ -650,7 +649,7 @@ class Page1Notebook(nb):
     blind_area = StaticBoxSizer(VERTICAL, panel, '盲注选项')
     _blind_area = blind_area.GetStaticBox()
 
-    border = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
     self._blind_area_first_ckbtn = cb(_blind_area, label = '首字符:')

@@ -46,7 +46,7 @@ class Handler(object):
     else:
       _cmdline_str = 'start cmd /k sqlmap %s' % _sqlmap_opts
 
-    # self.w.main_notebook.ChangeSelection(1)
+    # self.w.main_notebook.SetSelection(1)
     # print(_cmdline_str)
     Popen(_cmdline_str, shell = True)
 
@@ -121,7 +121,7 @@ class Handler(object):
       self._log_view_insert(_target_file_path)
 
   def read_dumped_file(self, event):
-    self.w.main_notebook.ChangeSelection(2)
+    self.w.main_notebook.SetSelection(2)
     m = self.w._notebook
 
     _base_dir = self._get_url_dir()

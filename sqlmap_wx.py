@@ -9,7 +9,7 @@ from widgets import wx, Panel, btn, cb, cbb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, ALIGN_CENTER
 
 from page1_notebook import Page1Notebook
-from handlers import Handler
+from handlers import Handler, IS_POSIX
 
 BoxSizer = wx.BoxSizer
 GridSizer = wx.GridSizer
@@ -25,7 +25,7 @@ class Window(wx.Frame):
     self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
 
     self.initUI()
-    # self.make_accels()  # 要先初始化完后, 才能设全局键
+    self.make_accels()  # 要先初始化完后, 才能设全局键
 
   # @profile
   def initUI(self):
@@ -68,7 +68,7 @@ class Window(wx.Frame):
       self.accel_entries.append((wx.ACCEL_ALT, ord(main_note_ks[i]), pageid))
       self.Bind(
         wx.EVT_MENU,
-        lambda evt, page = i: self.main_notebook.ChangeSelection(page),
+        lambda evt, page = i: self.main_notebook.SetSelection(page),
         id = pageid)
 
     _note_keys = ['Q', 'W', 'E', 'R', 'T']
@@ -79,7 +79,7 @@ class Window(wx.Frame):
       self.Bind(
         wx.EVT_MENU,
         lambda evt, page = i:
-          self._notebook.ChangeSelection(page)
+          self._notebook.SetSelection(page)
             if self.main_notebook.GetSelection() == 0 else evt.Skip(),
         id = pageid)
 
@@ -280,6 +280,9 @@ class Window(wx.Frame):
     https://www.jianshu.com/p/11090e197648
     https://wiki.gnome.org/Projects/PyGObject/Threading
     '''
+    byte_coding = 'utf8'
+    if not IS_POSIX:
+      byte_coding = 'gbk'
     # _manual_hh = '/home/needle/bin/output_interval.sh'
     # WIN下不能用此行
     # _manual_hh = ['/usr/bin/env', 'sqlmap', '-hh']
@@ -288,7 +291,7 @@ class Window(wx.Frame):
       _subprocess = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, bufsize=1, shell = True)
 
       for _an_bytes_line_tmp in iter(_subprocess.stdout.readline, b''):
-        wx.CallAfter(textbuffer.write, _an_bytes_line_tmp.decode('utf8'))
+        wx.CallAfter(textbuffer.write, _an_bytes_line_tmp.decode(byte_coding))
       _subprocess.stdout.close()
       _subprocess.wait()
     except FileNotFoundError as e:
