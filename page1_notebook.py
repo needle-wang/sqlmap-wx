@@ -71,7 +71,7 @@ class Page1Notebook(nb):
     page1_other_misc_area = StaticBoxSizer(VERTICAL, panel, '杂项')
     _page1_other_misc_area = page1_other_misc_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -88,7 +88,7 @@ class Page1Notebook(nb):
     row1.Add(self._page1_misc_web_root_ckbtn, border)
     row1.Add(self._page1_misc_web_root_entry, proportion_border)
     row1.Add(self._page1_misc_tmp_dir_ckbtn, border)
-    row1.Add(self._page1_misc_tmp_dir_entry, proportion = 1)
+    row1.Add(self._page1_misc_tmp_dir_entry, proportion = 1, flag = EXPAND)
     row1.Add(self._page1_misc_tmp_dir_chooser, border)
 
     row2 = BoxSizer()
@@ -149,6 +149,10 @@ class Page1Notebook(nb):
     page1_other_misc_area.Add(row3, spacing)
     page1_other_misc_area.Add(row4, spacing)
     page1_other_misc_area.Add(row5, spacing)
+    # 最后一行总是会变矮~, 添加一个无用的widget, 抵消一下~
+    _dummy = btn(_page1_other_misc_area, label = '我是一个无用的按钮, 不用管我')
+    _dummy.Disable()
+    page1_other_misc_area.Add(_dummy, spacing)
 
     return page1_other_misc_area
 
@@ -156,7 +160,7 @@ class Page1Notebook(nb):
     page1_other_general_area = StaticBoxSizer(VERTICAL, panel, '通用项')
     _page1_other_general_area = page1_other_general_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -190,7 +194,7 @@ class Page1Notebook(nb):
     row2.Add(self._page1_general_parse_errors_ckbtn, border)
     row2.Add(self._page1_misc_cleanup_ckbtn, border)
     row2.Add(self._page1_general_preprocess_ckbtn, border)
-    row2.Add(self._page1_general_preprocess_entry, proportion = 1)
+    row2.Add(self._page1_general_preprocess_entry, proportion = 1, flag = EXPAND)
     row2.Add(self._page1_general_preprocess_chooser, border)
 
     row3 = BoxSizer()
@@ -233,10 +237,10 @@ class Page1Notebook(nb):
         self._handlers.set_file_entry_text(evt, data))
 
     row5.Add(self._page1_general_session_file_ckbtn, border)
-    row5.Add(self._page1_general_session_file_entry, proportion = 1)
+    row5.Add(self._page1_general_session_file_entry, proportion = 1, flag = EXPAND)
     row5.Add(self._page1_general_session_file_chooser, border)
     row5.Add(self._page1_general_output_dir_ckbtn, border)
-    row5.Add(self._page1_general_output_dir_entry, proportion = 1)
+    row5.Add(self._page1_general_output_dir_entry, proportion = 1, flag = EXPAND)
     row5.Add(self._page1_general_output_dir_chooser, border)
 
     row6 = BoxSizer()
@@ -268,10 +272,10 @@ class Page1Notebook(nb):
         self._handlers.set_file_entry_text(evt, data))
 
     row7.Add(self._page1_general_traffic_file_ckbtn, border)
-    row7.Add(self._page1_general_traffic_file_entry, proportion = 1)
+    row7.Add(self._page1_general_traffic_file_entry, proportion = 1, flag = EXPAND)
     row7.Add(self._page1_general_traffic_file_chooser, border)
     row7.Add(self._page1_general_har_ckbtn, border)
-    row7.Add(self._page1_general_har_entry, proportion = 1)
+    row7.Add(self._page1_general_har_entry, proportion = 1, flag = EXPAND)
     row7.Add(self._page1_general_har_chooser, border)
 
     row8 = BoxSizer()
@@ -292,10 +296,10 @@ class Page1Notebook(nb):
         self._handlers.set_file_entry_text(evt, data))
 
     row8.Add(self._page1_general_save_ckbtn, border)
-    row8.Add(self._page1_general_save_entry, proportion = 1)
+    row8.Add(self._page1_general_save_entry, proportion = 1, flag = EXPAND)
     row8.Add(self._page1_general_save_chooser, border)
     row8.Add(self._page1_general_scope_ckbtn, border)
-    row8.Add(self._page1_general_scope_entry, proportion = 1)
+    row8.Add(self._page1_general_scope_entry, proportion = 1, flag = EXPAND)
     row8.Add(self._page1_general_scope_chooser, border)
 
     row9 = BoxSizer()
@@ -342,7 +346,7 @@ class Page1Notebook(nb):
     file_os_registry_area = StaticBoxSizer(VERTICAL, panel, '访问WIN下注册表')
     _file_os_registry_area = file_os_registry_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -360,9 +364,9 @@ class Page1Notebook(nb):
     self._file_os_registry_reg_value_label = st(_file_os_registry_area, label = '值')
     self._file_os_registry_reg_value_entry = tc(_file_os_registry_area)
 
-    row2.Add(self._file_os_registry_reg_key_label, border)
+    row2.Add(self._file_os_registry_reg_key_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row2.Add(self._file_os_registry_reg_key_entry, proportion_border)
-    row2.Add(self._file_os_registry_reg_value_label, border)
+    row2.Add(self._file_os_registry_reg_value_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row2.Add(self._file_os_registry_reg_value_entry, proportion_border)
 
     row3 = BoxSizer()
@@ -371,9 +375,9 @@ class Page1Notebook(nb):
     self._file_os_registry_reg_type_label = st(_file_os_registry_area, label = '类型')
     self._file_os_registry_reg_type_entry = tc(_file_os_registry_area)
 
-    row3.Add(self._file_os_registry_reg_data_label, border)
+    row3.Add(self._file_os_registry_reg_data_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row3.Add(self._file_os_registry_reg_data_entry, proportion_border)
-    row3.Add(self._file_os_registry_reg_type_label, border)
+    row3.Add(self._file_os_registry_reg_type_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row3.Add(self._file_os_registry_reg_type_entry, proportion_border)
 
     file_os_registry_area.Add(row1, flag = EXPAND)
@@ -386,7 +390,7 @@ class Page1Notebook(nb):
     file_os_access_area = StaticBoxSizer(VERTICAL, panel, '访问后端OS')
     _file_os_access_area = file_os_access_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -422,7 +426,7 @@ class Page1Notebook(nb):
     self._file_os_access_tmp_path_entry = tc(_file_os_access_area)
 
     row3.Add(self._file_os_access_msf_path_ckbtn, border)
-    row3.Add(self._file_os_access_msf_path_entry, proportion = 1)
+    row3.Add(self._file_os_access_msf_path_entry, proportion = 1, flag = EXPAND)
     row3.Add(self._file_os_access_msf_path_chooser, border)
     row3.Add(self._file_os_access_tmp_path_ckbtn, border)
     row3.Add(self._file_os_access_tmp_path_entry, proportion_border)
@@ -438,7 +442,7 @@ class Page1Notebook(nb):
     file_write_area = StaticBoxSizer(VERTICAL, panel, '文件上传')
     _file_write_area = file_write_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -453,7 +457,7 @@ class Page1Notebook(nb):
 
     row1.Add(self._file_write_area_udf_ckbtn, border)
     row1.Add(self._file_write_area_shared_lib_ckbtn, border)
-    row1.Add(self._file_write_area_shared_lib_entry, proportion = 1)
+    row1.Add(self._file_write_area_shared_lib_entry, proportion = 1, flag = EXPAND)
     row1.Add(self._file_write_area_shared_lib_chooser, border)
 
     row2 = BoxSizer()
@@ -466,7 +470,7 @@ class Page1Notebook(nb):
         self._handlers.set_file_entry_text(evt, data))
 
     row2.Add(self._file_write_area_file_write_ckbtn, border)
-    row2.Add(self._file_write_area_file_write_entry, proportion = 1)
+    row2.Add(self._file_write_area_file_write_entry, proportion = 1, flag = EXPAND)
     row2.Add(self._file_write_area_file_write_chooser, border)
 
     row3 = BoxSizer()
@@ -487,7 +491,7 @@ class Page1Notebook(nb):
     file_read_area = StaticBoxSizer(VERTICAL, panel, '读取远程文件')
     _file_read_area = file_read_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
     self._file_read_area_file_read_ckbtn = cb(_file_read_area, label = '远程文件路径(--file-read=)')
@@ -543,13 +547,13 @@ class Page1Notebook(nb):
     brute_force_area = StaticBoxSizer(VERTICAL, panel, '暴破表名/列名')
     _brute_force_area = brute_force_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 6)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 6)
 
     row1 = BoxSizer()
     self._brute_force_area_common_tables_ckbtn = cb(_brute_force_area, label = '常用表名')
     self._brute_force_area_common_columns_ckbtn = cb(_brute_force_area, label = '常用列名')
 
-    row1.Add(st(_brute_force_area, label = '检查是否存在:'), border)
+    row1.Add(st(_brute_force_area, label = '检查是否存在:'), flag = wx.ALIGN_CENTER | LEFT, border = 6)
     row1.Add(self._brute_force_area_common_tables_ckbtn, border)
     row1.Add(self._brute_force_area_common_columns_ckbtn, border)
 
@@ -561,7 +565,7 @@ class Page1Notebook(nb):
     runsql_area = StaticBoxSizer(VERTICAL, panel, '执行SQL语句')
     _runsql_area = runsql_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 10)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 10)
 
     row1 = BoxSizer()
@@ -583,7 +587,7 @@ class Page1Notebook(nb):
 
     row2.Add(self._runsql_area_sql_shell_ckbtn, border)
     row2.Add(self._runsql_area_sql_file_ckbtn, border)
-    row2.Add(self._runsql_area_sql_file_entry, proportion = 1)
+    row2.Add(self._runsql_area_sql_file_entry, proportion = 1, flag = EXPAND)
     row2.Add(self._runsql_area_sql_file_chooser, border)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 6)
@@ -596,7 +600,7 @@ class Page1Notebook(nb):
     meta_area = StaticBoxSizer(VERTICAL, panel, '数据库名, 表名, 列名...')
     _meta_area = meta_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 10)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 10)
 
     row1 = BoxSizer()
@@ -646,7 +650,7 @@ class Page1Notebook(nb):
     blind_area = StaticBoxSizer(VERTICAL, panel, '盲注选项')
     _blind_area = blind_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 10)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
 
     row1 = BoxSizer()
     self._blind_area_first_ckbtn = cb(_blind_area, label = '首字符:')
@@ -672,7 +676,7 @@ class Page1Notebook(nb):
     limit_area = StaticBoxSizer(VERTICAL, panel, 'limit(dump时的限制)')
     _limit_area = limit_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
     self._limit_area_start_ckbtn = cb(_limit_area, label = '始于第')
@@ -680,14 +684,14 @@ class Page1Notebook(nb):
 
     row1.Add(self._limit_area_start_ckbtn, border)
     row1.Add(self._limit_area_start_entry)
-    row1.Add(st(_limit_area, label = '条'), border)
+    row1.Add(st(_limit_area, label = '条'), flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
     row2 = BoxSizer()
     self._limit_area_stop_ckbtn = cb(_limit_area, label = '止于第')
     self._limit_area_stop_entry = tc(_limit_area)
     row2.Add(self._limit_area_stop_ckbtn, border)
     row2.Add(self._limit_area_stop_entry)
-    row2.Add(st(_limit_area, label = '条'), border)
+    row2.Add(st(_limit_area, label = '条'), flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 10)
     limit_area.Add(row1, spacing)
@@ -763,7 +767,7 @@ class Page1Notebook(nb):
     request_proxy_area = StaticBoxSizer(VERTICAL, panel, '隐匿/代理')
     _request_proxy_area = request_proxy_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -790,7 +794,7 @@ class Page1Notebook(nb):
     self._request_area_safe_freq_entry = tc(_request_proxy_area)
 
     row2.Add(self._request_area_safe_req_ckbtn, border)
-    row2.Add(self._request_area_safe_req_entry, proportion = 1)
+    row2.Add(self._request_area_safe_req_entry, proportion = 1, flag = EXPAND)
     row2.Add(self._request_area_safe_req_chooser, border)
     row2.Add(self._request_area_safe_freq_ckbtn, border)
     row2.Add(self._request_area_safe_freq_entry, border)
@@ -809,7 +813,7 @@ class Page1Notebook(nb):
     row3.Add(self._request_area_ignore_proxy_ckbtn, border)
     row3.Add(self._request_area_proxy_ckbtn, border)
     row3.Add(self._request_area_proxy_file_ckbtn, border)
-    row3.Add(self._request_area_proxy_file_entry, proportion = 1)
+    row3.Add(self._request_area_proxy_file_entry, proportion = 1, flag = EXPAND)
     row3.Add(self._request_area_proxy_file_chooser, border)
 
     row4 = BoxSizer()
@@ -860,7 +864,7 @@ class Page1Notebook(nb):
     request_custom_area = StaticBoxSizer(VERTICAL, panel, 'request定制')
     _request_custom_area = request_custom_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -919,7 +923,7 @@ class Page1Notebook(nb):
     request_data_area = StaticBoxSizer(VERTICAL, panel, 'HTTP data')
     _request_data_area = request_data_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -963,7 +967,7 @@ class Page1Notebook(nb):
     self._request_area_drop_set_cookie_ckbtn = cb(_request_data_area, label = '丢弃Set-Cookie头')
 
     row4.Add(self._request_area_load_cookies_ckbtn, border)
-    row4.Add(self._request_area_load_cookies_entry, proportion = 1)
+    row4.Add(self._request_area_load_cookies_entry, proportion = 1, flag = EXPAND)
     row4.Add(self._request_area_load_cookies_chooser, border)
     row4.Add(self._request_area_drop_set_cookie_ckbtn, border)
 
@@ -985,7 +989,7 @@ class Page1Notebook(nb):
     row5.Add(self._request_area_auth_cred_ckbtn, border)
     row5.Add(self._request_area_auth_cred_entry, proportion_border)
     row5.Add(self._request_area_auth_file_ckbtn, border)
-    row5.Add(self._request_area_auth_file_entry, proportion = 1)
+    row5.Add(self._request_area_auth_file_entry, proportion = 1, flag = EXPAND)
     row5.Add(self._request_area_auth_file_chooser, border)
 
     row6 = BoxSizer()
@@ -1015,7 +1019,7 @@ class Page1Notebook(nb):
     request_header_area = StaticBoxSizer(VERTICAL, panel, 'HTTP header')
     _request_header_area = request_header_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -1099,7 +1103,7 @@ class Page1Notebook(nb):
                                           maxValue = 6,
                                           style = wx.SL_VALUE_LABEL)
 
-    row1.Add(self._general_area_verbose_ckbtn)
+    row1.Add(self._general_area_verbose_ckbtn, flag = EXPAND)
     row1.Add(self._general_area_verbose_scale, proportion = 1)
 
     self._general_area_finger_ckbtn = cb(_general_area, label = '执行宽泛的DB版本检测')
@@ -1126,7 +1130,7 @@ class Page1Notebook(nb):
     self._optimize_area_thread_num_ckbtn = cb(_optimize_area, label = '使用线程数:')
     self._optimize_area_thread_num_spinbtn = sp(_optimize_area, value = '2', min = 2, max = 10000)
 
-    row2.Add(self._optimize_area_thread_num_ckbtn)
+    row2.Add(self._optimize_area_thread_num_ckbtn, flag = EXPAND)
     row2.Add(self._optimize_area_thread_num_spinbtn, proportion = 1, flag = RIGHT, border = 10)
 
     self._optimize_area_predict_ckbtn = cb(_optimize_area, label = '预测通常的查询结果')
@@ -1157,40 +1161,39 @@ class Page1Notebook(nb):
     tech_area = StaticBoxSizer(VERTICAL, panel, '各注入技术的选项')
     _tech_area = tech_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
-    expand_border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
 
     grid = GridSizer(5, 2, 6, 0)
     self._tech_area_tech_ckbtn = cb(_tech_area, label = '注入技术')
     self._tech_area_tech_entry = tc(_tech_area)
 
-    grid.Add(self._tech_area_tech_ckbtn, expand_border)
-    grid.Add(self._tech_area_tech_entry, expand_border)
+    grid.Add(self._tech_area_tech_ckbtn, border)
+    grid.Add(self._tech_area_tech_entry, border)
 
     self._tech_area_time_sec_ckbtn = cb(_tech_area, label = '指定DB延迟多少秒响应')
     self._tech_area_time_sec_entry = tc(_tech_area)
 
-    grid.Add(self._tech_area_time_sec_ckbtn, expand_border)
-    grid.Add(self._tech_area_time_sec_entry, expand_border)
+    grid.Add(self._tech_area_time_sec_ckbtn, border)
+    grid.Add(self._tech_area_time_sec_entry, border)
 
     self._tech_area_union_col_ckbtn = cb(_tech_area, label = '指定最大union列数')
     self._tech_area_union_col_entry = tc(_tech_area)
 
-    grid.Add(self._tech_area_union_col_ckbtn, expand_border)
-    grid.Add(self._tech_area_union_col_entry, expand_border)
+    grid.Add(self._tech_area_union_col_ckbtn, border)
+    grid.Add(self._tech_area_union_col_entry, border)
 
     self._tech_area_union_chr_ckbtn = cb(_tech_area, label = '指定枚举列数时所用字符')
     self._tech_area_union_chr_entry = tc(_tech_area)
 
-    grid.Add(self._tech_area_union_chr_ckbtn, expand_border)
-    grid.Add(self._tech_area_union_chr_entry, expand_border)
+    grid.Add(self._tech_area_union_chr_ckbtn, border)
+    grid.Add(self._tech_area_union_chr_entry, border)
 
     self._tech_area_union_from_ckbtn = cb(_tech_area, label = '指定枚举列数时from的表名')
     self._tech_area_union_from_entry = tc(_tech_area)
 
-    grid.Add(self._tech_area_union_from_ckbtn, expand_border)
-    grid.Add(self._tech_area_union_from_entry, expand_border)
+    grid.Add(self._tech_area_union_from_ckbtn, border)
+    grid.Add(self._tech_area_union_from_entry, border)
 
     row6 = BoxSizer()
     self._tech_area_dns_ckbtn = cb(_tech_area, label = '指定DNS')
@@ -1219,7 +1222,7 @@ class Page1Notebook(nb):
       lambda evt, data = [self._tech_area_second_req_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    row9.Add(self._tech_area_second_req_entry, proportion_border)
+    row9.Add(self._tech_area_second_req_entry, proportion = 1, flag = EXPAND | LEFT, border = 5)
     row9.Add(self._tech_area_second_req_chooser, border)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 3)
@@ -1235,7 +1238,7 @@ class Page1Notebook(nb):
     detection_area = StaticBoxSizer(VERTICAL, panel, '探测选项')
     _detection_area = detection_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
     row1 = BoxSizer()
@@ -1310,7 +1313,7 @@ class Page1Notebook(nb):
     inject_area = StaticBoxSizer(VERTICAL, panel, '注入选项')
     _inject_area = inject_area.GetStaticBox()
 
-    border = SizerFlags().Border(LEFT | RIGHT, 6)
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 6)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 6)
 
     row1 = BoxSizer()
@@ -1366,23 +1369,21 @@ class Page1Notebook(nb):
     row9.Add(self._inject_area_os_ckbtn, border)
     row9.Add(self._inject_area_os_entry, proportion_border)
 
-    row10 = BoxSizer()
+    grid = GridSizer(3, 2, 0, 0)
     self._inject_area_no_cast_ckbtn = cb(_inject_area, label = '关掉payload变形机制')
     self._inject_area_no_escape_ckbtn = cb(_inject_area, label = '关掉string转义')
-    row10.Add(self._inject_area_no_cast_ckbtn, border)
-    row10.Add(self._inject_area_no_escape_ckbtn, border)    # 需要右对齐
+    grid.Add(self._inject_area_no_cast_ckbtn)
+    grid.Add(self._inject_area_no_escape_ckbtn, flag = LEFT, border = 20)
 
-    row11 = BoxSizer()
     _invalid_label = st(_inject_area, label = '对payload中的废值:')
     self._inject_area_invalid_logic_ckbtn = cb(_inject_area, label = '使用逻辑运算符')
-    row11.Add(_invalid_label, border)
-    row11.Add(self._inject_area_invalid_logic_ckbtn, border)
+    grid.Add(_invalid_label, flag = wx.ALIGN_CENTER)
+    grid.Add(self._inject_area_invalid_logic_ckbtn, flag = LEFT, border = 20)
 
-    row12 = BoxSizer()
     self._inject_area_invalid_bignum_ckbtn = cb(_inject_area, label = '使用大数')
     self._inject_area_invalid_str_ckbtn = cb(_inject_area, label = '使用随机字符串')
-    row12.Add(self._inject_area_invalid_bignum_ckbtn, border)
-    row12.Add(self._inject_area_invalid_str_ckbtn, border)
+    grid.Add(self._inject_area_invalid_bignum_ckbtn, flag = ALIGN_RIGHT)
+    grid.Add(self._inject_area_invalid_str_ckbtn, flag = LEFT, border = 20)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 3)
     inject_area.Add(row1, spacing)
@@ -1394,11 +1395,9 @@ class Page1Notebook(nb):
     inject_area.Add(row7, spacing)
     inject_area.Add(row8, spacing)
     inject_area.Add(row9, spacing)
-    inject_area.Add(row10, spacing)
-    inject_area.Add(row11, flag = ALIGN_RIGHT | TOP | BOTTOM, border = 3)
-    inject_area.Add(row12, flag = ALIGN_RIGHT | TOP | BOTTOM, border = 3)
+    inject_area.Add(grid, flag = EXPAND | LEFT, border = 6)
 
-    return inject_area  # 一定要返回StaticBoxSizer, 不然会段错!
+    return inject_area  # 一定要返回Sizer(StaticBoxSizer), 不然会段错误!
 
 
 def main():

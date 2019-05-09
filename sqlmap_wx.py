@@ -2,7 +2,7 @@
 #
 # 2019年 05月 05日 星期日 14:50:15 CST
 
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 
 from widgets import wx, Panel, btn, cb, cbb, nb, st, tc
@@ -113,7 +113,7 @@ class Window(wx.Frame):
     # gtk3下的正确的高度!
     # self.a = nb(self, size = (400, 68))
     # b = tc(a, size = (-1, 36))
-    self._target_notebook = nb(self, size = (-1, 68))
+    self._target_notebook = nb(self)
 
     self._url_combobox = cbb(self._target_notebook, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
 
@@ -126,9 +126,9 @@ class Window(wx.Frame):
       lambda evt, data = [self._burp_logfile]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox2.Add(self._burp_logfile, proportion = 1)
-    hbox2.Add(self._burp_logfile_chooser)
-    p2.SetSizerAndFit(hbox2)
+    hbox2.Add(self._burp_logfile, proportion = 1, flag = EXPAND)
+    hbox2.Add(self._burp_logfile_chooser, flag = EXPAND)
+    p2.SetSizer(hbox2)
 
     p3 = Panel(self._target_notebook)
     hbox3 = BoxSizer()
@@ -139,9 +139,9 @@ class Window(wx.Frame):
       lambda evt, data = [self._request_file]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox3.Add(self._request_file, proportion = 1)
-    hbox3.Add(self._request_file_chooser)
-    p3.SetSizerAndFit(hbox3)
+    hbox3.Add(self._request_file, proportion = 1, flag = EXPAND)
+    hbox3.Add(self._request_file_chooser, flag = EXPAND)
+    p3.SetSizer(hbox3)
 
     p4 = Panel(self._target_notebook)
     hbox4 = BoxSizer()
@@ -152,9 +152,9 @@ class Window(wx.Frame):
       lambda evt, data = [self._bulkfile]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox4.Add(self._bulkfile, proportion = 1)
-    hbox4.Add(self._bulkfile_chooser)
-    p4.SetSizerAndFit(hbox4)
+    hbox4.Add(self._bulkfile, proportion = 1, flag = EXPAND)
+    hbox4.Add(self._bulkfile_chooser, flag = EXPAND)
+    p4.SetSizer(hbox4)
 
     p5 = Panel(self._target_notebook)
     hbox5 = BoxSizer()
@@ -165,8 +165,8 @@ class Window(wx.Frame):
       lambda evt, data = [self._configfile]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox5.Add(self._configfile, proportion = 1)
-    hbox5.Add(self._configfile_chooser)
+    hbox5.Add(self._configfile, proportion = 1, flag = EXPAND)
+    hbox5.Add(self._configfile_chooser, flag = EXPAND)
     p5.SetSizerAndFit(hbox5)
 
     self._sitemap_url = tc(self._target_notebook)
@@ -285,7 +285,7 @@ class Window(wx.Frame):
     # _manual_hh = ['/usr/bin/env', 'sqlmap', '-hh']
     _manual_hh = 'echo y|sqlmap -hh'
     try:
-      _subprocess = Popen(_manual_hh, stdout=PIPE, bufsize=1, shell = True)
+      _subprocess = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, bufsize=1, shell = True)
 
       for _an_bytes_line_tmp in iter(_subprocess.stdout.readline, b''):
         wx.CallAfter(textbuffer.write, _an_bytes_line_tmp.decode('utf8'))
