@@ -5,7 +5,7 @@
 from subprocess import Popen, PIPE
 from threading import Thread
 
-from widgets import TextCtrl, wx, Panel, btn, cb, cbb, nb, st, tc
+from widgets import wx, Panel, btn, cb, cbb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, ALIGN_CENTER
 
 from page1_notebook import Page1Notebook
@@ -188,7 +188,7 @@ class Window(wx.Frame):
     cmd_area = StaticBoxSizer(VERTICAL, p, 'A.收集选项 的结果显示在这:')
     _cmd_area = cmd_area.GetStaticBox()
 
-    self._cmd_entry = TextCtrl(_cmd_area)
+    self._cmd_entry = tc(_cmd_area)
 
     cmd_area.Add(self._cmd_entry, flag = EXPAND)
 

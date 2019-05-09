@@ -331,11 +331,11 @@ class Page1Notebook(nb):
     file_os_access_area = self.build_page1_file_os_access(p)
     file_os_registry_area = self.build_page1_file_os_registry(p)
 
-    vbox.Add(file_read_area, flag = EXPAND | ALL, border = 15)
-    vbox.Add(file_write_area, flag = EXPAND | ALL, border = 15)
-    vbox.Add(file_os_access_area, flag = EXPAND | ALL, border = 15)
-    vbox.Add(file_os_registry_area, flag = EXPAND | ALL, border = 15)
-    p.SetSizerAndFit(vbox)
+    vbox.Add(file_read_area, flag = EXPAND | ALL, border = 10)
+    vbox.Add(file_write_area, flag = EXPAND | ALL, border = 10)
+    vbox.Add(file_os_access_area, flag = EXPAND | ALL, border = 10)
+    vbox.Add(file_os_registry_area, flag = EXPAND | ALL, border = 10)
+    p.SetSizer(vbox)
     return p
 
   def build_page1_file_os_registry(self, panel):
@@ -513,7 +513,7 @@ class Page1Notebook(nb):
     limit_area = self.build_page1_enumeration_limit(p)
     blind_area = self.build_page1_enumeration_blind(p)
 
-    spacing = SizerFlags().Expand().Border(ALL, 15)
+    spacing = SizerFlags().Expand().Border(ALL, 10)
     hbox1.Add(enum_area, spacing)
     hbox1.Add(dump_area, spacing)
     hbox1.Add(limit_area, spacing)
@@ -521,22 +521,22 @@ class Page1Notebook(nb):
 
     hbox2 = BoxSizer()
     meta_area = self.build_page1_enumeration_meta(p)
-    hbox2.Add(meta_area, proportion = 1, flag = ALL, border = 15)
+    hbox2.Add(meta_area, proportion = 1, flag = ALL, border = 10)
 
     hbox3 = BoxSizer()
     runsql_area = self.build_page1_enumeration_runsql(p)
-    hbox3.Add(runsql_area, proportion = 1, flag = ALL, border = 15)
+    hbox3.Add(runsql_area, proportion = 1, flag = ALL, border = 10)
 
     hbox4 = BoxSizer()
     brute_force_area = self.build_page1_enumeration_brute_force(p)
-    hbox4.Add(brute_force_area, flag = ALL, border = 15)
+    hbox4.Add(brute_force_area, flag = ALL, border = 10)
 
     vbox = BoxSizer(VERTICAL)
     vbox.Add(hbox1)
     vbox.Add(hbox2, flag = EXPAND)
     vbox.Add(hbox3, flag = EXPAND)
     vbox.Add(hbox4)
-    p.SetSizerAndFit(vbox)
+    p.SetSizer(vbox)
     return p
 
   def build_page1_enumeration_brute_force(self, panel):
@@ -1410,7 +1410,7 @@ def main():
   n = Page1Notebook(win, Handler(win))
 
   box = BoxSizer()
-  box.Add(n, proportion = 1)
+  box.Add(n, proportion = 1, flag = EXPAND | BOTTOM, border = 5)
   win.SetSizerAndFit(box)
 
   win.Centre()

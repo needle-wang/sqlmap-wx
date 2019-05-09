@@ -2,14 +2,24 @@
 # encoding: utf-8
 #
 # 2019年 05月 05日 星期日 21:09:49 CST
-
 import wx
+import wx.lib.agw.flatnotebook as FNB
+
+
+class Notebook(FNB.FlatNotebook):
+  def __init__(self, *args, **kwargs):
+    _bookStyle = FNB.FNB_NO_X_BUTTON | FNB.FNB_NO_NAV_BUTTONS | FNB.FNB_NODRAG | FNB.FNB_RIBBON_TABS
+    super().__init__(*args, agwStyle = _bookStyle, **kwargs)
+
+
+nb = Notebook
+# nb = wx.Notebook  # 很糟糕的实现, 不要用!
 Panel = wx.Panel
+
 btn = wx.Button
 cb = wx.CheckBox
 cbb = wx.ComboBox
 ci = wx.Choice
-nb = wx.Notebook
 sl = wx.Slider
 sp = wx.SpinCtrl
 st = wx.StaticText
