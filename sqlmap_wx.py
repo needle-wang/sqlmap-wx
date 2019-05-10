@@ -6,7 +6,7 @@ from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 
 from widgets import wx, Panel, btn, cb, cbb, nb, st, tc
-from widgets import VERTICAL, EXPAND, ALL, ALIGN_CENTER
+from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
 
 from page1_notebook import Page1Notebook
 from handlers import Handler, IS_POSIX
@@ -289,12 +289,21 @@ class Window(wx.Frame):
   def build_page5(self, parent):
     p = Panel(parent)
     vbox = BoxSizer(VERTICAL)
+
+    self._get_sqlmap_path_btn = btn(p, label = '获取帮助')
     # 多行文本框的默认size太小了
-    # 默认高度太低, 不指定个高度, 会报 滚动条相关的size 警告
+    # 默认高度太低, 不指定个高度, gtk会报 滚动条相关的size 警告
     self._page5_manual_view = tc(p,
                                  size = (-1, 300),
                                  style = wx.TE_MULTILINE | wx.TE_READONLY)
-    vbox.Add(self._page5_manual_view, proportion = 1, flag = EXPAND | ALL, border = 10)
+
+    self._get_sqlmap_path_btn.Bind(
+      EVT_BUTTON,
+      lambda evt, view = self._page5_manual_view:
+        self._set_manual_view(view))
+
+    vbox.Add(self._get_sqlmap_path_btn, flag = TOP | LEFT | BOTTOM, border = 10)
+    vbox.Add(self._page5_manual_view, proportion = 1, flag = EXPAND | LEFT | RIGHT, border = 10)
 
     # 使用线程 填充 帮助标签, 加快启动速度
     t = Thread(target = self._set_manual_view,
@@ -311,13 +320,17 @@ class Window(wx.Frame):
     https://www.jianshu.com/p/11090e197648
     https://wiki.gnome.org/Projects/PyGObject/Threading
     '''
+    textbuffer.SetValue('')
+    sqlmap_path = 'sqlmap'
+    _path = self._notebook.sqlmap_path_entry.GetValue().strip()
+    if _path:
+      sqlmap_path = _path
+
     byte_coding = 'utf8'
     if not IS_POSIX:
       byte_coding = 'gbk'
-    # _manual_hh = '/home/needle/bin/output_interval.sh'
-    # WIN下不能用此行
-    # _manual_hh = ['/usr/bin/env', 'sqlmap', '-hh']
-    _manual_hh = 'echo y|sqlmap -hh'
+    # win下的sqlmap -hh有Enter阻塞
+    _manual_hh = 'echo y|%s -hh' % sqlmap_path
     try:
       _subprocess = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, bufsize=1, shell = True)
 

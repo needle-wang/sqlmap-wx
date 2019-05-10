@@ -5,7 +5,7 @@
 from wx.lib.scrolledpanel import ScrolledPanel
 
 from widgets import wx, Panel, btn, cb, cbb, ci, nb, sl, sp, st, tc
-from widgets import HORIZONTAL, VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_RIGHT
+from widgets import HORIZONTAL, VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER, ALIGN_RIGHT
 
 BoxSizer = wx.BoxSizer
 GridSizer = wx.GridSizer
@@ -371,9 +371,9 @@ class Page1Notebook(nb):
     self._file_os_registry_reg_value_label = st(_file_os_registry_area, label = '值')
     self._file_os_registry_reg_value_entry = tc(_file_os_registry_area)
 
-    row2.Add(self._file_os_registry_reg_key_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row2.Add(self._file_os_registry_reg_key_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row2.Add(self._file_os_registry_reg_key_entry, proportion_border)
-    row2.Add(self._file_os_registry_reg_value_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row2.Add(self._file_os_registry_reg_value_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row2.Add(self._file_os_registry_reg_value_entry, proportion_border)
 
     row3 = BoxSizer()
@@ -382,9 +382,9 @@ class Page1Notebook(nb):
     self._file_os_registry_reg_type_label = st(_file_os_registry_area, label = '类型')
     self._file_os_registry_reg_type_entry = tc(_file_os_registry_area)
 
-    row3.Add(self._file_os_registry_reg_data_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row3.Add(self._file_os_registry_reg_data_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row3.Add(self._file_os_registry_reg_data_entry, proportion_border)
-    row3.Add(self._file_os_registry_reg_type_label, flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row3.Add(self._file_os_registry_reg_type_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row3.Add(self._file_os_registry_reg_type_entry, proportion_border)
 
     file_os_registry_area.Add(row1, flag = EXPAND)
@@ -560,7 +560,7 @@ class Page1Notebook(nb):
     self._brute_force_area_common_tables_ckbtn = cb(_brute_force_area, label = '常用表名')
     self._brute_force_area_common_columns_ckbtn = cb(_brute_force_area, label = '常用列名')
 
-    row1.Add(st(_brute_force_area, label = '检查是否存在:'), flag = wx.ALIGN_CENTER | LEFT, border = 6)
+    row1.Add(st(_brute_force_area, label = '检查是否存在:'), flag = ALIGN_CENTER | LEFT, border = 6)
     row1.Add(self._brute_force_area_common_tables_ckbtn, border)
     row1.Add(self._brute_force_area_common_columns_ckbtn, border)
 
@@ -689,14 +689,14 @@ class Page1Notebook(nb):
 
     row1.Add(self._limit_area_start_ckbtn, border)
     row1.Add(self._limit_area_start_entry)
-    row1.Add(st(_limit_area, label = '条'), flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row1.Add(st(_limit_area, label = '条'), flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
     row2 = BoxSizer()
     self._limit_area_stop_ckbtn = cb(_limit_area, label = '止于第')
     self._limit_area_stop_entry = tc(_limit_area)
     row2.Add(self._limit_area_stop_ckbtn, border)
     row2.Add(self._limit_area_stop_entry)
-    row2.Add(st(_limit_area, label = '条'), flag = wx.ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row2.Add(st(_limit_area, label = '条'), flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 10)
     limit_area.Add(row1, spacing)
@@ -1071,6 +1071,21 @@ class Page1Notebook(nb):
 
     spacing = SizerFlags().Expand().Border(ALL, 5)
 
+    hbox0 = BoxSizer()
+    _sqlmap_path_label = st(p, label = '指定sqlmap路径:')
+
+    self.sqlmap_path_entry = tc(p)
+    self.sqlmap_path_entry.SetValue('sqlmap')
+    self._sqlmap_path_chooser = btn(p, label = '打开')
+    self._sqlmap_path_chooser.Bind(
+      EVT_BUTTON,
+      lambda evt, data = [self.sqlmap_path_entry]:
+        self._handlers.set_file_entry_text(evt, data))
+
+    hbox0.Add(_sqlmap_path_label, flag = ALIGN_CENTER)
+    hbox0.Add(self.sqlmap_path_entry, proportion = 1, flag = EXPAND)
+    hbox0.Add(self._sqlmap_path_chooser, flag = EXPAND | RIGHT, border = 25)
+
     hbox1 = BoxSizer()
     # win下 探测选项staticbox不能用proportion = 1, 最大化时会让右侧的staticbox消失
     # hbox1_grid为了win写的兼容sizer, 怎么感觉在写html?
@@ -1096,6 +1111,7 @@ class Page1Notebook(nb):
     hbox2.Add(general_area, spacing)
 
     vbox = BoxSizer(VERTICAL)
+    vbox.Add(hbox0, flag = EXPAND | LEFT | RIGHT, border = 5)
     vbox.Add(hbox1, flag = EXPAND | RIGHT, border = 20)  # 20: win下的滚动条不致于掩盖末端内容~~
     vbox.Add(hbox2)
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条

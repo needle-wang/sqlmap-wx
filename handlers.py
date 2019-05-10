@@ -38,15 +38,19 @@ class Handler(object):
     # print(_final_line)
     if _final_line is not None:
       self.w._cmd_entry.SetValue(_final_line.strip())
-      self.w._cmd_entry.SetFocus()
+      self.w._notebook.SetFocus()
 
   def run_cmdline(self, event):
-    self.w._cmd_entry.SetFocus()
+    self.w._notebook.SetFocus()
+    sqlmap_path = 'sqlmap'
+    _path = self.w._notebook.sqlmap_path_entry.GetValue().strip()
+    if _path:
+      sqlmap_path = _path
     _sqlmap_opts = self.w._cmd_entry.GetValue().strip()
     if IS_POSIX:
-      _cmdline_str = '/usr/bin/env xterm -hold -e sqlmap %s' % _sqlmap_opts
+      _cmdline_str = '/usr/bin/env xterm -hold -e %s %s' % (sqlmap_path, _sqlmap_opts)
     else:
-      _cmdline_str = 'start cmd /k sqlmap %s' % _sqlmap_opts
+      _cmdline_str = 'start cmd /k %s %s' % (sqlmap_path, _sqlmap_opts)
 
     # self.w.main_notebook.SetSelection(1)
     # print(_cmdline_str)
