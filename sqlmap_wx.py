@@ -123,16 +123,21 @@ class Window(wx.Frame):
         if isinstance(_tmp_entry, tc):
           _tmp_entry.SetValue('')
 
+    m.SetFocus()
+
   def unselect_all_ckbtn(self, event):
     m = self._notebook
     for _i in dir(m):
       if _i.endswith('ckbtn'):
         _tmp_ckbtn = getattr(m, _i)
-        if isinstance(_tmp_ckbtn, cb):
+        if isinstance(_tmp_ckbtn, cb) and _tmp_ckbtn.IsChecked():
           _tmp_ckbtn.SetValue(False)
     for _i in m._enum_area_opts_ckbtns:
       for _j in _i:
-        _j.SetValue(False)
+        if _j.IsChecked():
+          _j.SetValue(False)
+
+    m.SetFocus()
 
   def onExit(self, event):
     # https://stackoverflow.com/questions/49454737/how-can-i-exit-out-of-a-wxpython-application-cleanly

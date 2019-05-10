@@ -39,6 +39,11 @@ class Page1Notebook(nb):
     self.AddPage(page1_file, '文件(R)')
     self.AddPage(page1_other, '其他(T)')
 
+  def cb_single(self, event, checkbox):
+    cb = event.GetEventObject()
+    if cb.IsChecked():
+      checkbox.SetValue(False)
+
   def optimize_area_controller(self, event):
     if self._optimize_area_turn_all_ckbtn.IsChecked():
       self._optimize_area_predict_ckbtn.SetValue(False)
@@ -1024,6 +1029,7 @@ class Page1Notebook(nb):
 
     row1 = BoxSizer()
     self._request_area_random_agent_ckbtn = cb(_request_header_area, label = '随机User-Agent头')
+    self._request_area_random_agent_ckbtn.SetValue(True)
     self._request_area_user_agent_ckbtn = cb(_request_header_area, label = '指定User-Agent头')
     self._request_area_user_agent_entry = tc(_request_header_area)
 
@@ -1300,6 +1306,14 @@ class Page1Notebook(nb):
     row7 = GridSizer(1, 2, 0, 0)
     self._detection_area_text_only_ckbtn = cb(_detection_area, label = '仅对比文本')
     self._detection_area_titles_ckbtn = cb(_detection_area, label = '仅对比title')
+    self._detection_area_text_only_ckbtn.Bind(
+      wx.EVT_CHECKBOX,
+      lambda evt, cbtmp = self._detection_area_titles_ckbtn:
+        self.cb_single(evt, cbtmp))
+    self._detection_area_titles_ckbtn.Bind(
+      wx.EVT_CHECKBOX,
+      lambda evt, cbtmp = self._detection_area_text_only_ckbtn:
+        self.cb_single(evt, cbtmp))
 
     row7.Add(self._detection_area_text_only_ckbtn, border)
     row7.Add(self._detection_area_titles_ckbtn, border)
@@ -1331,6 +1345,7 @@ class Page1Notebook(nb):
 
     row2 = BoxSizer()
     self._inject_area_skip_static_ckbtn = cb(_inject_area, label = '跳过无动态特性的参数')
+    self._inject_area_skip_static_ckbtn.SetValue(True)
     row2.Add(self._inject_area_skip_static_ckbtn, border)
 
     row3 = BoxSizer()

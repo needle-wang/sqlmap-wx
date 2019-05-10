@@ -38,8 +38,10 @@ class Handler(object):
     # print(_final_line)
     if _final_line is not None:
       self.w._cmd_entry.SetValue(_final_line.strip())
+      self.w._cmd_entry.SetFocus()
 
   def run_cmdline(self, event):
+    self.w._cmd_entry.SetFocus()
     _sqlmap_opts = self.w._cmd_entry.GetValue().strip()
     if IS_POSIX:
       _cmdline_str = '/usr/bin/env xterm -hold -e sqlmap %s' % _sqlmap_opts
