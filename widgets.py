@@ -8,8 +8,11 @@ import wx.lib.agw.flatnotebook as FNB
 
 class Notebook(FNB.FlatNotebook):
   def __init__(self, *args, **kwargs):
-    _bookStyle = FNB.FNB_NO_X_BUTTON | FNB.FNB_NO_NAV_BUTTONS | FNB.FNB_NODRAG | FNB.FNB_RIBBON_TABS
+    # become the old wx.Notebook style
+    _bookStyle = FNB.FNB_NO_X_BUTTON | FNB.FNB_NO_NAV_BUTTONS | FNB.FNB_NODRAG
+    _bookStyle |= FNB.FNB_RIBBON_TABS   # 使用ribbon主题风格
     super().__init__(*args, agwStyle = _bookStyle, **kwargs)
+    self.SetBackgroundColour(wx.WHITE)
 
 
 nb = Notebook

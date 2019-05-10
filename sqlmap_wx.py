@@ -21,18 +21,21 @@ EVT_BUTTON = wx.EVT_BUTTON
 
 class Window(wx.Frame):
   def __init__(self, parent):
-    super().__init__(parent, title = 'sqlmap-wx', size = (300, 400))
+    super().__init__(parent, title = 'sqlmap-wx')
     self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
 
     self.initUI()
-    self.make_accels()  # 要先初始化完后, 才能设全局键
+    # self.make_accelerators()  # 要先初始化完后, 才能设全局键
 
   # @profile
   def initUI(self):
+    p = Panel(self)
     vbox = BoxSizer(VERTICAL)
-    self.build_page_target()
 
-    self.main_notebook = nb(self)
+    self._target_notebook = nb(p)
+    self.build_target_notebook(self._target_notebook)
+
+    self.main_notebook = nb(p)
     page1 = self.build_page1(self.main_notebook)
     page2 = self.build_page2(self.main_notebook)
     page3 = self.build_page3(self.main_notebook)
@@ -40,19 +43,23 @@ class Window(wx.Frame):
     page5 = self.build_page5(self.main_notebook)
     page6 = self.build_page6(self.main_notebook)
 
-    self.main_notebook.AddPage(page1, '选项区(&1)')
-    self.main_notebook.AddPage(page2, '输出区(&2)')
-    self.main_notebook.AddPage(page3, '日志区(&3)')
-    self.main_notebook.AddPage(page4, 'API区(&4)')
-    self.main_notebook.AddPage(page5, '帮助(&H)')
+    self.main_notebook.AddPage(page1, '选项区(1)')
+    self.main_notebook.AddPage(page2, '输出区(2)')
+    self.main_notebook.AddPage(page3, '日志区(3)')
+    self.main_notebook.AddPage(page4, 'API区(4)')
+    self.main_notebook.AddPage(page5, '帮助(H)')
     self.main_notebook.AddPage(page6, '关于')
 
     vbox.Add(self._target_notebook, flag = EXPAND)
     vbox.Add(self.main_notebook, proportion = 1, flag = EXPAND)
-    # 很重要! Fit重新校正布局(包括子页面)
-    self.SetSizerAndFit(vbox)
+    p.SetSizer(vbox)
 
-  def make_accels(self):
+    _frame_sz = BoxSizer()
+    _frame_sz.Add(p, proportion = 1, flag = EXPAND)
+    # 使用SetSizerAndFit方法使frame拥有最小size
+    self.SetSizerAndFit(_frame_sz)
+
+  def make_accelerators(self):
     '''
     https://www.blog.pythonlibrary.org/2017/09/28/wxpython-all-about-accelerators/
     只有最后一次的SetAcceleratorTable会生效
@@ -109,15 +116,10 @@ class Window(wx.Frame):
     # https://stackoverflow.com/questions/49454737/how-can-i-exit-out-of-a-wxpython-application-cleanly
     wx.CallAfter(self.Close)
 
-  def build_page_target(self):
-    # gtk3下的正确的高度!
-    # self.a = nb(self, size = (400, 68))
-    # b = tc(a, size = (-1, 36))
-    self._target_notebook = nb(self)
+  def build_target_notebook(self, parent):
+    self._url_combobox = cbb(parent, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
 
-    self._url_combobox = cbb(self._target_notebook, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
-
-    p2 = Panel(self._target_notebook)
+    p2 = Panel(parent)
     hbox2 = BoxSizer()
     self._burp_logfile = tc(p2)
     self._burp_logfile_chooser = btn(p2, label = '打开')
@@ -130,7 +132,7 @@ class Window(wx.Frame):
     hbox2.Add(self._burp_logfile_chooser, flag = EXPAND)
     p2.SetSizer(hbox2)
 
-    p3 = Panel(self._target_notebook)
+    p3 = Panel(parent)
     hbox3 = BoxSizer()
     self._request_file = tc(p3)
     self._request_file_chooser = btn(p3, label = '打开')
@@ -143,7 +145,7 @@ class Window(wx.Frame):
     hbox3.Add(self._request_file_chooser, flag = EXPAND)
     p3.SetSizer(hbox3)
 
-    p4 = Panel(self._target_notebook)
+    p4 = Panel(parent)
     hbox4 = BoxSizer()
     self._bulkfile = tc(p4)
     self._bulkfile_chooser = btn(p4, label = '打开')
@@ -156,7 +158,7 @@ class Window(wx.Frame):
     hbox4.Add(self._bulkfile_chooser, flag = EXPAND)
     p4.SetSizer(hbox4)
 
-    p5 = Panel(self._target_notebook)
+    p5 = Panel(parent)
     hbox5 = BoxSizer()
     self._configfile = tc(p5)
     self._configfile_chooser = btn(p5, label = '打开')
@@ -169,16 +171,16 @@ class Window(wx.Frame):
     hbox5.Add(self._configfile_chooser, flag = EXPAND)
     p5.SetSizerAndFit(hbox5)
 
-    self._sitemap_url = tc(self._target_notebook)
-    self._google_dork = tc(self._target_notebook)
+    self._sitemap_url = tc(parent)
+    self._google_dork = tc(parent)
 
-    self._target_notebook.AddPage(self._url_combobox, '目标url')
-    self._target_notebook.AddPage(p2, 'burp日志')
-    self._target_notebook.AddPage(p3, 'HTTP请求')
-    self._target_notebook.AddPage(p4, 'BULKFILE')
-    self._target_notebook.AddPage(p5, 'ini文件')
-    self._target_notebook.AddPage(self._sitemap_url, 'xml_url')
-    self._target_notebook.AddPage(self._google_dork, 'GOOGLEDORK')
+    parent.AddPage(self._url_combobox, '目标url')
+    parent.AddPage(p2, 'burp日志')
+    parent.AddPage(p3, 'HTTP请求')
+    parent.AddPage(p4, 'BULKFILE')
+    parent.AddPage(p5, 'ini文件')
+    parent.AddPage(self._sitemap_url, 'xml_url')
+    parent.AddPage(self._google_dork, 'GOOGLEDORK')
 
   def build_page1(self, parent):
     p = Panel(parent)

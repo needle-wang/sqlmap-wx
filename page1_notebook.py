@@ -33,11 +33,11 @@ class Page1Notebook(nb):
     page1_file = self.build_page1_file()
     page1_other = self.build_page1_other()
 
-    self.AddPage(page1_setting, '测试(&Q)')
-    self.AddPage(page1_request, '请求(_W)')
-    self.AddPage(page1_enumeration, '枚举(&E)')
-    self.AddPage(page1_file, '文件(&R)')
-    self.AddPage(page1_other, '其他(&T)')
+    self.AddPage(page1_setting, '测试(Q)')
+    self.AddPage(page1_request, '请求(W)')
+    self.AddPage(page1_enumeration, '枚举(E)')
+    self.AddPage(page1_file, '文件(R)')
+    self.AddPage(page1_other, '其他(T)')
 
   def optimize_area_controller(self, event):
     if self._optimize_area_turn_all_ckbtn.IsChecked():
@@ -744,8 +744,7 @@ class Page1Notebook(nb):
     return enum_area
 
   def build_page1_request(self):
-    p = ScrolledPanel(self, style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER)
-    p.SetupScrolling(scroll_x = False)
+    p = ScrolledPanel(self, style = wx.BORDER_THEME)
 
     vbox = BoxSizer(VERTICAL)
     request_header_area = self.build_page1_request_header(p)
@@ -760,6 +759,7 @@ class Page1Notebook(nb):
     vbox.Add(request_proxy_area, spacing)
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     p.SetSizer(vbox)
+    p.SetupScrolling(scroll_x = False)
     return p
 
   def build_page1_request_proxy(self, panel):
@@ -1060,8 +1060,7 @@ class Page1Notebook(nb):
     return request_header_area
 
   def build_page1_setting(self):
-    p = ScrolledPanel(self, style=wx.TAB_TRAVERSAL | wx.SUNKEN_BORDER)
-    p.SetupScrolling(scroll_x = False)
+    p = ScrolledPanel(self)
 
     spacing = SizerFlags().Expand().Border(ALL, 5)
 
@@ -1088,6 +1087,7 @@ class Page1Notebook(nb):
     vbox.Add(hbox2, flag = EXPAND)
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     p.SetSizer(vbox)
+    p.SetupScrolling(scroll_x = False)
     return p
 
   def build_page1_setting_general(self, panel):
