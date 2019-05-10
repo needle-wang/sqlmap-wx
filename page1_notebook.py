@@ -336,10 +336,11 @@ class Page1Notebook(nb):
     file_os_access_area = self.build_page1_file_os_access(p)
     file_os_registry_area = self.build_page1_file_os_registry(p)
 
-    vbox.Add(file_read_area, flag = EXPAND | ALL, border = 10)
-    vbox.Add(file_write_area, flag = EXPAND | ALL, border = 10)
-    vbox.Add(file_os_access_area, flag = EXPAND | ALL, border = 10)
-    vbox.Add(file_os_registry_area, flag = EXPAND | ALL, border = 10)
+    spacing = SizerFlags().Expand().Border(TOP | LEFT | RIGHT, 10)
+    vbox.Add(file_read_area, spacing)
+    vbox.Add(file_write_area, spacing)
+    vbox.Add(file_os_access_area, spacing)
+    vbox.Add(file_os_registry_area, spacing)
     p.SetSizer(vbox)
     return p
 
@@ -1065,13 +1066,19 @@ class Page1Notebook(nb):
     spacing = SizerFlags().Expand().Border(ALL, 5)
 
     hbox1 = BoxSizer()
+    # win下 探测选项staticbox不能用proportion = 1, 最大化时会让右侧的staticbox消失
+    # hbox1_grid为了win写的兼容sizer, 怎么感觉在写html?
+    hbox1_grid = GridSizer(1, 2, 0, 0)
+
     inject_area = self.build_page1_setting_inject(p)
+
     detection_area = self.build_page1_setting_detection(p)
     tech_area = self.build_page1_setting_tech(p)
+    hbox1_grid.Add(detection_area, flag = EXPAND | RIGHT, border = 10)
+    hbox1_grid.Add(tech_area, flag = EXPAND)
 
     hbox1.Add(inject_area, spacing)
-    hbox1.Add(detection_area, proportion = 1, flag = EXPAND | ALL, border = 5)
-    hbox1.Add(tech_area, spacing)
+    hbox1.Add(hbox1_grid, spacing)
 
     hbox2 = BoxSizer()
     tamper_area = self.build_page1_setting_tamper(p)
@@ -1083,8 +1090,8 @@ class Page1Notebook(nb):
     hbox2.Add(general_area, spacing)
 
     vbox = BoxSizer(VERTICAL)
-    vbox.Add(hbox1, flag = EXPAND)
-    vbox.Add(hbox2, flag = EXPAND)
+    vbox.Add(hbox1, flag = EXPAND | RIGHT, border = 20)  # 20: win下的滚动条不致于掩盖末端内容~~
+    vbox.Add(hbox2)
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     p.SetSizer(vbox)
     p.SetupScrolling(scroll_x = False)

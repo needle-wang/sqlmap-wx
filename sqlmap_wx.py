@@ -25,7 +25,7 @@ class Window(wx.Frame):
     self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
 
     self.initUI()
-    # self.make_accelerators()  # 要先初始化完后, 才能设全局键
+    self.make_accelerators()  # 要先初始化完后, 才能设全局键
 
   # @profile
   def initUI(self):
@@ -89,9 +89,31 @@ class Window(wx.Frame):
           self._notebook.SetSelection(page)
             if self.main_notebook.GetSelection() == 0 else evt.Skip(),
         id = pageid)
+    # win下, 若焦点没有按钮上, 则不响应mnemonic, 只能在这里实现了
+    _btn_keys = ['A', 'S', 'D', 'F']
+    btns = self.btn_grid.GetChildren()
+    for i in range(len(btns)):
+      btn = btns[i].GetWindow()
+      btnid = btn.GetId()
+
+      self.accel_entries.append((wx.ACCEL_ALT, ord(_btn_keys[i]), btnid))
+      self.Bind(
+        wx.EVT_MENU,
+        lambda evt, _btn = btn:  # 防止闭包: btn这个变量名跟lambda绑定成一体
+          self.make_btn_accel(_btn)
+            if self.main_notebook.GetSelection() == 0 else evt.Skip(),
+        id = btnid)
 
     accel_tbl = wx.AcceleratorTable(self.accel_entries)
     self.SetAcceleratorTable(accel_tbl)
+
+  def make_btn_accel(self, btn):
+    '''
+    https://stackoverflow.com/questions/12786471/invoking-a-wxpython-evt-button-event-programmatically
+    '''
+    evt = wx.PyCommandEvent(wx.EVT_BUTTON.typeId, btn.GetId())
+    # print(evt)
+    wx.PostEvent(btn, evt)
 
   def clear_all_entry(self, event):
     m = self._notebook
@@ -198,25 +220,27 @@ class Window(wx.Frame):
     self._notebook = Page1Notebook(p, self._handlers)
 
     # 构造与执行
-    grid = GridSizer(1, 4, 0, 0)
-    _build_button = btn(p, label = 'A.收集选项(&A)')
+    self.btn_grid = GridSizer(1, 4, 0, 0)
+    _build_button = btn(p, label = 'A.收集选项(A)')
     _build_button.Bind(EVT_BUTTON, self._handlers.build_all)
     # 用于改善ui的使用体验
-    _unselect_all_btn = btn(p, label = '反选所有复选框(&S)')
+    _unselect_all_btn = btn(p, label = '反选所有复选框(S)')
     _unselect_all_btn.Bind(EVT_BUTTON, self.unselect_all_ckbtn)
-    _clear_all_entry = btn(p, label = '清空所有输入框(&D)')
+
+    _clear_all_entry = btn(p, label = '清空所有输入框(D)')
     _clear_all_entry.Bind(EVT_BUTTON, self.clear_all_entry)
-    _run_button = btn(p, label = 'B.开始(&F)')
+
+    _run_button = btn(p, label = 'B.开始(F)')
     _run_button.Bind(EVT_BUTTON, self._handlers.run_cmdline)
 
-    grid.Add(_build_button, flag = ALIGN_CENTER)
-    grid.Add(_unselect_all_btn, flag = ALIGN_CENTER)
-    grid.Add(_clear_all_entry, flag = ALIGN_CENTER)
-    grid.Add(_run_button, flag = ALIGN_CENTER)
+    self.btn_grid.Add(_build_button, flag = ALIGN_CENTER)
+    self.btn_grid.Add(_unselect_all_btn, flag = ALIGN_CENTER)
+    self.btn_grid.Add(_clear_all_entry, flag = ALIGN_CENTER)
+    self.btn_grid.Add(_run_button, flag = ALIGN_CENTER)
 
     vbox.Add(cmd_area, flag = EXPAND)
     vbox.Add(self._notebook, proportion = 1, flag = EXPAND)
-    vbox.Add(grid, flag = EXPAND)
+    vbox.Add(self.btn_grid, flag = EXPAND)
     p.SetSizerAndFit(vbox)
     return p
 

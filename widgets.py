@@ -10,17 +10,28 @@ class Notebook(FNB.FlatNotebook):
   def __init__(self, *args, **kwargs):
     # become the old wx.Notebook style
     _bookStyle = FNB.FNB_NO_X_BUTTON | FNB.FNB_NO_NAV_BUTTONS | FNB.FNB_NODRAG
-    _bookStyle |= FNB.FNB_RIBBON_TABS   # 使用ribbon主题风格
+    # 标签不能有焦点, 不然win7下ScrolledPanel不响应滚轮,
+    # ScrolledPanel需要焦点在其中 才能响应滚轮;
+    # 使用ribbon主题风格
+    _bookStyle |= FNB.FNB_NO_TAB_FOCUS | FNB.FNB_RIBBON_TABS
     super().__init__(*args, agwStyle = _bookStyle, **kwargs)
     self.SetBackgroundColour(wx.WHITE)
 
 
-nb = Notebook
-# nb = wx.Notebook  # 很糟糕的实现, 不要用!
+class CheckBox(wx.CheckBox):
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    # only for win, 背景(240, 240, 240, 255)是灰色, 却要重新设一遍前景才能去灰~
+    # 侮辱智商! 脑子都搞蒙了
+    self.SetForegroundColour(self.GetForegroundColour())
+
+
 Panel = wx.Panel
+# nb = wx.Notebook  # 很糟糕的实现, 不要用!
+nb = Notebook
 
 btn = wx.Button
-cb = wx.CheckBox
+cb = CheckBox
 cbb = wx.ComboBox
 ci = wx.Choice
 sl = wx.Slider
@@ -39,12 +50,6 @@ LEFT = wx.LEFT
 RIGHT = wx.RIGHT
 ALIGN_RIGHT = wx.ALIGN_RIGHT
 ALIGN_CENTER = wx.ALIGN_CENTER
-
-
-class Panel(wx.Panel):
-  def __init__(self, *args, **kw):
-    super().__init__(*args, **kw)
-    self.szr = wx.BoxSizer(wx.VERTICAL)
 
 
 class TextCtrl(wx.TextCtrl):
