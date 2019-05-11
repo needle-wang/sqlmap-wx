@@ -2,7 +2,7 @@
 #
 # 2019年 05月 05日 星期日 20:43:40 CST
 
-from widgets import wx, Panel, Scroll, btn, cb, cbb, ci, nb, sl, sp, st, tc
+from widgets import wx, Panel, Scroll, btn, cb, cbb, ci, nb, nc, sl, sp, st, tc
 from widgets import HORIZONTAL, VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER, ALIGN_RIGHT
 
 BoxSizer = wx.BoxSizer
@@ -203,7 +203,7 @@ class Page1Notebook(nb):
 
     row3 = BoxSizer()
     self._page1_general_crawl_ckbtn = cb(_page1_other_general_area, label = '爬网站(的层级/深度)')
-    self._page1_general_crawl_entry = tc(_page1_other_general_area)
+    self._page1_general_crawl_entry = nc(_page1_other_general_area)
     self._page1_general_crawl_exclude_ckbtn = cb(_page1_other_general_area, label = '爬站时排除(正则)页面')
     self._page1_general_crawl_exclude_entry = tc(_page1_other_general_area)
 
@@ -683,7 +683,7 @@ class Page1Notebook(nb):
 
     row1 = BoxSizer()
     self._limit_area_start_ckbtn = cb(_limit_area, label = '始于第')
-    self._limit_area_start_entry = tc(_limit_area)
+    self._limit_area_start_entry = nc(_limit_area)
 
     row1.Add(self._limit_area_start_ckbtn, border)
     row1.Add(self._limit_area_start_entry)
@@ -691,7 +691,7 @@ class Page1Notebook(nb):
 
     row2 = BoxSizer()
     self._limit_area_stop_ckbtn = cb(_limit_area, label = '止于第')
-    self._limit_area_stop_entry = tc(_limit_area)
+    self._limit_area_stop_entry = nc(_limit_area)
     row2.Add(self._limit_area_stop_ckbtn, border)
     row2.Add(self._limit_area_stop_entry)
     row2.Add(st(_limit_area, label = '条'), flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
@@ -823,7 +823,7 @@ class Page1Notebook(nb):
     self._request_area_proxy_ip_label = st(_request_proxy_area, label = 'IP:')
     self._request_area_proxy_ip_entry = tc(_request_proxy_area)
     self._request_area_proxy_port_label = st(_request_proxy_area, label = 'PORT:')
-    self._request_area_proxy_port_entry = tc(_request_proxy_area)
+    self._request_area_proxy_port_entry = nc(_request_proxy_area)
     self._request_area_proxy_username_label = st(_request_proxy_area, label = 'username:')
     self._request_area_proxy_username_entry = tc(_request_proxy_area)
     self._request_area_proxy_password_label = st(_request_proxy_area, label = 'password:')
@@ -841,7 +841,7 @@ class Page1Notebook(nb):
     row5 = BoxSizer()
     self._request_area_tor_ckbtn = cb(_request_proxy_area, label = '使用Tor匿名网络')
     self._request_area_tor_port_ckbtn = cb(_request_proxy_area, label = 'Tor端口:')
-    self._request_area_tor_port_entry = tc(_request_proxy_area)
+    self._request_area_tor_port_entry = nc(_request_proxy_area)
     self._request_area_tor_type_ckbtn = cb(_request_proxy_area, label = 'Tor代理类型')
     self._request_area_tor_type_entry = tc(_request_proxy_area)
     self._request_area_check_tor_ckbtn = cb(_request_proxy_area, label = '检查Tor连接')
@@ -891,11 +891,11 @@ class Page1Notebook(nb):
 
     row2 = BoxSizer()
     self._request_area_delay_ckbtn = cb(_request_custom_area, label = '请求间隔(秒)')
-    self._request_area_delay_entry = tc(_request_custom_area)
+    self._request_area_delay_entry = nc(_request_custom_area)
     self._request_area_timeout_ckbtn = cb(_request_custom_area, label = '几秒超时')
-    self._request_area_timeout_entry = tc(_request_custom_area, value = '30')
+    self._request_area_timeout_entry = nc(_request_custom_area, value = '30')
     self._request_area_retries_ckbtn = cb(_request_custom_area, label = '超时重试次数')
-    self._request_area_retries_entry = tc(_request_custom_area, value = '3')
+    self._request_area_retries_entry = nc(_request_custom_area, value = '3')
     self._request_area_randomize_ckbtn = cb(_request_custom_area, label = '指定要随机改变值的参数')
     self._request_area_randomize_entry = tc(_request_custom_area)
 
@@ -1198,13 +1198,13 @@ class Page1Notebook(nb):
     grid.Add(self._tech_area_tech_entry, border)
 
     self._tech_area_time_sec_ckbtn = cb(_tech_area, label = '指定DB延迟多少秒响应')
-    self._tech_area_time_sec_entry = tc(_tech_area)
+    self._tech_area_time_sec_entry = nc(_tech_area)
 
     grid.Add(self._tech_area_time_sec_ckbtn, border)
     grid.Add(self._tech_area_time_sec_entry, border)
 
     self._tech_area_union_col_ckbtn = cb(_tech_area, label = '指定最大union列数')
-    self._tech_area_union_col_entry = tc(_tech_area)
+    self._tech_area_union_col_entry = nc(_tech_area)
 
     grid.Add(self._tech_area_union_col_ckbtn, border)
     grid.Add(self._tech_area_union_col_entry, border)
@@ -1312,10 +1312,10 @@ class Page1Notebook(nb):
 
     row6 = BoxSizer()
     self._detection_area_code_ckbtn = cb(_detection_area, label = '指定http状态码')
-    self._detection_area_code_entry = tc(_detection_area)
+    self._detection_area_code_entry = nc(_detection_area)
 
     row6.Add(self._detection_area_code_ckbtn, border)
-    row6.Add(self._detection_area_code_entry, border)
+    row6.Add(self._detection_area_code_entry, proportion_border)
 
     row7 = GridSizer(1, 2, 0, 0)
     self._detection_area_text_only_ckbtn = cb(_detection_area, label = '仅对比文本')

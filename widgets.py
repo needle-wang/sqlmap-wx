@@ -2,6 +2,7 @@
 # encoding: utf-8
 #
 # 2019年 05月 05日 星期日 21:09:49 CST
+import string
 import wx
 import wx.lib.agw.flatnotebook as FNB
 from wx.lib.scrolledpanel import ScrolledPanel
@@ -15,7 +16,7 @@ class Notebook(FNB.FlatNotebook):
     # ScrolledPanel需要焦点在其中 才能响应滚轮;
     # 使用ribbon主题风格
     _bookStyle |= FNB.FNB_NO_TAB_FOCUS | FNB.FNB_RIBBON_TABS
-    super().__init__(*args, agwStyle = _bookStyle, **kwargs)
+    super().__init__(*args, agwStyle=_bookStyle, **kwargs)
     self.SetBackgroundColour(wx.WHITE)
 
 
@@ -27,9 +28,42 @@ class CheckBox(wx.CheckBox):
     self.SetForegroundColour(self.GetForegroundColour())
 
 
+class NumCtrl(wx.TextCtrl):
+  '''
+  https://stackoverflow.com/questions/1369086/is-it-possible-to-limit-textctrl-to-accept-numbers-only-in-wxpython
+  '''
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Bind(wx.EVT_CHAR, self.onChar)
+
+  def onChar(self, event):
+    keycode = event.GetKeyCode()
+    obj = event.GetEventObject()
+    val = obj.GetValue()
+    # filter unicode characters
+    if keycode == wx.WXK_NONE:
+      pass
+    # allow digits
+    elif chr(keycode) in string.digits:
+      event.Skip()
+    # allow special, non-printable keycodes
+    elif chr(keycode) not in string.printable:
+      event.Skip()  # allow all other special keycode
+    # allow '-' for negative numbers
+    elif chr(keycode) == '-':
+      if val[0] == '-':
+        obj.SetValue(val[1:])
+      else:
+        obj.SetValue('-' + val)
+    # allow '.' for float numbers
+    elif chr(keycode) == '.' and '.' not in val:
+      event.Skip()
+    return
+
+
 SplitterWindow = wx.SplitterWindow
-Panel = wx.Panel
 Scroll = ScrolledPanel
+Panel = wx.Panel
 # nb = wx.Notebook  # 很糟糕的实现, 不要用!
 nb = Notebook
 
@@ -37,6 +71,7 @@ btn = wx.Button
 cb = CheckBox
 cbb = wx.ComboBox
 ci = wx.Choice
+nc = NumCtrl
 sl = wx.Slider
 sp = wx.SpinCtrl
 st = wx.StaticText
@@ -53,14 +88,6 @@ LEFT = wx.LEFT
 RIGHT = wx.RIGHT
 ALIGN_RIGHT = wx.ALIGN_RIGHT
 ALIGN_CENTER = wx.ALIGN_CENTER
-
-
-class TextCtrl(wx.TextCtrl):
-  def __init__(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
-
-    # self.SetSizeHints((168, 36))
-    self.SetSize(168, 36)
 
 
 def main():
