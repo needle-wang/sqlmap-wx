@@ -4,6 +4,7 @@
 # 2019年 05月 05日 星期日 21:09:49 CST
 import wx
 import wx.lib.agw.flatnotebook as FNB
+from wx.lib.scrolledpanel import ScrolledPanel
 
 
 class Notebook(FNB.FlatNotebook):
@@ -26,7 +27,9 @@ class CheckBox(wx.CheckBox):
     self.SetForegroundColour(self.GetForegroundColour())
 
 
+SplitterWindow = wx.SplitterWindow
 Panel = wx.Panel
+Scroll = ScrolledPanel
 # nb = wx.Notebook  # 很糟糕的实现, 不要用!
 nb = Notebook
 
@@ -53,8 +56,8 @@ ALIGN_CENTER = wx.ALIGN_CENTER
 
 
 class TextCtrl(wx.TextCtrl):
-  def __init__(self, *args, **kw):
-    super().__init__(*args, **kw)
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
 
     # self.SetSizeHints((168, 36))
     self.SetSize(168, 36)

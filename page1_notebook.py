@@ -2,9 +2,7 @@
 #
 # 2019年 05月 05日 星期日 20:43:40 CST
 
-from wx.lib.scrolledpanel import ScrolledPanel
-
-from widgets import wx, Panel, btn, cb, cbb, ci, nb, sl, sp, st, tc
+from widgets import wx, Panel, Scroll, btn, cb, cbb, ci, nb, sl, sp, st, tc
 from widgets import HORIZONTAL, VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER, ALIGN_RIGHT
 
 BoxSizer = wx.BoxSizer
@@ -750,7 +748,7 @@ class Page1Notebook(nb):
     return enum_area
 
   def build_page1_request(self):
-    p = ScrolledPanel(self, style = wx.BORDER_THEME)
+    p = Scroll(self, style = wx.BORDER_THEME)
 
     vbox = BoxSizer(VERTICAL)
     request_header_area = self.build_page1_request_header(p)
@@ -831,13 +829,13 @@ class Page1Notebook(nb):
     self._request_area_proxy_password_label = st(_request_proxy_area, label = 'password:')
     self._request_area_proxy_password_entry = tc(_request_proxy_area)
 
-    row4.Add(self._request_area_proxy_ip_label, border)
+    row4.Add(self._request_area_proxy_ip_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row4.Add(self._request_area_proxy_ip_entry, proportion_border)
-    row4.Add(self._request_area_proxy_port_label, border)
+    row4.Add(self._request_area_proxy_port_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row4.Add(self._request_area_proxy_port_entry, border)
-    row4.Add(self._request_area_proxy_username_label, border)
+    row4.Add(self._request_area_proxy_username_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row4.Add(self._request_area_proxy_username_entry, proportion_border)
-    row4.Add(self._request_area_proxy_password_label, border)
+    row4.Add(self._request_area_proxy_password_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row4.Add(self._request_area_proxy_password_entry, proportion_border)
 
     row5 = BoxSizer()
@@ -1067,7 +1065,7 @@ class Page1Notebook(nb):
     return request_header_area
 
   def build_page1_setting(self):
-    p = ScrolledPanel(self)
+    p = Scroll(self)
 
     spacing = SizerFlags().Expand().Border(ALL, 5)
 

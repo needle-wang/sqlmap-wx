@@ -5,7 +5,7 @@
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 
-from widgets import wx, Panel, btn, cb, cbb, nb, st, tc
+from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, cbb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
 
 from page1_notebook import Page1Notebook
@@ -43,10 +43,10 @@ class Window(wx.Frame):
     page5 = self.build_page5(self.main_notebook)
     page6 = self.build_page6(self.main_notebook)
 
+    self.main_notebook.AddPage(page4, 'API区(4)')
     self.main_notebook.AddPage(page1, '选项区(1)')
     self.main_notebook.AddPage(page2, '输出区(2)')
     self.main_notebook.AddPage(page3, '日志区(3)')
-    self.main_notebook.AddPage(page4, 'API区(4)')
     self.main_notebook.AddPage(page5, '帮助(H)')
     self.main_notebook.AddPage(page6, '关于')
 
@@ -283,7 +283,76 @@ class Window(wx.Frame):
 
   def build_page4(self, parent):
     p = Panel(parent)
+    vbox = BoxSizer(VERTICAL)
 
+    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
+    proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
+
+    row1 = BoxSizer()
+    self._page4_api_server_label = st(p, label = 'REST-JSON API server:')
+    self._page4_api_server_entry = tc(p, value = '127.0.0.1:8775')
+    self._page4_admin_token_label = st(p, label = 'Admin (secret) token:')
+    self._page4_admin_token_entry = tc(p)
+    self._page4_admin_token_entry.SetMaxLength(32)
+
+    row1.Add(self._page4_api_server_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row1.Add(self._page4_api_server_entry, proportion_border)
+    row1.Add(self._page4_admin_token_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row1.Add(self._page4_admin_token_entry, proportion_border)
+
+    row2 = BoxSizer()
+    _arrow_down = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_BUTTON)
+    self._page4_task_new_btn = btn(p, label = '创建任务')
+    self._page4_admin_list_btn = btn(p, label = '显示任务')
+    self._page4_admin_list_btn.SetBitmap(_arrow_down, dir = RIGHT)
+    self._page4_admin_flush_btn = btn(p, label = '删除所有任务')
+    self._page4_clear_task_view_btn = btn(p, label = '清空反馈的结果')
+
+    self._page4_task_new_btn.Bind(EVT_BUTTON, self._handlers.api_task_new)
+    self._page4_admin_list_btn.Bind(EVT_BUTTON, self._handlers.api_admin_list)
+    self._page4_admin_flush_btn.Bind(EVT_BUTTON, self._handlers.api_admin_flush)
+    self._page4_clear_task_view_btn.Bind(EVT_BUTTON, self._handlers.clear_task_view_buffer)
+
+    row2.Add(self._page4_task_new_btn, flag = LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_admin_list_btn, flag = LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_admin_flush_btn, flag = LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_clear_task_view_btn, flag = LEFT | RIGHT, border = 5)
+
+    row3 = SplitterWindow(p, style = wx.SP_LIVE_UPDATE | wx.BORDER_SUNKEN)
+    # 不能放在SplitVertically后面, 不然gravity会无效
+    row3.SetMinimumPaneSize(400)
+    row3.SetSashGravity(0.7)
+
+    lpane = Scroll(row3)
+    self._api_admin_list_rows = lpane
+
+    lpane.SetSizer(BoxSizer(VERTICAL))
+
+    rpane = Panel(row3)
+    _rbox = BoxSizer(VERTICAL)
+
+    self._page4_option_get_entry = tc(rpane, value = 'url risk level')
+    _options_example = ("{\n"
+                        "  'url': 'http://www.site.com/vuln.php?id=1',\n"
+                        "  'level': 1, 'risk': 1,\n\n"
+                        "}\n# 所有选项见sqlmap目录中的optiondict.py\n")
+    self._page4_option_set_view = tc(rpane,
+                                     value = _options_example,
+                                     style = wx.TE_MULTILINE)
+    _rbox.Add(self._page4_option_get_entry, flag = EXPAND | ALL, border = 2)
+    _rbox.Add(self._page4_option_set_view, proportion = 1, flag = EXPAND | ALL, border = 2)
+    rpane.SetSizer(_rbox)
+
+    row3.SplitVertically(lpane, rpane)
+
+    self._page4_task_view = tc(p, value = '此处显示反馈的结果:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
+
+    vbox.Add(row1, flag = EXPAND | ALL, border = 5)
+    vbox.Add(row2, flag = EXPAND | ALL, border = 5)
+    vbox.Add(row3, proportion = 1, flag = EXPAND | LEFT | RIGHT, border = 10)
+    vbox.Add(self._page4_task_view, proportion = 1, flag = EXPAND | ALL, border = 10)
+
+    p.SetSizerAndFit(vbox)
     return p
 
   def build_page5(self, parent):
