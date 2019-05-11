@@ -10,6 +10,7 @@ from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTE
 
 from page1_notebook import Page1Notebook
 from handlers import Handler, IS_POSIX
+from session import Session
 
 BoxSizer = wx.BoxSizer
 GridSizer = wx.GridSizer
@@ -26,6 +27,9 @@ class Window(wx.Frame):
 
     self.initUI()
     self.make_accelerators()  # 要先初始化完后, 才能设全局键
+    # 读取 上次所有选项
+    self.session = Session(self._notebook)
+    self.session.load_from_tmp()
 
   # @profile
   def initUI(self):
@@ -43,10 +47,10 @@ class Window(wx.Frame):
     page5 = self.build_page5(self.main_notebook)
     page6 = self.build_page6(self.main_notebook)
 
-    self.main_notebook.AddPage(page4, 'API区(4)')
     self.main_notebook.AddPage(page1, '选项区(1)')
     self.main_notebook.AddPage(page2, '输出区(2)')
     self.main_notebook.AddPage(page3, '日志区(3)')
+    self.main_notebook.AddPage(page4, 'API区(4)')
     self.main_notebook.AddPage(page5, '帮助(H)')
     self.main_notebook.AddPage(page6, '关于')
 
@@ -64,7 +68,8 @@ class Window(wx.Frame):
     https://www.blog.pythonlibrary.org/2017/09/28/wxpython-all-about-accelerators/
     只有最后一次的SetAcceleratorTable会生效
     '''
-    self.Bind(wx.EVT_MENU, self.onExit, id = wx.ID_EXIT)
+    self.Bind(wx.EVT_CLOSE, self.onExit)
+    self.Bind(wx.EVT_MENU, self.onCloseByAccel, id = wx.ID_EXIT)
     self.accel_entries = [(wx.ACCEL_CTRL, ord('Q'), wx.ID_EXIT),
                           (wx.ACCEL_CTRL, ord('W'), wx.ID_EXIT)]
 
@@ -139,9 +144,17 @@ class Window(wx.Frame):
 
     m.SetFocus()
 
-  def onExit(self, event):
+  def onCloseByAccel(self, event):
+    # print('by accelerator.')
     # https://stackoverflow.com/questions/49454737/how-can-i-exit-out-of-a-wxpython-application-cleanly
     wx.CallAfter(self.Close)
+
+  def onExit(self, event):
+    # print('by ALT-<F4> or click close button.')
+    # 保存 此次所有选项
+    self.session.save_to_tmp()
+
+    event.Skip()
 
   def build_target_notebook(self, parent):
     self._url_combobox = cbb(parent, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
@@ -417,8 +430,8 @@ class Window(wx.Frame):
     vbox = BoxSizer(VERTICAL)
 
     _about_str = '''
-    1. VERSION: 0.1
-       2019年 05月 08日 星期三 20:59:42 CST
+    1. VERSION: 0.2
+       2019年 05月 12日 星期日 00:04:13 CST
        required: python3.5+, wxPython4.0+, sqlmap(require: python2.6+)
        作者: needle wang ( needlewang2011@gmail.com )\n
     2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
