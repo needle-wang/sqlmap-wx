@@ -11,6 +11,7 @@ from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTE
 from page1_notebook import Page1Notebook
 from handlers import Handler, IS_POSIX
 from session import Session
+from tooltips import Widget_Mesg as INIT_MESG
 
 BoxSizer = wx.BoxSizer
 GridSizer = wx.GridSizer
@@ -26,7 +27,11 @@ class Window(wx.Frame):
     self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
 
     self.initUI()
-    self.make_accelerators()  # 要先初始化完后, 才能设全局键
+    self.make_accelerators()  # 要先初始化完成后, 才能设全局键
+
+    # 添加tooltips, placeholders等
+    INIT_MESG(self)
+
     # 读取 上次所有选项
     self.session = Session(self._notebook)
     self.session.load_from_tmp()
@@ -145,11 +150,16 @@ class Window(wx.Frame):
     m.SetFocus()
 
   def onCloseByAccel(self, event):
+    '''
+    https://stackoverflow.com/questions/49454737/how-can-i-exit-out-of-a-wxpython-application-cleanly
+    '''
     # print('by accelerator.')
-    # https://stackoverflow.com/questions/49454737/how-can-i-exit-out-of-a-wxpython-application-cleanly
     wx.CallAfter(self.Close)
 
   def onExit(self, event):
+    '''
+    https://www.daniweb.com/programming/software-development/code/216760/verify-exit-dialog-wxpython
+    '''
     # print('by ALT-<F4> or click close button.')
     # 保存 此次所有选项
     self.session.save_to_tmp()
@@ -264,6 +274,7 @@ class Window(wx.Frame):
 
   def build_page2(self, parent):
     p = Panel(parent)
+    st(p, label = 'TODO')
     return p
 
   def build_page3(self, parent):
@@ -278,15 +289,15 @@ class Window(wx.Frame):
 
     grid = GridSizer(1, 3, 0, 0)
     _page3_read_target_btn = btn(p, label = '查看target文件')
-    _page3_clear_btn = btn(p, label = '清空(&C)')
+    self._page3_clear_btn = btn(p, label = '清空(&C)')
     _page3_read_log_btn = btn(p, label = '查看log文件')
 
     _page3_read_target_btn.Bind(EVT_BUTTON, self._handlers.read_target_file)
-    _page3_clear_btn.Bind(EVT_BUTTON, self._handlers.clear_log_view_buffer)
+    self._page3_clear_btn.Bind(EVT_BUTTON, self._handlers.clear_log_view_buffer)
     _page3_read_log_btn.Bind(EVT_BUTTON, self._handlers.read_log_file)
 
     grid.Add(_page3_read_target_btn, flag = ALIGN_CENTER)
-    grid.Add(_page3_clear_btn, flag = ALIGN_CENTER)
+    grid.Add(self._page3_clear_btn, flag = ALIGN_CENTER)
     grid.Add(_page3_read_log_btn, flag = ALIGN_CENTER)
 
     vbox.Add(self._page3_log_view, proportion = 1, flag = EXPAND | ALL, border = 10)
