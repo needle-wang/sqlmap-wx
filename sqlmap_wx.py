@@ -130,7 +130,7 @@ class Window(wx.Frame):
     for _i in dir(m):
       if _i.endswith('entry'):
         _tmp_entry = getattr(m, _i)
-        if isinstance(_tmp_entry, tc):
+        if isinstance(_tmp_entry, tc) and _tmp_entry is not self._notebook.sqlmap_path_entry:
           _tmp_entry.SetValue('')
 
     m.SetFocus()
