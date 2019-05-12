@@ -2,7 +2,7 @@
 sqlmap GUI, using wxpython4.0  
 
 #### SCREENSHORT
-![screenshot](https://github.com/needle-wang/sqlmap-ui/blob/master/screenshots/sqlmap-wx1.png)
+![screenshot](https://github.com/needle-wang/sqlmap-wx/blob/master/screenshots/sqlmap-wx1.png)
 
 #### INSTALLATION
 1. **REQUIRED**  
