@@ -15,7 +15,7 @@ from sqlmap's FAQ:
      win: `pip3 install wxPython`  
      linux: go to wxPython's website for help  
   - requests: `pip3 install requests`
-  - [sqlmap](https://github.com/sqlmapproject/sqlmap): `pip2 install sqlmap` #hope sqlmap ports to python3 in future...
+  - latest [sqlmap](https://github.com/sqlmapproject/sqlmap): `git clone` it.  
 2. **GET**
   - `git clone https://github.com/needle-wang/sqlmap-wx.git`
 3. **RUN**  
