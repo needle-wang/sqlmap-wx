@@ -749,18 +749,31 @@ class Page1Notebook(nb):
 
   def build_page1_request(self):
     p = Scroll(self, style = wx.BORDER_THEME)
-
     vbox = BoxSizer(VERTICAL)
-    request_header_area = self.build_page1_request_header(p)
-    request_data_area = self.build_page1_request_data(p)
-    request_custom_area = self.build_page1_request_custom(p)
-    request_proxy_area = self.build_page1_request_proxy(p)
 
-    spacing = SizerFlags().Expand().Border(ALL, 5)
-    vbox.Add(request_header_area, spacing)
-    vbox.Add(request_data_area, spacing)
-    vbox.Add(request_custom_area, spacing)
-    vbox.Add(request_proxy_area, spacing)
+    proportion_border = SizerFlags(1).Expand().Border(RIGHT, 20)
+    # 本来没必要加行的, 为了让win下的滚动条不致于掩盖末端内容~~
+    row1 = BoxSizer()
+    request_header_area = self.build_page1_request_header(p)
+    row1.Add(request_header_area, proportion_border)
+
+    row2 = BoxSizer()
+    request_data_area = self.build_page1_request_data(p)
+    row2.Add(request_data_area, proportion_border)
+
+    row3 = BoxSizer()
+    request_custom_area = self.build_page1_request_custom(p)
+    row3.Add(request_custom_area, proportion_border)
+
+    row4 = BoxSizer()
+    request_proxy_area = self.build_page1_request_proxy(p)
+    row4.Add(request_proxy_area, proportion_border)
+
+    spacing = SizerFlags().Expand().Border(ALL, 10)
+    vbox.Add(row1, spacing)
+    vbox.Add(row2, spacing)
+    vbox.Add(row3, spacing)
+    vbox.Add(row4, spacing)
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     p.SetSizer(vbox)
     p.SetupScrolling(scroll_x = False)
@@ -1110,7 +1123,7 @@ class Page1Notebook(nb):
 
     vbox = BoxSizer(VERTICAL)
     vbox.Add(hbox0, flag = EXPAND | LEFT | RIGHT, border = 5)
-    vbox.Add(hbox1, flag = EXPAND | RIGHT, border = 20)  # 20: win下的滚动条不致于掩盖末端内容~~
+    vbox.Add(hbox1, flag = EXPAND | RIGHT, border = 20)  # 20: 让win下的滚动条不致于掩盖末端内容~~
     vbox.Add(hbox2)
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     p.SetSizer(vbox)

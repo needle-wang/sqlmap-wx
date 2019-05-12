@@ -412,12 +412,12 @@ class Handler(object):
         data[0].SetValue(dialog.GetPath())
         data[0].SetFocus()
 
-  def clear_log_view_buffer(self, event):
-    self.w._page3_log_view.SetValue(
-      'sqlmap的运行记录都放在这: %s\n' % (Path.home() / '.sqlmap/output'))
-
   def clear_task_view_buffer(self, event):
     self.w._page4_task_view.SetValue('')
+
+  def clear_log_view_buffer(self, event):
+    self.w._page3_log_view.SetValue(
+      'sqlmap的运行记录都放在这: %s\n' % self.get_output_dir())
 
   def _get_url_dir(self):
     '''
@@ -431,11 +431,13 @@ class Handler(object):
 
       _load_host = urlparse(_load_url).netloc
 
-      if IS_POSIX:
-        output_dir = Path.home() / '.sqlmap/output' / _load_host
-      else:
-        output_dir = Path.home() / 'AppData/Local/sqlmap/output' / _load_host
-      return output_dir
+      return self.get_output_dir() / _load_host
+
+  def get_output_dir(self):
+    if IS_POSIX:
+      return Path.home() / '.sqlmap/output'
+    else:
+      return Path.home() / 'AppData/Local/sqlmap/output'
 
   def _log_view_insert(self, file_path):
     '''

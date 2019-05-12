@@ -4,7 +4,6 @@
 
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
-from time import sleep
 
 from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, cbb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
@@ -25,14 +24,13 @@ EVT_BUTTON = wx.EVT_BUTTON
 class Window(wx.Frame):
   def __init__(self, parent):
     super().__init__(parent, title = 'sqlmap-wx')
-    self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
+    self.SetIcon(wx.Icon('sqlmap_wx.ico'))
 
+    self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
     self.initUI()
     self.make_accelerators()  # 要先初始化完成后, 才能设全局键
-
     # 添加tooltips, placeholders等
     INIT_MESG(self)
-
     # 读取 上次所有选项
     self.session = Session(self)
     self.session.load_from_tmp()
@@ -369,6 +367,8 @@ class Window(wx.Frame):
     rpane.SetSizer(_rbox)
 
     row3.SplitVertically(lpane, rpane)
+    # win下, lpane是灰色的, 将row3设下颜色, 又是兼容代码...
+    row3.SetBackgroundColour(self._page4_option_set_view.GetBackgroundColour())
 
     self._page4_task_view = tc(p, value = '此处显示反馈的结果:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
 
@@ -435,6 +435,8 @@ class Window(wx.Frame):
       _subprocess.wait()
     except FileNotFoundError as e:
       wx.CallAfter(view.write, str(e))
+    except Exception as e:
+      print(e)  # 如果主线程结束太快, 会: AssertionError: No wx.App created yet
     finally:
       _subprocess.stdout.close()
 
