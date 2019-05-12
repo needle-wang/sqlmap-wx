@@ -1,6 +1,10 @@
 ## sqlmap-wx
 sqlmap GUI, using wxpython4.0  
 
+congratulations about sqlmap ported to python3!  
+from sqlmap's FAQ:  
+"Both Python 2 and 3 are supported from May of 2019"  
+
 #### SCREENSHORT
 ![screenshot](https://github.com/needle-wang/sqlmap-wx/blob/master/screenshots/sqlmap-wx1.png)
 
@@ -23,7 +27,7 @@ sqlmap GUI, using wxpython4.0
 
 #### ABOUT
 1. V0.2  
-   2019年 05月 12日 星期日 03:31:44 CST  
+   2019-05-12 16:58  
    作者: needle wang ( needlewang2011@gmail.com )  
 2. 使用wxPthon4重写sqlmap-ui(using PyGObject)  
 5. 感谢[sqm](https://github.com/kxcode/gui-for-sqlmap)带来的灵感, 其作者: [KINGX](https://github.com/kxcode) (sqm UI 使用的是python2 + tkinter)  
