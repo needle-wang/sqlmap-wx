@@ -4,6 +4,7 @@
 
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
+from time import sleep
 
 from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, cbb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
@@ -33,7 +34,7 @@ class Window(wx.Frame):
     INIT_MESG(self)
 
     # 读取 上次所有选项
-    self.session = Session(self._notebook)
+    self.session = Session(self)
     self.session.load_from_tmp()
 
   # @profile
@@ -390,51 +391,58 @@ class Window(wx.Frame):
                                  size = (-1, 300),
                                  style = wx.TE_MULTILINE | wx.TE_READONLY)
 
-    self._get_sqlmap_path_btn.Bind(
-      EVT_BUTTON,
-      lambda evt, view = self._page5_manual_view:
-        self._set_manual_view(view))
+    self._get_sqlmap_path_btn.Bind(EVT_BUTTON, self._make_help_thread)
 
     vbox.Add(self._get_sqlmap_path_btn, flag = TOP | LEFT | BOTTOM, border = 10)
     vbox.Add(self._page5_manual_view, proportion = 1, flag = EXPAND | LEFT | RIGHT, border = 10)
 
-    # 使用线程 填充 帮助标签, 加快启动速度
-    t = Thread(target = self._set_manual_view,
-               args = (self._page5_manual_view,))
-    # t.daemon = True   # 死了也会存在
-    t.start()
+    self._make_help_thread(None)
 
     p.SetSizerAndFit(vbox)
     return p
 
-  def _set_manual_view(self, textbuffer):
+  def _make_help_thread(self, event):
+    isClick = True if event else False
+    # 使用线程 填充 帮助标签, 加快启动速度
+    t = Thread(target = self._set_manual_view,
+               args = (self._page5_manual_view, isClick))
+    # t.daemon = True   # 死了也会存在
+    t.start()
+
+  def _set_manual_view(self, view, isClick):
     '''
     不用多线程能行嘛? 想要获得输出结果就一定会有阻塞的可能!
     https://www.jianshu.com/p/11090e197648
     https://wiki.gnome.org/Projects/PyGObject/Threading
+    needle注: 跟sqlamp-gtk版本的代码可不一样, 操作的共享对象有两个,
+              不过原则一样, 所有对共用对象的操作都要用CallAfter
+              这样写是不是很丑?
     '''
-    textbuffer.SetValue('')
-    sqlmap_path = 'sqlmap'
-    _path = self._notebook.sqlmap_path_entry.GetValue().strip()
-    if _path:
-      sqlmap_path = _path
+    if isClick:
+      wx.CallAfter(self._get_sqlmap_path_btn.Disable)
+      wx.CallAfter(view.SetValue, '')
 
-    byte_coding = 'utf8'
-    if not IS_POSIX:
-      byte_coding = 'gbk'
+    byte_coding = 'utf8' if IS_POSIX else 'gbk'
+
+    # _manual_hh = '/home/needle/bin/output_interval.sh'
     # win下的sqlmap -hh有Enter阻塞
-    _manual_hh = 'echo y|%s -hh' % sqlmap_path
+    _manual_hh = 'echo y|%s -hh' % self._handlers.get_sqlmap_path()
     try:
       _subprocess = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, bufsize=1, shell = True)
 
       for _an_bytes_line_tmp in iter(_subprocess.stdout.readline, b''):
-        wx.CallAfter(textbuffer.write, _an_bytes_line_tmp.decode(byte_coding))
-      _subprocess.stdout.close()
+        wx.CallAfter(view.write, _an_bytes_line_tmp.decode(byte_coding))
       _subprocess.wait()
     except FileNotFoundError as e:
-      wx.CallAfter(textbuffer.write, str(e))
+      wx.CallAfter(view.write, str(e))
     finally:
-      wx.CallAfter(textbuffer.ShowPosition, 0)
+      _subprocess.stdout.close()
+
+    if isClick:
+      # 用gtk时, 如果view不在屏幕上可见, ShowPosition会报错
+      wx.CallAfter(view.ShowPosition, 0)
+      wx.CallAfter(self._get_sqlmap_path_btn.Enable)
+      wx.CallAfter(self._get_sqlmap_path_btn.SetFocus)
 
   def build_page6(self, parent):
     p = Panel(parent)

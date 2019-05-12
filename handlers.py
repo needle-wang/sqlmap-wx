@@ -64,7 +64,7 @@ class Handler(object):
         _resp = _resp.json()
         # print(_resp)
         if _resp['success']:
-          # self._task_view_append('总任务数: %s' % _resp['tasks_num'])
+          self._task_view_append('总任务数: %s' % _resp['tasks_num'])
           p = self.w._api_admin_list_rows
           vbox = p.GetSizer()
           # 清空之前的任务列表
@@ -140,6 +140,8 @@ class Handler(object):
           p.SetupScrolling()
       except Exception as e:
         self._task_view_append(e)
+    else:
+        self._task_view_append('需要填写API server和admin token.')
 
   def api_option_list(self, taskid):
     '''
@@ -367,11 +369,10 @@ class Handler(object):
 
   def run_cmdline(self, event):
     self.w._notebook.SetFocus()
-    sqlmap_path = 'sqlmap'
-    _path = self.get_tc_value(self.w._notebook.sqlmap_path_entry)
-    if _path:
-      sqlmap_path = _path
+
     _sqlmap_opts = self.get_tc_value(self.w._cmd_entry)
+    sqlmap_path = self.get_sqlmap_path()
+
     if IS_POSIX:
       _cmdline_str = '/usr/bin/env xterm -hold -e %s %s' % (sqlmap_path, _sqlmap_opts)
     else:
@@ -380,6 +381,22 @@ class Handler(object):
     # self.w.main_notebook.SetSelection(1)
     # print(_cmdline_str)
     Popen(_cmdline_str, shell = True)
+
+  def get_sqlmap_path(self, path = 'sqlmap'):
+    path_in_tc = self.get_tc_value(self.w._notebook.sqlmap_path_entry)
+
+    if IS_POSIX:
+      if path_in_tc:
+        path = path_in_tc
+    else:
+      # sqlmap.exe and sqlmap.py in win
+      if path_in_tc:
+        if path_in_tc.endswith('.py'):
+          path = 'python "%s"' % path_in_tc
+        else:
+          path = path_in_tc
+
+    return path
 
   def set_file_entry_text(self, event, data):
     '''
@@ -414,7 +431,11 @@ class Handler(object):
 
       _load_host = urlparse(_load_url).netloc
 
-      return Path.home() / '.sqlmap/output' / _load_host
+      if IS_POSIX:
+        output_dir = Path.home() / '.sqlmap/output' / _load_host
+      else:
+        output_dir = Path.home() / 'AppData/Local/sqlmap/output' / _load_host
+      return output_dir
 
   def _log_view_insert(self, file_path):
     '''
@@ -433,8 +454,9 @@ class Handler(object):
       self.w._page3_log_view.write(str(e))
     finally:
       self.w._page3_log_view.write(
-        time.strftime('\n%Y-%m-%d %R:%S: ----------我是分割线----------\n',
-                      time.localtime()))
+        time.strftime('\n%Y-%m-%d %R:%S: ', time.localtime()))
+      # win下, strftime方法无法处理unicode, py的bug, 到此时还没修复
+      self.w._page3_log_view.write('----------我是分割线----------\n',)
 
       self.w._page3_log_view.SetFocus()
       _mark = self.w._page3_log_view.GetInsertionPoint()

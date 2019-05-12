@@ -9,14 +9,18 @@ LAST_TMP = 'last.tmp'
 
 
 class Session(object):
-  def __init__(self, m):
+  def __init__(self, w):
     '''
+    w: sqlmap_wx.Window
     m: page1_notebook.Page1Notebook
     '''
+    self.w = w
+    self.m = w._notebook
+
     self._cfg = ConfigParser()
-    self.m = m
 
   def save_to_tmp(self):
+    self._save_to_tmp_target()
     self._save_to_tmp_ckbtn()
     self._save_to_tmp_entry()
 
@@ -27,8 +31,20 @@ class Session(object):
     # 如果文件不存在, 不会报错
     self._cfg.read(LAST_TMP, 'utf8')
 
+    self._load_from_tmp_target()
     self._load_from_tmp_ckbtn()
     self._load_from_tmp_entry()
+
+  def _save_to_tmp_target(self):
+    if self._cfg.has_section('Target'):
+      self._cfg.remove_section('Target')
+
+    self._cfg.add_section('Target')
+
+    _tmp_url = self.w._url_combobox.GetValue().strip()
+
+    if _tmp_url:
+      self._cfg['Target']['_url_combobox'] = _tmp_url
 
   def _save_to_tmp_entry(self):
     if self._cfg.has_section('Entry'):
@@ -59,17 +75,19 @@ class Session(object):
 
     self._cfg['CheckButton']['checked'] = ','.join(_checked)
 
-  def _load_from_tmp_entry(self):
-    if not self._cfg.has_section('Entry'):
-      self._cfg.add_section('Entry')
+  def _load_from_tmp_target(self):
+    if not self._cfg.has_section('Target'):
+      self._cfg.add_section('Target')
 
-    for _i in self._cfg.options('Entry'):
-      # 不去手动改LAST_TMP, self.m就肯定有_i属性了
-      _tmp_entry = getattr(self.m, _i)
+    for _i in self._cfg.options('Target'):
+      if _i == '_url_combobox':
+        # 不去手动改LAST_TMP, self.m就肯定有_i属性了
+        _tmp_url = self.w._url_combobox
 
-      if isinstance(_tmp_entry, tc) and self._cfg['Entry'][_i]:
-        # print(type(self._cfg['Entry'][_i]))
-        _tmp_entry.SetValue(self._cfg['Entry'][_i])
+        if self._cfg['Target'][_i]:
+          _tmp_url.SetValue(self._cfg['Target'][_i])
+
+      break
 
   def _load_from_tmp_ckbtn(self):
     if not self._cfg.has_section('CheckButton'):
@@ -87,6 +105,18 @@ class Session(object):
     except KeyError as e:
       # 如果没有checked项, 则pass
       pass
+
+  def _load_from_tmp_entry(self):
+    if not self._cfg.has_section('Entry'):
+      self._cfg.add_section('Entry')
+
+    for _i in self._cfg.options('Entry'):
+      # 不去手动改LAST_TMP, self.m就肯定有_i属性了
+      _tmp_entry = getattr(self.m, _i)
+
+      if isinstance(_tmp_entry, tc) and self._cfg['Entry'][_i]:
+        # print(type(self._cfg['Entry'][_i]))
+        _tmp_entry.SetValue(self._cfg['Entry'][_i])
 
 
 def main():
