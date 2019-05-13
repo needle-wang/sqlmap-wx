@@ -385,6 +385,7 @@ class Window(wx.Frame):
     vbox = BoxSizer(VERTICAL)
 
     self._get_sqlmap_path_btn = btn(p, label = '获取帮助')
+    self._get_sqlmap_path_btn.Disable()
     # 多行文本框的默认size太小了
     # 默认高度太低, 不指定个高度, gtk会报 滚动条相关的size 警告
     self._page5_manual_view = tc(p,
@@ -414,8 +415,8 @@ class Window(wx.Frame):
     不用多线程能行嘛? 想要获得输出结果就一定会有阻塞的可能!
     https://www.jianshu.com/p/11090e197648
     https://wiki.gnome.org/Projects/PyGObject/Threading
-    needle注: 跟sqlamp-gtk版本的代码可不一样, 操作的共享对象有两个,
-              不过原则一样, 所有对共用对象的操作都要用CallAfter
+    needle注: 操作的共享对象有两个: _get_sqlmap_path_btn, view
+              原则一样, 所有对共用对象的操作都要用CallAfter
               这样写是不是很丑?
     '''
     if isClick:
@@ -439,11 +440,11 @@ class Window(wx.Frame):
       print(e)  # 如果主线程结束太快, 会: AssertionError: No wx.App created yet
     finally:
       _subprocess.stdout.close()
+      wx.CallAfter(self._get_sqlmap_path_btn.Enable)
 
     if isClick:
       # 用gtk时, 如果view不在屏幕上可见, ShowPosition会报错
       wx.CallAfter(view.ShowPosition, 0)
-      wx.CallAfter(self._get_sqlmap_path_btn.Enable)
       wx.CallAfter(self._get_sqlmap_path_btn.SetFocus)
 
   def build_page6(self, parent):
