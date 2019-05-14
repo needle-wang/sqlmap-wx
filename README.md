@@ -22,12 +22,12 @@ from sqlmap's FAQ:
   - `./sqlmap_wx.py`  
 
 #### TODO
-- ~~重写完成, 功能和界面完全一样~~
+- ~~重写完成, 功能和界面与sqlmap-gtk完全一样~~
 - 继续重构, 优化?
 
 #### ABOUT
-1. V0.2  
-   2019-05-12 16:58  
+1. V0.3  
+   2019-05-15 00:17  
    作者: needle wang ( needlewang2011@gmail.com )  
 2. 使用wxPthon4重写sqlmap-ui(using PyGObject)  
 5. 感谢[sqm](https://github.com/kxcode/gui-for-sqlmap)带来的灵感, 其作者: [KINGX](https://github.com/kxcode) (sqm UI 使用的是python2 + tkinter)  

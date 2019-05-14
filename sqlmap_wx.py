@@ -454,8 +454,8 @@ class Window(wx.Frame):
     vbox = BoxSizer(VERTICAL)
 
     _about_str = '''
-    1. VERSION: 0.2
-       2019-05-12 16:58
+    1. VERSION: 0.3
+       2019-05-15 00:17
        required: python3.5+, wxPython4.0+, sqlmap(require: python2.6+)
        作者: needle wang ( needlewang2011@gmail.com )\n
     2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
