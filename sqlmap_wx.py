@@ -432,14 +432,16 @@ class Window(wx.Frame):
       _subprocess = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, bufsize=1, shell = True)
 
       for _an_bytes_line_tmp in iter(_subprocess.stdout.readline, b''):
-        wx.CallAfter(view.write, _an_bytes_line_tmp.decode(byte_coding))
+        wx.CallAfter(view.write,
+                     _an_bytes_line_tmp.decode(byte_coding))
+
       _subprocess.wait()
+      _subprocess.stdout.close()
     except FileNotFoundError as e:
       wx.CallAfter(view.write, str(e))
     except Exception as e:
       print(e)  # 如果主线程结束太快, 会: AssertionError: No wx.App created yet
     finally:
-      _subprocess.stdout.close()
       wx.CallAfter(self._get_sqlmap_path_btn.Enable)
 
     if isClick:
