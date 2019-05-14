@@ -13,7 +13,7 @@ SizerFlags = wx.SizerFlags
 EVT_BUTTON = wx.EVT_BUTTON
 
 
-class Page1Notebook(nb):
+class Notebook(nb):
   def __init__(self, parent, handlers):
     '''
     最大的宽应该是由最长的 request定制的第一行 决定
@@ -24,7 +24,7 @@ class Page1Notebook(nb):
     super().__init__(parent)
 
     self._handlers = handlers
-
+    # 选项区 - 设置, 请求, 枚举, 文件, 其他
     page1_setting = self.build_page1_setting()
     page1_request = self.build_page1_request()
     page1_enumeration = self.build_page1_enumeration()
@@ -1452,9 +1452,9 @@ def main():
   from handlers import Handler
   app = wx.App()
 
-  win = wx.Frame(None, title = 'sqlmap-page1')
+  win = wx.Frame(None, title = 'sqlmap-options')
 
-  n = Page1Notebook(win, Handler(win))
+  n = Notebook(win, Handler(win))
 
   box = BoxSizer()
   box.Add(n, proportion = 1, flag = EXPAND | BOTTOM, border = 5)

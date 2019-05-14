@@ -8,7 +8,7 @@ from threading import Thread
 from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, cbb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
 
-from page1_notebook import Page1Notebook
+from opts_wx import Notebook
 from handlers import Handler, IS_POSIX
 from session import Session
 from tooltips import Widget_Mesg as INIT_MESG
@@ -244,7 +244,7 @@ class Window(wx.Frame):
     cmd_area.Add(self._cmd_entry, flag = EXPAND)
 
     # 主构造区
-    self._notebook = Page1Notebook(p, self._handlers)
+    self._notebook = Notebook(p, self._handlers)
 
     # 构造与执行
     self.btn_grid = GridSizer(1, 4, 0, 0)

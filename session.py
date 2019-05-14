@@ -12,7 +12,7 @@ class Session(object):
   def __init__(self, w):
     '''
     w: sqlmap_wx.Window
-    m: page1_notebook.Page1Notebook
+    m: opts_wx.Notebook
     '''
     self.w = w
     self.m = w._notebook

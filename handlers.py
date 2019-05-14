@@ -5,7 +5,7 @@
 
 import ast
 import time
-from os import environ, name as OS_NAME
+from os import name as OS_NAME
 # python3.5+
 from pathlib import Path
 from subprocess import Popen
