@@ -27,6 +27,23 @@ class CheckBox(wx.CheckBox):
     # 侮辱智商! 脑子都搞蒙了
     self.SetForegroundColour(self.GetForegroundColour())
 
+    self.origin_bgcolor = self.GetBackgroundColour()
+    self.Bind(wx.EVT_CHECKBOX, self.set_color)
+
+  def set_color(self, event):
+    if self.IsChecked():
+      # 跟sqlmap-gtk一样: #f6d488
+      self.SetBackgroundColour(wx.Colour(246, 212, 136))
+    else:
+      self.SetBackgroundColour(self.origin_bgcolor)
+    # 这里调不调skip无所谓吧~
+    if event:
+      event.Skip()
+
+  def SetValue(self, state):
+    super().SetValue(state)
+    self.set_color(None)
+
 
 class NumCtrl(wx.TextCtrl):
   '''

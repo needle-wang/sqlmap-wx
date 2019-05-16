@@ -41,6 +41,8 @@ class Notebook(nb):
     cb = event.GetEventObject()
     if cb.IsChecked():
       checkbox.SetValue(False)
+    # 这是最后一个Bind, 要skip哈! 不然改不了颜色
+    event.Skip()
 
   def optimize_area_controller(self, event):
     if self._optimize_area_turn_all_ckbtn.IsChecked():
@@ -55,6 +57,8 @@ class Notebook(nb):
       self._optimize_area_predict_ckbtn.Enable()
       self._optimize_area_keep_alive_ckbtn.Enable()
       self._optimize_area_null_connect_ckbtn.Enable()
+    # 这是最后一个Bind, 要skip哈! 不然改不了颜色
+    event.Skip()
 
   def build_page1_other(self):
     p = Panel(self)
