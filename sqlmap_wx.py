@@ -308,8 +308,8 @@ class Window(wx.Frame):
     p = Panel(parent)
     vbox = BoxSizer(VERTICAL)
 
-    border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
-    proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
+    border = SizerFlags().Border(LEFT | RIGHT, 5).Align(ALIGN_CENTER)
+    proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5).Align(ALIGN_CENTER)
 
     row1 = BoxSizer()
     self._page4_api_server_label = st(p, label = 'REST-JSON API server:')
@@ -318,9 +318,9 @@ class Window(wx.Frame):
     self._page4_admin_token_entry = tc(p)
     self._page4_admin_token_entry.SetMaxLength(32)
 
-    row1.Add(self._page4_api_server_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row1.Add(self._page4_api_server_label, border)
     row1.Add(self._page4_api_server_entry, proportion_border)
-    row1.Add(self._page4_admin_token_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row1.Add(self._page4_admin_token_label, border)
     row1.Add(self._page4_admin_token_entry, proportion_border)
 
     row2 = BoxSizer()
@@ -341,13 +341,13 @@ class Window(wx.Frame):
     self._page4_admin_flush_btn.Bind(EVT_BUTTON, self._handlers.api_admin_flush)
     self._page4_clear_task_view_btn.Bind(EVT_BUTTON, self._handlers.clear_task_view_buffer)
 
-    row2.Add(self._page4_task_new_btn, flag = LEFT | RIGHT, border = 5)
-    row2.Add(self._page4_admin_list_btn, flag = LEFT | RIGHT, border = 5)
-    row2.Add(self._page4_admin_flush_btn, flag = LEFT | RIGHT, border = 5)
-    row2.Add(self._page4_clear_task_view_btn, flag = LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_task_new_btn, border)
+    row2.Add(self._page4_admin_list_btn, border)
+    row2.Add(self._page4_admin_flush_btn, border)
+    row2.Add(self._page4_clear_task_view_btn, border)
     row2.Add(self._page4_username_label, flag = ALIGN_CENTER | LEFT, border = 200)
     row2.Add(self._page4_username_entry, proportion_border)
-    row2.Add(self._page4_password_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_password_label, border)
     row2.Add(self._page4_password_entry, proportion_border)
 
     row3 = SplitterWindow(p, style = wx.SP_LIVE_UPDATE | wx.BORDER_SUNKEN)

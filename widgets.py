@@ -27,7 +27,7 @@ class CheckBox(wx.CheckBox):
     # 侮辱智商! 脑子都搞蒙了
     self.SetForegroundColour(self.GetForegroundColour())
 
-    self.origin_bgcolor = self.GetBackgroundColour()
+    self.origin_bgcolor = wx.SystemSettings.GetColour(wx.SYS_COLOUR_WINDOW)
     self.Bind(wx.EVT_CHECKBOX, self.set_color)
 
   def set_color(self, event):
