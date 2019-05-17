@@ -26,8 +26,8 @@ from sqlmap's FAQ:
 - 继续重构, 优化?
 
 #### ABOUT
-1. V0.3  
-   2019-05-15 00:17  
+1. V0.3.1  
+   2019-05-17 21:35  
    作者: needle wang ( needlewang2011@gmail.com )  
 2. 使用wxPthon4重写sqlmap-ui(using PyGObject)  
 5. 感谢[sqm](https://github.com/kxcode/gui-for-sqlmap)带来的灵感, 其作者: [KINGX](https://github.com/kxcode) (sqm UI 使用的是python2 + tkinter)  
