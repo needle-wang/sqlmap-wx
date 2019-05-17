@@ -324,12 +324,17 @@ class Window(wx.Frame):
     row1.Add(self._page4_admin_token_entry, proportion_border)
 
     row2 = BoxSizer()
-    _arrow_down = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_BUTTON)
     self._page4_task_new_btn = btn(p, label = '创建任务')
     self._page4_admin_list_btn = btn(p, label = '显示任务')
-    self._page4_admin_list_btn.SetBitmap(_arrow_down, dir = RIGHT)
     self._page4_admin_flush_btn = btn(p, label = '删除所有任务')
     self._page4_clear_task_view_btn = btn(p, label = '清空反馈的结果')
+    self._page4_username_label = st(p, label = '用户名:')
+    self._page4_username_entry = tc(p)
+    self._page4_password_label = st(p, label = '密码:')
+    self._page4_password_entry = tc(p)
+
+    _arrow_down = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_BUTTON)
+    self._page4_admin_list_btn.SetBitmap(_arrow_down, dir = RIGHT)
 
     self._page4_task_new_btn.Bind(EVT_BUTTON, self._handlers.api_task_new)
     self._page4_admin_list_btn.Bind(EVT_BUTTON, self._handlers.api_admin_list)
@@ -340,11 +345,15 @@ class Window(wx.Frame):
     row2.Add(self._page4_admin_list_btn, flag = LEFT | RIGHT, border = 5)
     row2.Add(self._page4_admin_flush_btn, flag = LEFT | RIGHT, border = 5)
     row2.Add(self._page4_clear_task_view_btn, flag = LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_username_label, flag = ALIGN_CENTER | LEFT, border = 200)
+    row2.Add(self._page4_username_entry, proportion_border)
+    row2.Add(self._page4_password_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row2.Add(self._page4_password_entry, proportion_border)
 
     row3 = SplitterWindow(p, style = wx.SP_LIVE_UPDATE | wx.BORDER_SUNKEN)
     # 不能放在SplitVertically后面, 不然gravity会无效
+    # row3.SetSashGravity(0.5)
     row3.SetMinimumPaneSize(400)
-    row3.SetSashGravity(0.7)
 
     lpane = Scroll(row3)
     self._api_admin_list_rows = lpane
@@ -355,20 +364,23 @@ class Window(wx.Frame):
     _rbox = BoxSizer(VERTICAL)
 
     self._page4_option_get_entry = tc(rpane, value = 'url risk level')
+    _page4_option_set_view_tip = st(rpane, label = '所有选项见sqlmap目录中的optiondict.py')
     _options_example = ("{\n"
                         "  'url': 'http://www.site.com/vuln.php?id=1',\n"
                         "  'level': 1, 'risk': 1,\n\n"
-                        "}\n# 所有选项见sqlmap目录中的optiondict.py\n")
+                        "}\n")
     self._page4_option_set_view = tc(rpane,
                                      value = _options_example,
                                      style = wx.TE_MULTILINE)
     _rbox.Add(self._page4_option_get_entry, flag = EXPAND | ALL, border = 2)
+    _rbox.Add(_page4_option_set_view_tip, flag = ALL, border = 2)
     _rbox.Add(self._page4_option_set_view, proportion = 1, flag = EXPAND | ALL, border = 2)
     rpane.SetSizer(_rbox)
 
     row3.SplitVertically(lpane, rpane)
     # win下, lpane是灰色的, 将row3设下颜色, 又是兼容代码...
     row3.SetBackgroundColour(self._page4_option_set_view.GetBackgroundColour())
+    row3.SetSashPosition(lpane.GetMinWidth())
 
     self._page4_task_view = tc(p, value = '此处显示反馈的结果:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
 
@@ -457,7 +469,8 @@ class Window(wx.Frame):
     1. VERSION: 0.3
        2019-05-15 00:17
        required: python3.5+, wxPython4.0+, sqlmap(require: python2.6+)
-       作者: needle wang ( needlewang2011@gmail.com )\n
+       作者: needle wang ( needlewang2011@gmail.com )
+       https://github.com/needle-wang/sqlmap-wx/\n
     2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
     3. wxpython教程: https://wiki.wxpython.org/
                      http://zetcode.com/wxpython/
