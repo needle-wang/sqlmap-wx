@@ -584,7 +584,7 @@ class Notebook(nb):
     row1.Add(self._runsql_area_sql_query_entry, proportion = 1, flag = RIGHT, border = 10)
 
     row2 = BoxSizer()
-    self._runsql_area_sql_shell_ckbtn = cb(_runsql_area, label = '打开个SQL交互shell')
+    self._runsql_area_sql_shell_ckbtn = cb(_runsql_area, label = '打开一个SQL交互shell')
     self._runsql_area_sql_file_ckbtn = cb(_runsql_area, label = '本地SQL文件:')
     self._runsql_area_sql_file_entry = tc(_runsql_area)
     self._runsql_area_sql_file_chooser = btn(_runsql_area, label = '打开')
@@ -711,17 +711,17 @@ class Notebook(nb):
     _dump_area = dump_area.GetStaticBox()
 
     self._dump_area_dump_ckbtn = cb(_dump_area, label = 'dump(某库某表的条目)')
-    self._dump_area_dump_all_ckbtn = cb(_dump_area, label = '全部dump(拖库)')
+    self._dump_area_repair_ckbtn = cb(_dump_area, label = '重新获取有未知符号(?)的条目')
     self._dump_area_search_ckbtn = cb(_dump_area, label = '搜索')
     self._dump_area_no_sys_db_ckbtn = cb(_dump_area, label = '排除系统库')
-    self._dump_area_repair_ckbtn = cb(_dump_area, label = '重新获取有未知符号(?)的条目')
+    self._dump_area_dump_all_ckbtn = cb(_dump_area, label = '全部dump(拖库)')
 
     spacing = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
     dump_area.Add(self._dump_area_dump_ckbtn, spacing)
-    dump_area.Add(self._dump_area_dump_all_ckbtn, spacing)
+    dump_area.Add(self._dump_area_repair_ckbtn, spacing)
     dump_area.Add(self._dump_area_search_ckbtn, spacing)
     dump_area.Add(self._dump_area_no_sys_db_ckbtn, spacing)
-    dump_area.Add(self._dump_area_repair_ckbtn, spacing)
+    dump_area.Add(self._dump_area_dump_all_ckbtn, spacing)
 
     return dump_area
 
@@ -730,9 +730,9 @@ class Notebook(nb):
     _enum_area = enum_area.GetStaticBox()
 
     _enum_area_enum_labels = (
-      ('DB banner', '当前用户', '当前数据库', '主机名', '是否是DBA'),
+      ('DB banner', '当前用户', '当前数据库', '主机名', '是否为DBA'),
       ('用户', '密码', '权限', '角色', '数据库'),
-      ('表', '字段', '架构', '计数', '备注'))
+      ('表名', '列名', '架构', '行数', '备注'))
     self._enum_area_opts_ckbtns = ([], [], [])
     _enu_area_opts_cols = [BoxSizer(VERTICAL),
                            BoxSizer(VERTICAL),
@@ -894,7 +894,7 @@ class Notebook(nb):
     self._request_area_ignore_code_entry = tc(_request_custom_area, value = '401')
     self._request_area_skip_urlencode_ckbtn = cb(_request_custom_area, label = 'payload不使用url编码')
     self._request_area_force_ssl_ckbtn = cb(_request_custom_area, label = '强制使用HTTPS')
-    self._request_area_chunked_ckbtn = cb(_request_custom_area, label = '用Chunked编码发送POST请求')
+    self._request_area_chunked_ckbtn = cb(_request_custom_area, label = '"分块传输"发送POST请求')
     self._request_area_hpp_ckbtn = cb(_request_custom_area, label = '使用HTTP参数污染')
 
     row1.Add(self._request_area_ignore_redirects_ckbtn, border)

@@ -468,7 +468,7 @@ class Window(wx.Frame):
     _about_str = '''
     1. VERSION: 0.3.1
        2019年 05月 17日 星期五 21:35:32 CST
-       required: python3.5+, wxPython4.0+, sqlmap(require: python2.6+)
+       required: python3.5+, wxPython4.0+, sqlmap
        作者: needle wang ( needlewang2011@gmail.com )
        https://github.com/needle-wang/sqlmap-wx/\n
     2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
