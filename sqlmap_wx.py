@@ -5,9 +5,10 @@
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 
-from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, cbb, nb, st, tc
+from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, nb, st, tc
 from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
 
+from model import Model
 from opts_wx import Notebook
 from handlers import Handler, IS_POSIX
 from session import Session
@@ -26,19 +27,19 @@ class Window(wx.Frame):
     super().__init__(parent, title = 'sqlmap-wx')
     self.SetIcon(wx.Icon('sqlmap_wx.ico'))
 
-    self._handlers = Handler(self)  # 需要先设置handler, Bind需要它
+    self.m = Model()
+    self._handlers = Handler(self, self.m)  # 需要先设置handler, Bind需要它
     self.initUI()
     self.make_accelerators()  # 要先初始化完成后, 才能设全局键
     # 添加tooltips, placeholders等
-    INIT_MESG(self)
+    INIT_MESG(self.m)
     # 读取 上次所有选项
-    self.session = Session(self)
+    self.session = Session(self.m)
     self.session.load_from_tmp()
 
   # @profile
   def initUI(self):
     p = Panel(self)
-    vbox = BoxSizer(VERTICAL)
 
     self._target_notebook = nb(p)
     self.build_target_notebook(self._target_notebook)
@@ -58,6 +59,7 @@ class Window(wx.Frame):
     self.main_notebook.AddPage(page5, '帮助(H)')
     self.main_notebook.AddPage(page6, '关于')
 
+    vbox = BoxSizer(VERTICAL)
     vbox.Add(self._target_notebook, flag = EXPAND)
     vbox.Add(self.main_notebook, proportion = 1, flag = EXPAND)
     p.SetSizer(vbox)
@@ -98,7 +100,7 @@ class Window(wx.Frame):
           self._notebook.SetSelection(page)
             if self.main_notebook.GetSelection() == 0 else evt.Skip(),
         id = pageid)
-    # win下, 若焦点没有按钮上, 则不响应mnemonic, 只能在这里实现了
+    # win下, 若焦点没按钮上, 则不响应mnemonic, 只能在这里实现了
     _btn_keys = ['A', 'S', 'D', 'F']
     btns = self.btn_grid.GetChildren()
     for i in range(len(btns)):
@@ -125,17 +127,17 @@ class Window(wx.Frame):
     wx.PostEvent(btn, evt)
 
   def clear_all_entry(self, event):
-    m = self._notebook
+    m = self.m
     for _i in dir(m):
       if _i.endswith('entry'):
         _tmp_entry = getattr(m, _i)
-        if isinstance(_tmp_entry, tc) and _tmp_entry is not self._notebook.sqlmap_path_entry:
+        if isinstance(_tmp_entry, tc) and _tmp_entry is not m.sqlmap_path_entry:
           _tmp_entry.SetValue('')
 
-    m.SetFocus()
+    self._notebook.SetFocus()
 
   def unselect_all_ckbtn(self, event):
-    m = self._notebook
+    m = self.m
     for _i in dir(m):
       if _i.endswith('ckbtn'):
         _tmp_ckbtn = getattr(m, _i)
@@ -146,7 +148,7 @@ class Window(wx.Frame):
         if _j.IsChecked():
           _j.SetValue(False)
 
-    m.SetFocus()
+    self._notebook.SetFocus()
 
   def onCloseByAccel(self, event):
     '''
@@ -160,101 +162,106 @@ class Window(wx.Frame):
     https://www.daniweb.com/programming/software-development/code/216760/verify-exit-dialog-wxpython
     '''
     # print('by ALT-<F4> or click close button.')
-    # 保存 此次所有选项
-    self.session.save_to_tmp()
-
-    event.Skip()
+    try:
+      # 保存 此次所有选项
+      self.session.save_to_tmp()
+    except Exception as e:
+      raise e
+    finally:
+      event.Skip()
 
   def build_target_notebook(self, parent):
-    self._url_combobox = cbb(parent, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
+    m = self.m
+
+    m._url_combobox.Create(parent, choices = ['http://www.site.com/vuln.php?id=1'])   # style = wx.CB_DROPDOWN
 
     p2 = Panel(parent)
     hbox2 = BoxSizer()
-    self._burp_logfile = tc(p2)
-    self._burp_logfile_chooser = btn(p2, label = '打开')
-    self._burp_logfile_chooser.Bind(
+    m._burp_logfile.Create(p2)
+    m._burp_logfile_chooser.Create(p2, label = '打开')
+    m._burp_logfile_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [self._burp_logfile]:
+      lambda evt, data = [m._burp_logfile]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox2.Add(self._burp_logfile, proportion = 1, flag = EXPAND)
-    hbox2.Add(self._burp_logfile_chooser, flag = EXPAND)
+    hbox2.Add(m._burp_logfile, proportion = 1, flag = EXPAND)
+    hbox2.Add(m._burp_logfile_chooser, flag = EXPAND)
     p2.SetSizer(hbox2)
 
     p3 = Panel(parent)
     hbox3 = BoxSizer()
-    self._request_file = tc(p3)
-    self._request_file_chooser = btn(p3, label = '打开')
-    self._request_file_chooser.Bind(
+    m._request_file.Create(p3)
+    m._request_file_chooser.Create(p3, label = '打开')
+    m._request_file_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [self._request_file]:
+      lambda evt, data = [m._request_file]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox3.Add(self._request_file, proportion = 1, flag = EXPAND)
-    hbox3.Add(self._request_file_chooser, flag = EXPAND)
+    hbox3.Add(m._request_file, proportion = 1, flag = EXPAND)
+    hbox3.Add(m._request_file_chooser, flag = EXPAND)
     p3.SetSizer(hbox3)
 
     p4 = Panel(parent)
     hbox4 = BoxSizer()
-    self._bulkfile = tc(p4)
-    self._bulkfile_chooser = btn(p4, label = '打开')
-    self._bulkfile_chooser.Bind(
+    m._bulkfile.Create(p4)
+    m._bulkfile_chooser.Create(p4, label = '打开')
+    m._bulkfile_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [self._bulkfile]:
+      lambda evt, data = [m._bulkfile]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox4.Add(self._bulkfile, proportion = 1, flag = EXPAND)
-    hbox4.Add(self._bulkfile_chooser, flag = EXPAND)
+    hbox4.Add(m._bulkfile, proportion = 1, flag = EXPAND)
+    hbox4.Add(m._bulkfile_chooser, flag = EXPAND)
     p4.SetSizer(hbox4)
 
     p5 = Panel(parent)
     hbox5 = BoxSizer()
-    self._configfile = tc(p5)
-    self._configfile_chooser = btn(p5, label = '打开')
-    self._configfile_chooser.Bind(
+    m._configfile.Create(p5)
+    m._configfile_chooser.Create(p5, label = '打开')
+    m._configfile_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [self._configfile]:
+      lambda evt, data = [m._configfile]:
         self._handlers.set_file_entry_text(evt, data))
 
-    hbox5.Add(self._configfile, proportion = 1, flag = EXPAND)
-    hbox5.Add(self._configfile_chooser, flag = EXPAND)
-    p5.SetSizerAndFit(hbox5)
+    hbox5.Add(m._configfile, proportion = 1, flag = EXPAND)
+    hbox5.Add(m._configfile_chooser, flag = EXPAND)
+    p5.SetSizer(hbox5)
 
-    self._sitemap_url = tc(parent)
-    self._google_dork = tc(parent)
+    m._sitemap_url.Create(parent)
+    m._google_dork.Create(parent)
 
-    parent.AddPage(self._url_combobox, '目标url')
+    parent.AddPage(m._url_combobox, '目标url')
     parent.AddPage(p2, 'burp日志')
     parent.AddPage(p3, 'HTTP请求')
     parent.AddPage(p4, 'BULKFILE')
     parent.AddPage(p5, 'ini文件')
-    parent.AddPage(self._sitemap_url, 'xml_url')
-    parent.AddPage(self._google_dork, 'GOOGLEDORK')
+    parent.AddPage(m._sitemap_url, 'xml_url')
+    parent.AddPage(m._google_dork, 'GOOGLEDORK')
 
   def build_page1(self, parent):
     p = Panel(parent)
-    vbox = BoxSizer(VERTICAL)
+    m = self.m
 
     # sqlmap命令语句
     cmd_area = StaticBoxSizer(VERTICAL, p, 'A.收集选项 的结果显示在这:')
     _cmd_area = cmd_area.GetStaticBox()
 
-    self._cmd_entry = tc(_cmd_area)
+    m._cmd_entry.Create(_cmd_area)
 
-    cmd_area.Add(self._cmd_entry, flag = EXPAND)
+    cmd_area.Add(m._cmd_entry, flag = EXPAND)
 
     # 主构造区
-    self._notebook = Notebook(p, self._handlers)
+    self._notebook = Notebook(p, m, self._handlers)
 
-    # 构造与执行
+    # 构造与执行 和 改善ui的使用体验
     self.btn_grid = GridSizer(1, 4, 0, 0)
-    _build_button = btn(p, label = 'A.收集选项(A)')
-    _build_button.Bind(EVT_BUTTON, self._handlers.build_all)
-    # 用于改善ui的使用体验
-    _unselect_all_btn = btn(p, label = '反选所有复选框(S)')
-    _unselect_all_btn.Bind(EVT_BUTTON, self.unselect_all_ckbtn)
 
+    _build_button = btn(p, label = 'A.收集选项(A)')
+    _unselect_all_btn = btn(p, label = '反选所有复选框(S)')
     _clear_all_entry = btn(p, label = '清空所有输入框(D)')
+
+    _build_button.Bind(EVT_BUTTON, self._handlers.build_all)
+    _unselect_all_btn.Bind(EVT_BUTTON, self.unselect_all_ckbtn)
     _clear_all_entry.Bind(EVT_BUTTON, self.clear_all_entry)
 
     _run_button = btn(p, label = 'B.开始(F)')
@@ -265,6 +272,7 @@ class Window(wx.Frame):
     self.btn_grid.Add(_clear_all_entry, flag = ALIGN_CENTER)
     self.btn_grid.Add(_run_button, flag = ALIGN_CENTER)
 
+    vbox = BoxSizer(VERTICAL)
     vbox.Add(cmd_area, flag = EXPAND)
     vbox.Add(self._notebook, proportion = 1, flag = EXPAND)
     vbox.Add(self.btn_grid, flag = EXPAND)
@@ -278,77 +286,77 @@ class Window(wx.Frame):
 
   def build_page3(self, parent):
     p = Panel(parent)
-    vbox = BoxSizer(VERTICAL)
+    m = self.m
+
     # 多行文本框的默认size太小了
     # 默认高度太低, 不指定个高度, 会报 滚动条相关的size 警告
-    self._page3_log_view = tc(p,
-                              size = (-1, 300),
-                              style = wx.TE_MULTILINE | wx.TE_READONLY)
-    self._handlers.clear_log_view_buffer(None)
+    m._page3_log_view.Create(p,
+                             size = (-1, 300),
+                             style = wx.TE_MULTILINE | wx.TE_READONLY)
+    # self._handlers.clear_log_view_buffer(None)
 
     grid = GridSizer(1, 3, 0, 0)
-    _page3_read_target_btn = btn(p, label = '查看target文件')
-    self._page3_clear_btn = btn(p, label = '清空(&C)')
-    _page3_read_log_btn = btn(p, label = '查看log文件')
+    m._page3_read_target_btn.Create(p, label = '查看target文件')
+    m._page3_clear_btn.Create(p, label = '清空(&C)')
+    m._page3_read_log_btn.Create(p, label = '查看log文件')
 
-    _page3_read_target_btn.Bind(EVT_BUTTON, self._handlers.read_target_file)
-    self._page3_clear_btn.Bind(EVT_BUTTON, self._handlers.clear_log_view_buffer)
-    _page3_read_log_btn.Bind(EVT_BUTTON, self._handlers.read_log_file)
+    m._page3_read_target_btn.Bind(EVT_BUTTON, self._handlers.read_target_file)
+    m._page3_clear_btn.Bind(EVT_BUTTON, self._handlers.clear_log_view_buffer)
+    m._page3_read_log_btn.Bind(EVT_BUTTON, self._handlers.read_log_file)
 
-    grid.Add(_page3_read_target_btn, flag = ALIGN_CENTER)
-    grid.Add(self._page3_clear_btn, flag = ALIGN_CENTER)
-    grid.Add(_page3_read_log_btn, flag = ALIGN_CENTER)
+    grid.Add(m._page3_read_target_btn, flag = ALIGN_CENTER)
+    grid.Add(m._page3_clear_btn, flag = ALIGN_CENTER)
+    grid.Add(m._page3_read_log_btn, flag = ALIGN_CENTER)
 
-    vbox.Add(self._page3_log_view, proportion = 1, flag = EXPAND | ALL, border = 10)
+    vbox = BoxSizer(VERTICAL)
+    vbox.Add(m._page3_log_view, proportion = 1, flag = EXPAND | ALL, border = 10)
     vbox.Add(grid, flag = EXPAND)
     p.SetSizerAndFit(vbox)
     return p
 
   def build_page4(self, parent):
     p = Panel(parent)
-    vbox = BoxSizer(VERTICAL)
+    m = self.m
 
     border = SizerFlags().Border(LEFT | RIGHT, 5).Align(ALIGN_CENTER)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5).Align(ALIGN_CENTER)
 
-    row1 = BoxSizer()
-    self._page4_api_server_label = st(p, label = 'REST-JSON API server:')
-    self._page4_api_server_entry = tc(p, value = '127.0.0.1:8775')
-    self._page4_admin_token_label = st(p, label = 'Admin (secret) token:')
-    self._page4_admin_token_entry = tc(p)
-    self._page4_admin_token_entry.SetMaxLength(32)
+    row1, row2 = (BoxSizer() for _ in range(2))
+    m._page4_api_server_label.Create(p, label = 'REST-JSON API server:')
+    m._page4_api_server_entry.Create(p, value = '127.0.0.1:8775')
+    m._page4_admin_token_label.Create(p, label = 'Admin (secret) token:')
+    m._page4_admin_token_entry.Create(p)
+    m._page4_admin_token_entry.SetMaxLength(32)
+    row1.Add(m._page4_api_server_label, border)
+    row1.Add(m._page4_api_server_entry, proportion_border)
+    row1.Add(m._page4_admin_token_label, border)
+    row1.Add(m._page4_admin_token_entry, proportion_border)
 
-    row1.Add(self._page4_api_server_label, border)
-    row1.Add(self._page4_api_server_entry, proportion_border)
-    row1.Add(self._page4_admin_token_label, border)
-    row1.Add(self._page4_admin_token_entry, proportion_border)
-
-    row2 = BoxSizer()
-    self._page4_task_new_btn = btn(p, label = '创建任务')
-    self._page4_admin_list_btn = btn(p, label = '显示任务')
-    self._page4_admin_flush_btn = btn(p, label = '删除所有任务')
-    self._page4_clear_task_view_btn = btn(p, label = '清空反馈的结果')
-    self._page4_username_label = st(p, label = '用户名:')
-    self._page4_username_entry = tc(p)
-    self._page4_password_label = st(p, label = '密码:')
-    self._page4_password_entry = tc(p)
+    m._page4_task_new_btn.Create(p, label = '创建任务')
+    m._page4_admin_list_btn.Create(p, label = '显示任务')
+    m._page4_admin_flush_btn.Create(p, label = '删除所有任务')
+    m._page4_clear_task_view_btn.Create(p, label = '清空反馈的结果')
+    m._page4_username_label.Create(p, label = '用户名:')
+    m._page4_username_entry.Create(p)
+    m._page4_password_label.Create(p, label = '密码:')
+    m._page4_password_entry.Create(p)
 
     _arrow_down = wx.ArtProvider.GetBitmap(wx.ART_GO_DOWN, wx.ART_BUTTON)
-    self._page4_admin_list_btn.SetBitmap(_arrow_down, dir = RIGHT)
+    m._page4_admin_list_btn.SetBitmap(_arrow_down, dir = RIGHT)
 
-    self._page4_task_new_btn.Bind(EVT_BUTTON, self._handlers.api_task_new)
-    self._page4_admin_list_btn.Bind(EVT_BUTTON, self._handlers.api_admin_list)
-    self._page4_admin_flush_btn.Bind(EVT_BUTTON, self._handlers.api_admin_flush)
-    self._page4_clear_task_view_btn.Bind(EVT_BUTTON, self._handlers.clear_task_view_buffer)
+    m._page4_task_new_btn.Bind(EVT_BUTTON, self._handlers.api.task_new)
+    m._page4_admin_list_btn.Bind(EVT_BUTTON, self._handlers.api.admin_list)
+    m._page4_admin_flush_btn.Bind(EVT_BUTTON, self._handlers.api.admin_flush)
+    m._page4_clear_task_view_btn.Bind(EVT_BUTTON, self._handlers.clear_task_view_buffer)
 
-    row2.Add(self._page4_task_new_btn, border)
-    row2.Add(self._page4_admin_list_btn, border)
-    row2.Add(self._page4_admin_flush_btn, border)
-    row2.Add(self._page4_clear_task_view_btn, border)
-    row2.Add(self._page4_username_label, flag = ALIGN_CENTER | LEFT, border = 200)
-    row2.Add(self._page4_username_entry, proportion_border)
-    row2.Add(self._page4_password_label, border)
-    row2.Add(self._page4_password_entry, proportion_border)
+    row2.Add(m._page4_task_new_btn, border)
+    row2.Add(m._page4_admin_list_btn, border)
+    row2.Add(m._page4_admin_flush_btn, border)
+    row2.Add(m._page4_clear_task_view_btn, border)
+    row2.Add(m._page4_username_label, flag = ALIGN_CENTER | LEFT, border = 200)
+    row2.Add(m._page4_username_entry, proportion_border)
+    row2.Add(m._page4_password_label, border)
+    row2.Add(m._page4_password_entry, proportion_border)
 
     row3 = SplitterWindow(p, style = wx.SP_LIVE_UPDATE | wx.BORDER_SUNKEN)
     # 不能放在SplitVertically后面, 不然gravity会无效
@@ -363,63 +371,65 @@ class Window(wx.Frame):
     rpane = Panel(row3)
     _rbox = BoxSizer(VERTICAL)
 
-    self._page4_option_get_entry = tc(rpane, value = 'url risk level')
+    m._page4_option_get_entry.Create(rpane, value = 'url risk level')
     _page4_option_set_view_tip = st(rpane, label = '所有选项见sqlmap目录中的optiondict.py')
     _options_example = ("{\n"
                         "  'url': 'http://www.site.com/vuln.php?id=1',\n"
                         "  'level': 1, 'risk': 1,\n\n"
                         "}\n")
-    self._page4_option_set_view = tc(rpane,
-                                     value = _options_example,
-                                     style = wx.TE_MULTILINE)
-    _rbox.Add(self._page4_option_get_entry, flag = EXPAND | ALL, border = 2)
+    m._page4_option_set_view.Create(rpane,
+                                    value = _options_example,
+                                    style = wx.TE_MULTILINE)
+    _rbox.Add(m._page4_option_get_entry, flag = EXPAND | ALL, border = 2)
     _rbox.Add(_page4_option_set_view_tip, flag = ALL, border = 2)
-    _rbox.Add(self._page4_option_set_view, proportion = 1, flag = EXPAND | ALL, border = 2)
+    _rbox.Add(m._page4_option_set_view, proportion = 1, flag = EXPAND | ALL, border = 2)
     rpane.SetSizer(_rbox)
 
     row3.SplitVertically(lpane, rpane)
     # win下, lpane是灰色的, 将row3设下颜色, 又是兼容代码...
-    row3.SetBackgroundColour(self._page4_option_set_view.GetBackgroundColour())
+    row3.SetBackgroundColour(m._page4_option_set_view.GetBackgroundColour())
     row3.SetSashPosition(lpane.GetMinWidth())
 
-    self._page4_task_view = tc(p, value = '此处显示反馈的结果:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
+    m._page4_task_view.Create(p, value = '此处显示反馈的结果:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
 
+    vbox = BoxSizer(VERTICAL)
     vbox.Add(row1, flag = EXPAND | ALL, border = 5)
     vbox.Add(row2, flag = EXPAND | ALL, border = 5)
     vbox.Add(row3, proportion = 1, flag = EXPAND | LEFT | RIGHT, border = 10)
-    vbox.Add(self._page4_task_view, proportion = 1, flag = EXPAND | ALL, border = 10)
-
+    vbox.Add(m._page4_task_view, proportion = 1, flag = EXPAND | ALL, border = 10)
     p.SetSizerAndFit(vbox)
     return p
 
   def build_page5(self, parent):
     p = Panel(parent)
-    vbox = BoxSizer(VERTICAL)
+    m = self.m
 
     self._get_sqlmap_path_btn = btn(p, label = '获取帮助')
     self._get_sqlmap_path_btn.Disable()
     # 多行文本框的默认size太小了
     # 默认高度太低, 不指定个高度, gtk会报 滚动条相关的size 警告
-    self._page5_manual_view = tc(p,
-                                 size = (-1, 300),
-                                 style = wx.TE_MULTILINE | wx.TE_READONLY)
+    m._page5_manual_view.Create(p,
+                                size = (-1, 300),
+                                style = wx.TE_MULTILINE | wx.TE_READONLY)
 
-    self._get_sqlmap_path_btn.Bind(EVT_BUTTON, self._make_help_thread)
+    self._get_sqlmap_path_btn.Bind(
+      EVT_BUTTON, lambda evt, view = m._page5_manual_view:
+        self._make_help_thread(evt, view))
 
+    self._make_help_thread(None, m._page5_manual_view)
+
+    vbox = BoxSizer(VERTICAL)
     vbox.Add(self._get_sqlmap_path_btn, flag = TOP | LEFT | BOTTOM, border = 10)
-    vbox.Add(self._page5_manual_view, proportion = 1, flag = EXPAND | LEFT | RIGHT, border = 10)
-
-    self._make_help_thread(None)
-
+    vbox.Add(m._page5_manual_view, proportion = 1, flag = EXPAND | LEFT | RIGHT, border = 10)
     p.SetSizerAndFit(vbox)
     return p
 
-  def _make_help_thread(self, event):
+  def _make_help_thread(self, event, view):
     isClick = True if event else False
     # 使用线程 填充 帮助标签, 加快启动速度
     t = Thread(target = self._set_manual_view,
-               args = (self._page5_manual_view, isClick))
-    # t.daemon = True   # 死了也会存在
+               args = (view, isClick))
+    t.daemon = True  # 主线程退出了, 当然守护进程也要退出
     t.start()
 
   def _set_manual_view(self, view, isClick):
@@ -463,11 +473,10 @@ class Window(wx.Frame):
 
   def build_page6(self, parent):
     p = Panel(parent)
-    vbox = BoxSizer(VERTICAL)
 
     _about_str = '''
-    1. VERSION: 0.3.1
-       2019年 05月 17日 星期五 21:35:32 CST
+    1. VERSION: 0.3.2
+       2019年 10月 14日 星期一 20:00:01 CST
        required: python3.5+, wxPython4.0+, sqlmap
        作者: needle wang ( needlewang2011@gmail.com )
        https://github.com/needle-wang/sqlmap-wx/\n
@@ -481,19 +490,24 @@ class Window(wx.Frame):
     _page6_about = st(p, label = _about_str)
     # 完全居中!
     hbox.Add(_page6_about, flag = ALIGN_CENTER)
-    vbox.Add(hbox, proportion = 1, flag = ALIGN_CENTER)
 
+    vbox = BoxSizer(VERTICAL)
+    vbox.Add(hbox, proportion = 1, flag = ALIGN_CENTER)
     p.SetSizerAndFit(vbox)
     return p
 
 
 def main():
+  import time
+  start = time.process_time()
   app = wx.App()
-
+  # --------
   win = Window(None)
   win.Centre()
   win.Show()
-
+  # --------
+  end = time.process_time()
+  print('loading cost: %s Seconds' % (end - start))
   app.MainLoop()
 
 

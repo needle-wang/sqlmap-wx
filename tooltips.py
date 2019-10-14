@@ -5,33 +5,29 @@
 
 
 class Widget_Mesg(object):
-  def __init__(self, w):
+  def __init__(self, m):
     '''
-    w: sqlmap_wx.Window
+    m: model.Model
     '''
-    self.w = w
-
-    m = self.w._notebook
     self.set_all_placeholders(m)
     self.set_all_tooltips(m)
 
   def set_all_placeholders(self, m):
-    w = self.w
     # 0.target区
     self._set_placeholder('通常是从 目标url/burp日志/HTTP请求... 中任选一项',
-                          w._url_combobox)
+                          m._url_combobox)
     self._set_placeholder('-l: Burp或WebScarab代理的日志文件路径(用来解析目标)',
-                          w._burp_logfile)
+                          m._burp_logfile)
     self._set_placeholder('-r: 包含HTTP请求的的文件路径(如从fiddler中得来的)',
-                          w._request_file)
+                          m._request_file)
     self._set_placeholder('-m: 给定一个包含多个目标的文本路径',
-                          w._bulkfile)
+                          m._bulkfile)
     self._set_placeholder('-c: 从一个本地ini配置文件载入选项',
-                          w._configfile)
+                          m._configfile)
     self._set_placeholder('-x: 远程sitemap(.xml)文件的url(用来解析目标)',
-                          w._sitemap_url)
+                          m._sitemap_url)
     self._set_placeholder('-g: 将google dork的结果作为目标url',
-                          w._google_dork)
+                          m._google_dork)
     # 一、选项区(page1)
     # 1.测试页面
     self._set_placeholder('id',
@@ -90,26 +86,25 @@ class Widget_Mesg(object):
     使用gtk3.24时, 有scale组件的行内的tooltip会flicker(闪烁)(GTK3的bug!)
     只能禁用了
     '''
-    w = self.w
     # 0.target区
     self._set_tooltip('必填项, 从 目标url/burp日志/HTTP请求... 任选一项',
-                      w._url_combobox)
+                      m._url_combobox)
     self._set_tooltip('-l: Burp或WebScarab代理的日志文件路径(用来解析目标)',
-                      w._burp_logfile)
+                      m._burp_logfile)
     self._set_tooltip('-r: 包含HTTP请求的的文件路径(如从fiddler中得来的)',
-                      w._request_file)
+                      m._request_file)
     self._set_tooltip('-m: 给定一个包含多个目标的文本路径',
-                      w._bulkfile)
+                      m._bulkfile)
     self._set_tooltip('-c: 从一个本地ini配置文件载入选项',
-                      w._configfile)
+                      m._configfile)
     self._set_tooltip('-x: 远程sitemap(.xml)文件的url(用来解析目标)',
-                      w._sitemap_url)
+                      m._sitemap_url)
     self._set_tooltip('-g: 将google dork的结果作为目标url',
-                      w._google_dork)
+                      m._google_dork)
     # 一、选项区(page1)
     # 0._cmd_entry
     self._set_tooltip('1.勾选, 填写所需的 选项\n2.点击 收集选项\n3.点击 开始',
-                      w._cmd_entry)
+                      m._cmd_entry)
     # 1.测试页面
     self._set_tooltip('-p TESTPARAMETER\tTestable parameter(s)',
                       m._inject_area_param_ckbtn,
@@ -581,16 +576,16 @@ class Widget_Mesg(object):
                       m._page1_misc_z_entry)
     # 二、日志区(page3)
     self._set_tooltip('不会修改文件',
-                      w._page3_clear_btn)
+                      m._page3_clear_btn)
     # 三、API区(page4)
     self._set_tooltip('必填项, 不要加http://',
-                      w._page4_api_server_label,
-                      w._page4_api_server_entry)
+                      m._page4_api_server_label,
+                      m._page4_api_server_entry)
     self._set_tooltip('必填项, 32位的token',
-                      w._page4_admin_token_label,
-                      w._page4_admin_token_entry)
+                      m._page4_admin_token_label,
+                      m._page4_admin_token_entry)
     self._set_tooltip('此处填写要查看的选项(空格分隔), 如: url risk level',
-                      w._page4_option_get_entry)
+                      m._page4_option_get_entry)
     _api_usage = '''sqlampapi使用步骤:
     1. 在本地或远程运行: ./sqlmapapi.py -s
     2. 填写API区第一行的server和token
@@ -609,7 +604,7 @@ class Widget_Mesg(object):
           如果设置了无效的选项, 只能删除任务!
     '''
     self._set_tooltip(_api_usage,
-                      w._page4_option_set_view)
+                      m._page4_option_set_view)
 
   def _set_placeholder(self, placeholder, *widgets):
     '''
@@ -628,13 +623,7 @@ class Widget_Mesg(object):
 
 
 def main():
-  from widgets import g
-  from sqlmap_ui import UI_Window
-
-  win = UI_Window()
-  win.connect('destroy', g.main_quit)
-  win.show_all()
-  g.main()
+  pass
 
 
 if __name__ == '__main__':

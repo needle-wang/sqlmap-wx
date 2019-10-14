@@ -9,13 +9,11 @@ LAST_TMP = 'last.tmp'
 
 
 class Session(object):
-  def __init__(self, w):
+  def __init__(self, m):
     '''
-    w: sqlmap_wx.Window
-    m: opts_wx.Notebook
+    m: model.Model
     '''
-    self.w = w
-    self.m = w._notebook
+    self.m = m
 
     self._cfg = ConfigParser()
     # https://stackoverflow.com/questions/19359556/configparser-reads-capital-keys-and-make-them-lower-case
@@ -45,7 +43,7 @@ class Session(object):
 
     self._cfg.add_section('Target')
 
-    _tmp_url = self.w._url_combobox.GetValue().strip()
+    _tmp_url = self.m._url_combobox.GetValue().strip()
 
     if _tmp_url:
       self._cfg['Target']['_url_combobox'] = _tmp_url
@@ -86,7 +84,7 @@ class Session(object):
     for _i in self._cfg.options('Target'):
       if _i == '_url_combobox':
         # 不去手动改LAST_TMP, self.m就肯定有_i属性了
-        _tmp_url = self.w._url_combobox
+        _tmp_url = self.m._url_combobox
 
         if self._cfg['Target'][_i]:
           _tmp_url.SetValue(self._cfg['Target'][_i])

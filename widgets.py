@@ -23,6 +23,16 @@ class Notebook(FNB.FlatNotebook):
 class CheckBox(wx.CheckBox):
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
+    # 一步构造, 不能调用Create
+    if args or kwargs:
+      self._set_win_color()
+
+  def Create(self, *args, **kwargs):
+    # Create方法用于两步构造
+    super().Create(*args, **kwargs)
+    self._set_win_color()
+
+  def _set_win_color(self):
     # only for win, 背景(240, 240, 240, 255)是灰色, 却要重新设一遍前景才能去灰~
     # 侮辱智商! 脑子都搞蒙了
     self.SetForegroundColour(self.GetForegroundColour())
