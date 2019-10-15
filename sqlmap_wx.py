@@ -475,11 +475,11 @@ class Window(wx.Frame):
     p = Panel(parent)
 
     _about_str = '''
-    1. VERSION: 0.3.2
-       2019年 10月 14日 星期一 20:00:01 CST
+    1. VERSION: 0.3.3
+       2019年 10月 16日 星期三 06:54:46 CST
        required: python3.5+, wxPython4.0+, sqlmap
        作者: needle wang ( needlewang2011@gmail.com )
-       https://github.com/needle-wang/sqlmap-wx/\n
+       https://github.com/needle-wang/sqlmap-wx\n
     2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
     3. wxpython教程: https://wiki.wxpython.org/
                      http://zetcode.com/wxpython/
@@ -499,6 +499,8 @@ class Window(wx.Frame):
 
 def main():
   import time
+  # import wx.lib.mixins.inspection as wit
+  # app = wit.InspectableApp()
   start = time.process_time()
   app = wx.App()
   # --------
