@@ -32,7 +32,7 @@ class Layout_opts(object):
     hbox1 = BoxSizer()
     # win下 探测选项staticbox不能用proportion = 1, 最大化时会让右侧的staticbox消失
     # hbox1_grid为了win写的兼容sizer, 怎么感觉在写html?
-    hbox1_grid = GridSizer(1, 2, 0, 0)
+    hbox1_grid = wx.FlexGridSizer(1, 2, 0, 0)
 
     inject_area = self._setting_inject()
 
@@ -40,9 +40,11 @@ class Layout_opts(object):
     tech_area = self._setting_tech()
     hbox1_grid.Add(detection_area, flag = EXPAND | RIGHT, border = 10)
     hbox1_grid.Add(tech_area, flag = EXPAND)
+    hbox1_grid.AddGrowableRow(0, 1)
+    hbox1_grid.AddGrowableCol(0, 1)
 
     hbox1.Add(inject_area, spacing)
-    hbox1.Add(hbox1_grid, spacing)
+    hbox1.Add(hbox1_grid, proportion = 1, flag = EXPAND | ALL, border = 5)
 
     hbox2 = BoxSizer()
     tamper_area = self._setting_tamper()
@@ -54,7 +56,7 @@ class Layout_opts(object):
     hbox2.Add(general_area, spacing)
 
     vbox = BoxSizer(VERTICAL)
-    vbox.Add(hbox0, flag = EXPAND | LEFT | RIGHT, border = 5)
+    vbox.Add(hbox0, flag = EXPAND | LEFT, border = 5)
     vbox.Add(hbox1, flag = EXPAND | RIGHT, border = 20)  # 20: 让win下的滚动条不致于掩盖末端内容~~
     vbox.Add(hbox2)
     return vbox
@@ -158,7 +160,7 @@ class Layout_opts(object):
     border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
-    grid = GridSizer(5, 2, 6, 0)
+    grid = wx.FlexGridSizer(5, 2, 6, 0)
     grid.Add(self.moo._tech_area_tech_ckbtn, border)
     grid.Add(self.moo._tech_area_tech_entry, border)
     grid.Add(self.moo._tech_area_time_sec_ckbtn, border)
@@ -345,7 +347,7 @@ class Layout_opts(object):
     _boxes[_].Add(self.moo._request_area_ignore_timeouts_ckbtn, border)
     _boxes[_].Add(self.moo._request_area_ignore_redirects_ckbtn, border)
     _boxes[_].Add(self.moo._request_area_ignore_code_ckbtn, border)
-    _boxes[_].Add(self.moo._request_area_ignore_code_entry, proportion_border)
+    _boxes[_].Add(self.moo._request_area_ignore_code_entry, border)
     _boxes[_].Add(self.moo._request_area_skip_urlencode_ckbtn, border)
     _boxes[_].Add(self.moo._request_area_force_ssl_ckbtn, border)
     _boxes[_].Add(self.moo._request_area_hpp_ckbtn, border)
@@ -426,7 +428,7 @@ class Layout_opts(object):
     limit_area = self._enumeration_limit()
     blind_area = self._enumeration_blind()
 
-    spacing = SizerFlags().Expand().Border(LEFT | RIGHT, 10)
+    spacing = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     hbox1.Add(enum_area, spacing)
     hbox1.Add(dump_area, spacing)
     hbox1.Add(limit_area, spacing)
@@ -437,10 +439,10 @@ class Layout_opts(object):
     brute_force_area = self._enumeration_brute_force()
 
     vbox = BoxSizer(VERTICAL)
-    vbox.Add(hbox1, flag = TOP, border = 10)
-    vbox.Add(meta_area, flag = EXPAND | LEFT | RIGHT | TOP, border = 10)
-    vbox.Add(runsql_area, flag = EXPAND | LEFT | RIGHT | TOP, border = 10)
-    vbox.Add(brute_force_area, flag = LEFT | TOP, border = 10)
+    vbox.Add(hbox1, flag = TOP, border = 5)
+    vbox.Add(meta_area, flag = EXPAND | LEFT | RIGHT | TOP, border = 5)
+    vbox.Add(runsql_area, flag = EXPAND | LEFT | RIGHT | TOP, border = 5)
+    vbox.Add(brute_force_area, flag = LEFT | TOP, border = 5)
     return vbox
 
   def _enumeration_enum(self):
@@ -487,7 +489,7 @@ class Layout_opts(object):
     row2.Add(self.moo._limit_area_stop_entry)
     row2.Add(self.nb._limit_area_stop_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
-    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 10)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 2)
     limit_area.Add(row1, spacing)
     limit_area.Add(row2, spacing)
     return limit_area
@@ -506,7 +508,7 @@ class Layout_opts(object):
     row2.Add(self.nb._blind_area_last_label, flag = ALIGN_CENTER | LEFT, border = 5)
     row3.Add(self.nb._blind_area_note_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
-    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 10)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 2)
     blind_area.Add(row1, spacing)
     blind_area.Add(row2, spacing)
     blind_area.Add(row3, spacing)
@@ -582,7 +584,7 @@ class Layout_opts(object):
     file_os_access_area = self._file_os_access()
     file_os_registry_area = self._file_os_registry()
 
-    spacing = SizerFlags().Expand().Border(TOP | LEFT | RIGHT, 10)
+    spacing = SizerFlags().Expand().Border(TOP | LEFT | RIGHT, 5)
     vbox.Add(self.nb._page1_file_note_label, spacing)
     vbox.Add(file_read_area, spacing)
     vbox.Add(file_write_area, spacing)
@@ -601,7 +603,7 @@ class Layout_opts(object):
     row1.Add(self.moo._file_read_area_file_read_entry, proportion = 1)
     row1.Add(self.moo._file_read_area_file_read_btn, border)
 
-    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 6)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 3)
     file_read_area.Add(row1, spacing)
 
     return file_read_area
@@ -625,7 +627,7 @@ class Layout_opts(object):
     row3.Add(self.moo._file_write_area_file_dest_ckbtn, border)
     row3.Add(self.moo._file_write_area_file_dest_entry, proportion_border)
 
-    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 6)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 3)
     file_write_area.Add(row1, spacing)
     file_write_area.Add(row2, spacing)
     file_write_area.Add(row3, spacing)
@@ -678,9 +680,10 @@ class Layout_opts(object):
     row3.Add(self.moo._file_os_registry_reg_type_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row3.Add(self.moo._file_os_registry_reg_type_entry, proportion_border)
 
-    file_os_registry_area.Add(row1, flag = EXPAND)
-    file_os_registry_area.Add(row2, flag = EXPAND)
-    file_os_registry_area.Add(row3, flag = EXPAND)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 3)
+    file_os_registry_area.Add(row1, spacing)
+    file_os_registry_area.Add(row2, spacing)
+    file_os_registry_area.Add(row3, spacing)
 
     return file_os_registry_area
 

@@ -176,6 +176,9 @@ class Notebook(nb):
 
     m._tech_area_tech_ckbtn.Create(_sb, label = '注入技术')
     m._tech_area_tech_entry.Create(_sb)
+    m._tech_area_tech_entry.SetInitialSize(
+        m._tech_area_tech_entry.GetSizeFromTextSize(
+          m._tech_area_tech_entry.GetTextExtent("a" * 15).x))
     m._tech_area_time_sec_ckbtn.Create(_sb, label = '指定DB延迟多少秒响应')
     m._tech_area_time_sec_entry.Create(_sb)
     m._tech_area_union_col_ckbtn.Create(_sb, label = '指定最大union列数')
@@ -320,6 +323,9 @@ class Notebook(nb):
     m._request_area_ignore_redirects_ckbtn.Create(_sb, label = '忽略重定向')
     m._request_area_ignore_code_ckbtn.Create(_sb, label = '忽略错误型状态码:')
     m._request_area_ignore_code_entry.Create(_sb, value = '401')
+    m._request_area_ignore_code_entry.SetInitialSize(
+        m._request_area_ignore_code_entry.GetSizeFromTextSize(
+          m._request_area_ignore_code_entry.GetTextExtent("a" * 20).x))
     m._request_area_skip_urlencode_ckbtn.Create(_sb, label = 'payload不使用url编码')
     m._request_area_force_ssl_ckbtn.Create(_sb, label = '强制使用HTTPS')
     m._request_area_hpp_ckbtn.Create(_sb, label = 'HTTP参数污染')
