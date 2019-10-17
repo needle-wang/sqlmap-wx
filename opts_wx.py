@@ -81,7 +81,7 @@ class Notebook(nb):
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     # p.SetSizerAndFit(vbox)
     p.SetSizer(vbox)
-    p.SetupScrolling(scroll_x = False)
+    p.SetupScrolling(scroll_x = False, scrollIntoView = False)
     return p
 
   def build_page1_setting_inject(self, panel, m):
@@ -249,7 +249,7 @@ class Notebook(nb):
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
     # p.SetSizerAndFit(vbox)
     p.SetSizer(vbox)
-    p.SetupScrolling(scroll_x = False)
+    p.SetupScrolling(scroll_x = False, scrollIntoView = False)
     return p
 
   def build_page1_request_header(self, panel, m):
