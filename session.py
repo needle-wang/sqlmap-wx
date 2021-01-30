@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 #
-# 2018年 11月 09日 星期五 15:06:50 CST
+# 2018-11-09 15:06:50
 
 from configparser import ConfigParser
 from widgets import cb, tc
 
-LAST_TMP = 'last.tmp'
+LAST_TMP = 'static/last.tmp'
 
 
 class Session(object):
@@ -48,19 +48,6 @@ class Session(object):
     if _tmp_url:
       self._cfg['Target']['_url_combobox'] = _tmp_url
 
-  def _save_to_tmp_entry(self):
-    if self._cfg.has_section('Entry'):
-      self._cfg.remove_section('Entry')
-
-    self._cfg.add_section('Entry')
-
-    for _i in dir(self.m):
-      if _i.endswith('entry'):
-        _tmp_entry = getattr(self.m, _i)
-
-        if isinstance(_tmp_entry, tc) and _tmp_entry.GetValue().strip():
-          self._cfg['Entry'][_i] = _tmp_entry.GetValue()
-
   def _save_to_tmp_ckbtn(self):
     if self._cfg.has_section('CheckButton'):
       self._cfg.remove_section('CheckButton')
@@ -76,6 +63,19 @@ class Session(object):
           _checked.append(_i)
 
     self._cfg['CheckButton']['checked'] = ','.join(_checked)
+
+  def _save_to_tmp_entry(self):
+    if self._cfg.has_section('Entry'):
+      self._cfg.remove_section('Entry')
+
+    self._cfg.add_section('Entry')
+
+    for _i in dir(self.m):
+      if _i.endswith('entry'):
+        _tmp_entry = getattr(self.m, _i)
+
+        if isinstance(_tmp_entry, tc) and _tmp_entry.GetValue().strip():
+          self._cfg['Entry'][_i] = _tmp_entry.GetValue()
 
   def _load_from_tmp_target(self):
     if not self._cfg.has_section('Target'):
@@ -98,14 +98,13 @@ class Session(object):
     try:
       _checked = self._cfg['CheckButton']['checked'].split(',')
       for _i in _checked:
-        if _i:  # _i可能为''
-          # 不去手动改LAST_TMP, self.m就肯定有_i属性了
+        if _i:  # _i could be ''
           _tmp_ckbtn = getattr(self.m, _i)
           _tmp_ckbtn.SetValue(True)
-        else:  # _checked = [''], 则使用默认值
+        else:  # if _checked = [''], then use default
           pass
     except KeyError as e:
-      # 如果没有checked项, 则pass
+      # if no checked button, then pass
       pass
 
   def _load_from_tmp_entry(self):
@@ -113,12 +112,14 @@ class Session(object):
       self._cfg.add_section('Entry')
 
     for _i in self._cfg.options('Entry'):
-      # 不去手动改LAST_TMP, self.m就肯定有_i属性了
-      _tmp_entry = getattr(self.m, _i)
+      try:
+        _tmp_entry = getattr(self.m, _i)
 
-      if isinstance(_tmp_entry, tc) and self._cfg['Entry'][_i]:
-        # print(type(self._cfg['Entry'][_i]))
-        _tmp_entry.SetValue(self._cfg['Entry'][_i])
+        if isinstance(_tmp_entry, tc) and self._cfg['Entry'][_i]:
+          # print(type(self._cfg['Entry'][_i]))
+          _tmp_entry.SetValue(self._cfg['Entry'][_i])
+      except AttributeError as e:
+        pass
 
 
 def main():

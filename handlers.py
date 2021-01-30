@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
-# 2018年 08月 29日 星期三 15:34:10 CST
+# 2018-08-29 15:34:10
 
 import time
 from os import name as OS_NAME
-# python3.5+
 from pathlib import Path
 from subprocess import Popen
 from urllib.parse import urlparse
@@ -15,7 +13,6 @@ from handler_api import Api
 
 IS_POSIX = True if OS_NAME == 'posix' else False
 QUOTE = "'%s'" if OS_NAME == 'posix' else '"%s"'  # dos下只能用双引号
-EVT_BUTTON = wx.EVT_BUTTON
 
 
 class Handler(object):
@@ -23,6 +20,7 @@ class Handler(object):
     '''
     topwindow: sqlmap_wx.Window
     m: model.Model
+    还不能用注解, 会相互import
     '''
     self.w = topwindow
     self.m = m
@@ -30,13 +28,11 @@ class Handler(object):
     self.api = Api(topwindow, m)
 
   def build_all(self, event):
-    # _target = self._get_target()
-    _opts_list = self._collect_opts()
-
-    _opts_list = ''.join(_opts_list)
-    # print(_opts_list)
-    if _opts_list is not None:
-      self.m._cmd_entry.SetValue(_opts_list.strip())
+    _ = self._collect_opts()
+    _ = ''.join(_)
+    # print(_)
+    if _ is not None:
+      self.m._cmd_entry.SetValue(_.strip())
       self.w._notebook.SetFocus()
 
   def get_tc_value(self, textctrl):
@@ -50,9 +46,9 @@ class Handler(object):
     _sqlmap_opts = self.get_tc_value(self.m._cmd_entry).strip()
 
     if IS_POSIX:
-      _cmdline_str = '/usr/bin/env xterm -hold -e %s %s %s' % (sqlmap_path, _target, _sqlmap_opts)
+      _cmdline_str = f'/usr/bin/env xterm -hold -e {sqlmap_path} {_target} {_sqlmap_opts}'
     else:
-      _cmdline_str = 'start cmd /k %s %s %s' % (sqlmap_path, _target, _sqlmap_opts)
+      _cmdline_str = f'start cmd /k {sqlmap_path} {_target} {_sqlmap_opts}'
 
     # self.w.main_notebook.SetSelection(1)
     # print(_cmdline_str)
@@ -78,10 +74,10 @@ class Handler(object):
     '''
     data: [file_entry, 'title of chooser']
     '''
-    if len(data) > 1:   # 选择目录
+    if len(data) > 1:   # choose folder
       dialog = wx.DirDialog(self.w, message=data[1])
     else:
-      dialog = wx.FileDialog(self.w, message="选择文件")
+      dialog = wx.FileDialog(self.w, message="Choose file")
 
     with dialog:
       if dialog.ShowModal() == wx.ID_OK:
@@ -93,7 +89,7 @@ class Handler(object):
 
   def clear_log_view_buffer(self, event):
     self.m._page3_log_view.SetValue(
-      'sqlmap的运行记录都放在这: %s\n' % self.get_output_dir())
+      'sqlmap\'s log folder: %s\n' % self.get_output_dir())
 
   def _get_url_dir(self):
     '''
@@ -118,7 +114,7 @@ class Handler(object):
   def _log_view_insert(self, file_path):
     '''
     file_path: pathlib.Path
-               sqlmap库中dataToOutFile默认utf8写入
+               dataToOutFile in sqlmap lib writes with utf8 (default)
     '''
     m = self.m
     try:
@@ -128,14 +124,14 @@ class Handler(object):
           for _line_tmp in _line_list_tmp:
             m._page3_log_view.write(_line_tmp)
         else:
-          m._page3_log_view.write('%s: 空文件' % file_path)
+          m._page3_log_view.write(f'{file_path}: empty file')
     except EnvironmentError as e:
       m._page3_log_view.write(str(e))
     finally:
       m._page3_log_view.write(
         time.strftime('\n%Y-%m-%d %R:%S: ', time.localtime()))
       # win下, strftime方法无法处理unicode, py的bug, 到此时还没修复
-      m._page3_log_view.write('----------我是分割线----------\n',)
+      m._page3_log_view.write('----------split line----------\n',)
 
       m._page3_log_view.SetFocus()
       _mark = m._page3_log_view.GetInsertionPoint()
@@ -194,106 +190,106 @@ class Handler(object):
 
     _other_opts = [
       self._get_text_only_ckbtn("--check-internet",
-                                m._page1_general_check_internet_ckbtn),
+                                m._general_area_check_internet_ckbtn),
       self._get_text_only_ckbtn("--fresh-queries",
-                                m._page1_general_fresh_queries_ckbtn),
+                                m._general_area_fresh_queries_ckbtn),
       self._get_text_only_ckbtn("--forms",
-                                m._page1_general_forms_ckbtn),
+                                m._general_area_forms_ckbtn),
       self._get_text_only_ckbtn("--parse-errors",
-                                m._page1_general_parse_errors_ckbtn),
+                                m._general_area_parse_errors_ckbtn),
       self._get_text_only_ckbtn("--cleanup",
-                                m._page1_misc_cleanup_ckbtn),
+                                m._misc_area_cleanup_ckbtn),
       self._get_text_from_entry("--table-prefix=",
-                                m._page1_general_table_prefix_ckbtn,
-                                m._page1_general_table_prefix_entry),
+                                m._general_area_table_prefix_ckbtn,
+                                m._general_area_table_prefix_entry),
       self._get_text_from_entry("--binary-fields=",
-                                m._page1_general_binary_fields_ckbtn,
-                                m._page1_general_binary_fields_entry),
+                                m._general_area_binary_fields_ckbtn,
+                                m._general_area_binary_fields_entry),
       self._get_text_from_entry("--preprocess=",
-                                m._page1_general_preprocess_ckbtn,
-                                m._page1_general_preprocess_entry),
+                                m._general_area_preprocess_ckbtn,
+                                m._general_area_preprocess_entry),
       self._get_text_from_entry("--charset=",
-                                m._page1_general_charset_ckbtn,
-                                m._page1_general_charset_entry),
+                                m._general_area_charset_ckbtn,
+                                m._general_area_charset_entry),
       self._get_text_from_entry("--encoding=",
-                                m._page1_general_encoding_ckbtn,
-                                m._page1_general_encoding_entry),
+                                m._general_area_encoding_ckbtn,
+                                m._general_area_encoding_entry),
       self._get_text_from_entry("--web-root=",
-                                m._page1_general_web_root_ckbtn,
-                                m._page1_general_web_root_entry),
+                                m._general_area_web_root_ckbtn,
+                                m._general_area_web_root_entry),
       self._get_text_from_entry("--scope=",
-                                m._page1_general_scope_ckbtn,
-                                m._page1_general_scope_entry),
+                                m._general_area_scope_ckbtn,
+                                m._general_area_scope_entry),
       self._get_text_from_entry("--test-filter=",
-                                m._page1_general_test_filter_ckbtn,
-                                m._page1_general_test_filter_entry),
+                                m._general_area_test_filter_ckbtn,
+                                m._general_area_test_filter_entry),
       self._get_text_from_entry("--test-skip=",
-                                m._page1_general_test_skip_ckbtn,
-                                m._page1_general_test_skip_entry),
+                                m._general_area_test_skip_ckbtn,
+                                m._general_area_test_skip_entry),
       self._get_text_from_entry("--crawl=",
-                                m._page1_general_crawl_ckbtn,
-                                m._page1_general_crawl_entry),
+                                m._general_area_crawl_ckbtn,
+                                m._general_area_crawl_entry),
       self._get_text_from_entry("--crawl-exclude=",
-                                m._page1_general_crawl_exclude_ckbtn,
-                                m._page1_general_crawl_exclude_entry),
+                                m._general_area_crawl_exclude_ckbtn,
+                                m._general_area_crawl_exclude_entry),
       self._get_text_from_entry("-t ",
-                                m._page1_general_traffic_file_ckbtn,
-                                m._page1_general_traffic_file_entry),
+                                m._general_area_traffic_file_ckbtn,
+                                m._general_area_traffic_file_entry),
       self._get_text_from_entry("--har=",
-                                m._page1_general_har_ckbtn,
-                                m._page1_general_har_entry),
+                                m._general_area_har_ckbtn,
+                                m._general_area_har_entry),
       self._get_text_only_ckbtn("--flush-session",
-                                m._page1_general_flush_session_ckbtn),
+                                m._general_area_flush_session_ckbtn),
       self._get_text_from_entry("--dump-format=",
-                                m._page1_general_dump_format_ckbtn,
-                                m._page1_general_dump_format_entry),
+                                m._general_area_dump_format_ckbtn,
+                                m._general_area_dump_format_entry),
       self._get_text_from_entry("--csv-del=",
-                                m._page1_general_csv_del_ckbtn,
-                                m._page1_general_csv_del_entry),
+                                m._general_area_csv_del_ckbtn,
+                                m._general_area_csv_del_entry),
       self._get_text_from_entry("--save=",
-                                m._page1_general_save_ckbtn,
-                                m._page1_general_save_entry),
+                                m._general_area_save_ckbtn,
+                                m._general_area_save_entry),
       self._get_text_from_entry("-s ",
-                                m._page1_general_session_file_ckbtn,
-                                m._page1_general_session_file_entry),
+                                m._general_area_session_file_ckbtn,
+                                m._general_area_session_file_entry),
       self._get_text_from_entry("--output-dir=",
-                                m._page1_general_output_dir_ckbtn,
-                                m._page1_general_output_dir_entry),
+                                m._general_area_output_dir_ckbtn,
+                                m._general_area_output_dir_entry),
       self._get_text_only_ckbtn("--skip-waf",
-                                m._page1_misc_skip_waf_ckbtn),
+                                m._misc_area_skip_waf_ckbtn),
       self._get_text_only_ckbtn("--list-tampers",
-                                m._page1_misc_list_tampers_ckbtn),
+                                m._misc_area_list_tampers_ckbtn),
       self._get_text_only_ckbtn("--sqlmap-shell",
-                                m._page1_misc_sqlmap_shell_ckbtn),
+                                m._misc_area_sqlmap_shell_ckbtn),
       self._get_text_only_ckbtn("--disable-coloring",
-                                m._page1_misc_disable_color_ckbtn),
+                                m._misc_area_disable_color_ckbtn),
       self._get_text_only_ckbtn("--eta",
-                                m._page1_general_eta_ckbtn),
+                                m._general_area_eta_ckbtn),
       self._get_text_from_entry("--gpage=",
-                                m._page1_misc_gpage_ckbtn,
-                                m._page1_misc_gpage_spinbtn, None),
+                                m._misc_area_gpage_ckbtn,
+                                m._misc_area_gpage_spinbtn, None),
       self._get_text_only_ckbtn("--beep",
-                                m._page1_misc_beep_ckbtn),
+                                m._misc_area_beep_ckbtn),
       self._get_text_only_ckbtn("--offline",
-                                m._page1_misc_offline_ckbtn),
+                                m._misc_area_offline_ckbtn),
       self._get_text_only_ckbtn("--purge",
-                                m._page1_misc_purge_ckbtn),
+                                m._misc_area_purge_ckbtn),
       self._get_text_only_ckbtn("--dependencies",
-                                m._page1_misc_dependencies_ckbtn),
+                                m._misc_area_dependencies_ckbtn),
       self._get_text_only_ckbtn("--update",
-                                m._page1_misc_update_ckbtn),
+                                m._misc_area_update_ckbtn),
       self._get_text_from_entry("--alert=",
-                                m._page1_misc_alert_ckbtn,
-                                m._page1_misc_alert_entry),
+                                m._misc_area_alert_ckbtn,
+                                m._misc_area_alert_entry),
       self._get_text_from_entry("--tmp-dir=",
-                                m._page1_misc_tmp_dir_ckbtn,
-                                m._page1_misc_tmp_dir_entry),
+                                m._misc_area_tmp_dir_ckbtn,
+                                m._misc_area_tmp_dir_entry),
       self._get_text_from_entry("--answers=",
-                                m._page1_misc_answers_ckbtn,
-                                m._page1_misc_answers_entry),
+                                m._misc_area_answers_ckbtn,
+                                m._misc_area_answers_entry),
       self._get_text_from_entry("-z ",
-                                m._page1_misc_z_ckbtn,
-                                m._page1_misc_z_entry),
+                                m._misc_area_z_ckbtn,
+                                m._misc_area_z_entry),
     ]
 
     _file_opts = [
@@ -312,40 +308,40 @@ class Handler(object):
                                 m._file_write_area_file_dest_ckbtn,
                                 m._file_write_area_file_dest_entry),
       self._get_text_from_entry("--os-cmd=",
-                                m._file_os_access_os_cmd_ckbtn,
-                                m._file_os_access_os_cmd_entry),
+                                m._os_access_area_os_cmd_ckbtn,
+                                m._os_access_area_os_cmd_entry),
       self._get_text_only_ckbtn("--os-shell",
-                                m._file_os_access_os_shell_ckbtn),
+                                m._os_access_area_os_shell_ckbtn),
       self._get_text_only_ckbtn("--os-pwn",
-                                m._file_os_access_os_pwn_ckbtn),
+                                m._os_access_area_os_pwn_ckbtn),
       self._get_text_only_ckbtn("--os-smbrelay",
-                                m._file_os_access_os_smbrelay_ckbtn),
+                                m._os_access_area_os_smbrelay_ckbtn),
       self._get_text_only_ckbtn("--os-bof",
-                                m._file_os_access_os_bof_ckbtn),
+                                m._os_access_area_os_bof_ckbtn),
       self._get_text_only_ckbtn("--priv-esc",
-                                m._file_os_access_priv_esc_ckbtn),
+                                m._os_access_area_priv_esc_ckbtn),
       self._get_text_from_entry("--msf-path=",
-                                m._file_os_access_msf_path_ckbtn,
-                                m._file_os_access_msf_path_entry),
+                                m._os_access_area_msf_path_ckbtn,
+                                m._os_access_area_msf_path_entry),
       self._get_text_from_entry("--tmp-path=",
-                                m._file_os_access_tmp_path_ckbtn,
-                                m._file_os_access_tmp_path_entry),
+                                m._os_access_area_tmp_path_ckbtn,
+                                m._os_access_area_tmp_path_entry),
       self._get_text_only_ckbtn(
-        m._file_os_registry_reg_choice.GetString(
-          m._file_os_registry_reg_choice.GetSelection()),
-        m._file_os_registry_reg_ckbtn),
+        m._registry_area_reg_choice.GetString(
+          m._registry_area_reg_choice.GetSelection()),
+        m._registry_area_reg_ckbtn),
       self._get_text_from_entry("--reg-key=",
-                                m._file_os_registry_reg_ckbtn,
-                                m._file_os_registry_reg_key_entry),
+                                m._registry_area_reg_ckbtn,
+                                m._registry_area_reg_key_entry),
       self._get_text_from_entry("--reg-value=",
-                                m._file_os_registry_reg_ckbtn,
-                                m._file_os_registry_reg_value_entry),
+                                m._registry_area_reg_ckbtn,
+                                m._registry_area_reg_value_entry),
       self._get_text_from_entry("--reg-data=",
-                                m._file_os_registry_reg_ckbtn,
-                                m._file_os_registry_reg_data_entry),
+                                m._registry_area_reg_ckbtn,
+                                m._registry_area_reg_data_entry),
       self._get_text_from_entry("--reg-type=",
-                                m._file_os_registry_reg_ckbtn,
-                                m._file_os_registry_reg_type_entry),
+                                m._registry_area_reg_ckbtn,
+                                m._registry_area_reg_type_entry),
     ]
 
     _enumeration_opts = [
@@ -668,7 +664,7 @@ class Handler(object):
       self._get_text_only_ckbtn("--batch",
                                 m._general_area_batch_ckbtn),
       self._get_text_only_ckbtn("--wizard",
-                                m._page1_misc_wizard_ckbtn),
+                                m._misc_area_wizard_ckbtn),
       self._get_tampers(),
     ]
 

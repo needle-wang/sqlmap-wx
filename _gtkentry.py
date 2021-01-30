@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# 2019年 05月 05日 星期日 17:34:08 CST
+# 2019-05-05 17:34:08
 
 import gi
 gi.require_version('Gtk', '3.0')

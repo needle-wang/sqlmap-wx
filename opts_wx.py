@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
 #
-# 2019年 05月 05日 星期日 20:43:40 CST
+# 2019-05-05 20:43:40
 
 from widgets import wx, Panel, Scroll, nb, st, btn
+from widgets import EVT_BUTTON, EVT_CHECKBOX
 from layout import Layout_opts
-
-EVT_BUTTON = wx.EVT_BUTTON
-EVT_CHECKBOX = wx.EVT_CHECKBOX
 
 
 class Notebook(nb):
   def __init__(self, parent, model, handlers):
     '''
+    m: model.Model
     最大的宽应该是由最长的 request定制的第一行 决定
 
-    以"其他"标签的height作为标准高,
+    以"Other"标签的height作为标准高,
     高于此height的标签页使用ScrolledPanel, 显示滚动条
     '''
     super().__init__(parent)
@@ -22,7 +21,7 @@ class Notebook(nb):
     layout = Layout_opts(self, model)
 
     self._handlers = handlers
-    # 选项区 - 设置, 请求, 枚举, 文件, 其他
+    # OPTIONS - Inject, Request, Enumerate, File, Other
     page1_setting = self.build_page1_setting(layout)
     page1_request = self.build_page1_request(layout)
     page1_enumeration = self.build_page1_enumeration(layout)
@@ -75,7 +74,7 @@ class Notebook(nb):
     self.build_page1_setting_tech(p, m)
     self.build_page1_setting_tamper(p, m)
     self.build_page1_setting_optimize(p, m)
-    self.build_page1_setting_general(p, m)
+    self.build_page1_setting_offen(p, m)
 
     vbox = layout.setting_sizer()
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
@@ -221,8 +220,8 @@ class Notebook(nb):
 
     m._optimize_area_turn_all_ckbtn.Bind(EVT_CHECKBOX, self.optimize_area_controller)
 
-  def build_page1_setting_general(self, panel, m):
-    _sb = m._general_area
+  def build_page1_setting_offen(self, panel, m):
+    _sb = m._offen_area
     _sb.Create(panel, label = '常用选项')
 
     m._general_area_verbose_ckbtn.Create(_sb, label = '输出详细程度')
@@ -234,7 +233,7 @@ class Notebook(nb):
     m._general_area_finger_ckbtn.Create(_sb, label = '精确检测DB等版本信息')
     m._general_area_hex_ckbtn.Create(_sb, label = '响应使用hex转换')
     m._general_area_batch_ckbtn.Create(_sb, label = '非交互模式, 一切皆默认')
-    m._page1_misc_wizard_ckbtn.Create(_sb, label = '新手向导')
+    m._misc_area_wizard_ckbtn.Create(_sb, label = '新手向导')
 
   def build_page1_request(self, layout):
     p = Scroll(self, style = wx.BORDER_THEME)
@@ -405,7 +404,7 @@ class Notebook(nb):
   def build_page1_enumeration_enum(self, panel, m):
     _sb = m._enum_area
     _sb.Create(panel, label = '枚举')
-    # 要求要与_enum_area_opts_ckbtns的结构一致!
+    # 要与_enum_area_opts_ckbtns的结构一致!
     _enum_area_enum_labels = (
       ('DB banner', '当前用户', '当前数据库', '主机名', '是否为DBA'),
       ('用户', '密码', '权限', '角色', '库名'),
@@ -502,12 +501,12 @@ class Notebook(nb):
     m = self.m
 
     self._page1_file_note_label = st(p,
-        label = '注: 存在Stacked queries(堆查询注入)时, '
-                '才能使用该标签下的功能(udf功能除外)!')
+        label = 'Note: only if stacked query(堆查询注入) worked, '
+                'these functions below can be used except udf!')
     self.build_page1_file_read(p, m)
     self.build_page1_file_write(p, m)
     self.build_page1_file_os_access(p, m)
-    self.build_page1_file_os_registry(p, m)
+    self.build_page1_file_registry(p, m)
 
     vbox = layout.file_sizer()
     p.SetSizer(vbox)
@@ -548,44 +547,43 @@ class Notebook(nb):
     m._file_write_area_file_dest_entry.Create(_sb)
 
   def build_page1_file_os_access(self, panel, m):
-    _sb = m._file_os_access_area
+    _sb = m._os_access_area
     _sb.Create(panel, label = '访问后端OS')
 
-    m._file_os_access_os_cmd_ckbtn.Create(_sb, label = '执行CLI命令')
-    m._file_os_access_os_cmd_entry.Create(_sb)
-    m._file_os_access_os_shell_ckbtn.Create(_sb, label = '获取交互shell')
-    self._file_os_access_for_msf_label = st(_sb, label = 'Meterpreter相关(TCP连接):')
-    m._file_os_access_os_pwn_ckbtn.Create(_sb, label = '--os-pwn')
-    m._file_os_access_os_smbrelay_ckbtn.Create(_sb, label = '--os-smbrelay')
-    m._file_os_access_os_bof_ckbtn.Create(_sb, label = '--os-bof')
-    m._file_os_access_priv_esc_ckbtn.Create(_sb, label = '--priv-esc')
-    m._file_os_access_msf_path_ckbtn.Create(_sb, label = '本地Metasploit安装路径')
-    m._file_os_access_msf_path_entry.Create(_sb)
-    m._file_os_access_msf_path_chooser.Create(_sb, label = '打开')
-    m._file_os_access_msf_path_chooser.Bind(
+    m._os_access_area_os_cmd_ckbtn.Create(_sb, label = '执行CLI命令')
+    m._os_access_area_os_cmd_entry.Create(_sb)
+    m._os_access_area_os_shell_ckbtn.Create(_sb, label = '获取交互shell')
+    self._os_access_area_for_msf_label = st(_sb, label = 'Meterpreter相关(TCP连接):')
+    m._os_access_area_os_pwn_ckbtn.Create(_sb, label = '--os-pwn')
+    m._os_access_area_os_smbrelay_ckbtn.Create(_sb, label = '--os-smbrelay')
+    m._os_access_area_os_bof_ckbtn.Create(_sb, label = '--os-bof')
+    m._os_access_area_priv_esc_ckbtn.Create(_sb, label = '--priv-esc')
+    m._os_access_area_msf_path_ckbtn.Create(_sb, label = '本地Metasploit安装路径')
+    m._os_access_area_msf_path_entry.Create(_sb)
+    m._os_access_area_msf_path_chooser.Create(_sb, label = '打开')
+    m._os_access_area_msf_path_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._file_os_access_msf_path_entry, '选择 本地Metasploit安装目录']:
+      lambda evt, data = [m._os_access_area_msf_path_entry, '选择 本地Metasploit安装目录']:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._file_os_access_tmp_path_ckbtn.Create(_sb, label = '远程临时目录(绝对路径)')
-    m._file_os_access_tmp_path_entry.Create(_sb)
+    m._os_access_area_tmp_path_ckbtn.Create(_sb, label = '远程临时目录(绝对路径)')
+    m._os_access_area_tmp_path_entry.Create(_sb)
 
-  def build_page1_file_os_registry(self, panel, m):
-    _sb = m._file_os_registry_area
+  def build_page1_file_registry(self, panel, m):
+    _sb = m._registry_area
     _sb.Create(panel, label = '访问WIN下注册表')
 
-    m._file_os_registry_reg_ckbtn.Create(_sb, label = '键值操作:')
-    m._file_os_registry_reg_choice.Create(_sb,
-                                          choices = ['--reg-read', '--reg-add', '--reg-del'])
-    m._file_os_registry_reg_choice.SetSelection(0)
-    m._file_os_registry_reg_key_label.Create(_sb, label = '键路径')
-    m._file_os_registry_reg_key_entry.Create(_sb)
-    m._file_os_registry_reg_value_label.Create(_sb, label = '键名')
-    m._file_os_registry_reg_value_entry.Create(_sb)
-    m._file_os_registry_reg_data_label.Create(_sb, label = '键值')
-    m._file_os_registry_reg_data_entry.Create(_sb)
-    m._file_os_registry_reg_type_label.Create(_sb, label = '键值类型')
-    m._file_os_registry_reg_type_entry.Create(_sb)
+    m._registry_area_reg_ckbtn.Create(_sb, label = '键值操作:')
+    m._registry_area_reg_choice.Create(_sb, choices = ['--reg-read', '--reg-add', '--reg-del'])
+    m._registry_area_reg_choice.SetSelection(0)
+    m._registry_area_reg_key_label.Create(_sb, label = '键路径')
+    m._registry_area_reg_key_entry.Create(_sb)
+    m._registry_area_reg_value_label.Create(_sb, label = '键名')
+    m._registry_area_reg_value_entry.Create(_sb)
+    m._registry_area_reg_data_label.Create(_sb, label = '键值')
+    m._registry_area_reg_data_entry.Create(_sb)
+    m._registry_area_reg_type_label.Create(_sb, label = '键值类型')
+    m._registry_area_reg_type_entry.Create(_sb)
 
   def build_page1_other(self, layout):
     p = Panel(self)
@@ -602,136 +600,136 @@ class Notebook(nb):
     return p
 
   def build_page1_other_general(self, panel, m):
-    _sb = m._page1_other_general_area
+    _sb = m._general_area
     _sb.Create(panel, label = '通用项')
 
-    m._page1_general_check_internet_ckbtn.Create(_sb, label = '检查与目标的网络连接')
-    m._page1_general_fresh_queries_ckbtn.Create(_sb, label = '刷新此次查询')
-    m._page1_general_forms_ckbtn.Create(_sb, label = '获取form表单参数并测试')
-    m._page1_general_parse_errors_ckbtn.Create(_sb, label = '解析并显示响应中的错误信息')
-    m._page1_misc_cleanup_ckbtn.Create(_sb, label = '清理DBMS中的入侵痕迹!')
-    m._page1_general_table_prefix_ckbtn.Create(_sb, label = '临时表前缀')
-    m._page1_general_table_prefix_entry.Create(_sb)
+    m._general_area_check_internet_ckbtn.Create(_sb, label = '检查与目标的网络连接')
+    m._general_area_fresh_queries_ckbtn.Create(_sb, label = '刷新此次查询')
+    m._general_area_forms_ckbtn.Create(_sb, label = '获取form表单参数并测试')
+    m._general_area_parse_errors_ckbtn.Create(_sb, label = '解析并显示响应中的错误信息')
+    m._misc_area_cleanup_ckbtn.Create(_sb, label = '清理DBMS中的入侵痕迹!')
+    m._general_area_table_prefix_ckbtn.Create(_sb, label = '临时表前缀')
+    m._general_area_table_prefix_entry.Create(_sb)
     # size = ()是以px为单位的, 如果想设成以字符长度为宽, 蛋疼如下~~:
-    m._page1_general_table_prefix_entry.SetInitialSize(
-        m._page1_general_table_prefix_entry.GetSizeFromTextSize(
-          m._page1_general_table_prefix_entry.GetTextExtent("a" * 16).x))
-    m._page1_general_binary_fields_ckbtn.Create(_sb, label = '有二进制值的字段')
-    m._page1_general_binary_fields_entry.Create(_sb)
-    m._page1_general_binary_fields_entry.SetInitialSize(
-        m._page1_general_binary_fields_entry.GetSizeFromTextSize(
-          m._page1_general_binary_fields_entry.GetTextExtent("a" * 16).x))
-    m._page1_general_preprocess_ckbtn.Create(_sb, label = '指定预处理响应数据的脚本')
-    m._page1_general_preprocess_entry.Create(_sb)
-    m._page1_general_preprocess_chooser.Create(_sb, label = '打开')
-    m._page1_general_preprocess_chooser.Bind(
+    m._general_area_table_prefix_entry.SetInitialSize(
+        m._general_area_table_prefix_entry.GetSizeFromTextSize(
+          m._general_area_table_prefix_entry.GetTextExtent("a" * 16).x))
+    m._general_area_binary_fields_ckbtn.Create(_sb, label = '有二进制值的字段')
+    m._general_area_binary_fields_entry.Create(_sb)
+    m._general_area_binary_fields_entry.SetInitialSize(
+        m._general_area_binary_fields_entry.GetSizeFromTextSize(
+          m._general_area_binary_fields_entry.GetTextExtent("a" * 16).x))
+    m._general_area_preprocess_ckbtn.Create(_sb, label = '指定预处理响应数据的脚本')
+    m._general_area_preprocess_entry.Create(_sb)
+    m._general_area_preprocess_chooser.Create(_sb, label = '打开')
+    m._general_area_preprocess_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_preprocess_entry]:
+      lambda evt, data = [m._general_area_preprocess_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_general_charset_ckbtn.Create(_sb, label = '盲注所用的字符集合')
-    m._page1_general_charset_entry.Create(_sb, value = '0123456789abcdef')
-    m._page1_general_encoding_ckbtn.Create(_sb, label = '字符编码(用于数据获取)')
-    m._page1_general_encoding_entry.Create(_sb)
-    m._page1_general_web_root_ckbtn.Create(_sb, label = '远程web的根目录')
-    m._page1_general_web_root_entry.Create(_sb)
-    m._page1_general_scope_ckbtn.Create(_sb, label = '从代理日志过滤出目标(正则)')
-    m._page1_general_scope_entry.Create(_sb)
-    m._page1_general_scope_chooser.Create(_sb, label = '打开')
-    m._page1_general_scope_chooser.Bind(
+    m._general_area_charset_ckbtn.Create(_sb, label = '盲注所用的字符集合')
+    m._general_area_charset_entry.Create(_sb, value = '0123456789abcdef')
+    m._general_area_encoding_ckbtn.Create(_sb, label = '字符编码(用于数据获取)')
+    m._general_area_encoding_entry.Create(_sb)
+    m._general_area_web_root_ckbtn.Create(_sb, label = '远程web的根目录')
+    m._general_area_web_root_entry.Create(_sb)
+    m._general_area_scope_ckbtn.Create(_sb, label = '从代理日志过滤出目标(正则)')
+    m._general_area_scope_entry.Create(_sb)
+    m._general_area_scope_chooser.Create(_sb, label = '打开')
+    m._general_area_scope_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_scope_entry]:
+      lambda evt, data = [m._general_area_scope_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_general_test_filter_ckbtn.Create(_sb, label = '测试过滤器(从payload/title选择)')
-    m._page1_general_test_filter_entry.Create(_sb)
-    m._page1_general_test_skip_ckbtn.Create(_sb, label = '测试跳过(从payload/title选择)')
-    m._page1_general_test_skip_entry.Create(_sb)
+    m._general_area_test_filter_ckbtn.Create(_sb, label = '测试过滤器(从payload/title选择)')
+    m._general_area_test_filter_entry.Create(_sb)
+    m._general_area_test_skip_ckbtn.Create(_sb, label = '测试跳过(从payload/title选择)')
+    m._general_area_test_skip_entry.Create(_sb)
 
-    m._page1_general_crawl_ckbtn.Create(_sb, label = '爬网站(的层级/深度)')
-    m._page1_general_crawl_entry.Create(_sb)
-    m._page1_general_crawl_exclude_ckbtn.Create(_sb, label = '爬站时排除(正则)页面')
-    m._page1_general_crawl_exclude_entry.Create(_sb)
-    self._page1_general_hr = wx.StaticLine(_sb)
-    m._page1_general_traffic_file_ckbtn.Create(_sb, label = '转存所有http流量到文本')
-    m._page1_general_traffic_file_entry.Create(_sb)
-    m._page1_general_traffic_file_chooser.Create(_sb, label = '打开')
-    m._page1_general_traffic_file_chooser.Bind(
+    m._general_area_crawl_ckbtn.Create(_sb, label = '爬网站(的层级/深度)')
+    m._general_area_crawl_entry.Create(_sb)
+    m._general_area_crawl_exclude_ckbtn.Create(_sb, label = '爬站时排除(正则)页面')
+    m._general_area_crawl_exclude_entry.Create(_sb)
+    self._general_area_hr = wx.StaticLine(_sb)
+    m._general_area_traffic_file_ckbtn.Create(_sb, label = '转存所有http流量到文本')
+    m._general_area_traffic_file_entry.Create(_sb)
+    m._general_area_traffic_file_chooser.Create(_sb, label = '打开')
+    m._general_area_traffic_file_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_traffic_file_entry]:
+      lambda evt, data = [m._general_area_traffic_file_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_general_har_ckbtn.Create(_sb, label = '转存至HAR文件')
-    m._page1_general_har_entry.Create(_sb)
-    m._page1_general_har_chooser.Create(_sb, label = '打开')
-    m._page1_general_har_chooser.Bind(
+    m._general_area_har_ckbtn.Create(_sb, label = '转存至HAR文件')
+    m._general_area_har_entry.Create(_sb)
+    m._general_area_har_chooser.Create(_sb, label = '打开')
+    m._general_area_har_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_har_entry]:
+      lambda evt, data = [m._general_area_har_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_general_flush_session_ckbtn.Create(_sb, label = '清空目标的会话文件')
-    m._page1_general_dump_format_ckbtn.Create(_sb, label = 'dump结果的文件格式')
-    m._page1_general_dump_format_entry.Create(_sb)
-    m._page1_general_csv_del_ckbtn.Create(_sb, label = '(csv文件的)分隔符')
-    m._page1_general_csv_del_entry.Create(_sb, value = ',')
-    m._page1_general_save_ckbtn.Create(_sb, label = '保存选项至INI文件')
-    m._page1_general_save_entry.Create(_sb)
-    m._page1_general_save_chooser.Create(_sb, label = '打开')
-    m._page1_general_save_chooser.Bind(
+    m._general_area_flush_session_ckbtn.Create(_sb, label = '清空目标的会话文件')
+    m._general_area_dump_format_ckbtn.Create(_sb, label = 'dump结果的文件格式')
+    m._general_area_dump_format_entry.Create(_sb)
+    m._general_area_csv_del_ckbtn.Create(_sb, label = '(csv文件的)分隔符')
+    m._general_area_csv_del_entry.Create(_sb, value = ',')
+    m._general_area_save_ckbtn.Create(_sb, label = '保存选项至INI文件')
+    m._general_area_save_entry.Create(_sb)
+    m._general_area_save_chooser.Create(_sb, label = '打开')
+    m._general_area_save_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_save_entry]:
+      lambda evt, data = [m._general_area_save_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_general_session_file_ckbtn.Create(_sb, label = '载入会话文件')
-    m._page1_general_session_file_entry.Create(_sb)
-    m._page1_general_session_file_chooser.Create(_sb, label = '打开')
-    m._page1_general_session_file_chooser.Bind(
+    m._general_area_session_file_ckbtn.Create(_sb, label = '载入会话文件')
+    m._general_area_session_file_entry.Create(_sb)
+    m._general_area_session_file_chooser.Create(_sb, label = '打开')
+    m._general_area_session_file_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_session_file_entry]:
+      lambda evt, data = [m._general_area_session_file_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_general_output_dir_ckbtn.Create(_sb, label = '指定output目录')
-    m._page1_general_output_dir_entry.Create(_sb)
-    m._page1_general_output_dir_chooser.Create(_sb, label = '打开')
-    m._page1_general_output_dir_chooser.Bind(
+    m._general_area_output_dir_ckbtn.Create(_sb, label = '指定output目录')
+    m._general_area_output_dir_entry.Create(_sb)
+    m._general_area_output_dir_chooser.Create(_sb, label = '打开')
+    m._general_area_output_dir_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_general_output_dir_entry, '选择 结果保存在哪']:
+      lambda evt, data = [m._general_area_output_dir_entry, '选择 结果保存在哪']:
         self._handlers.set_file_entry_text(evt, data))
 
   def build_page1_other_misc(self, panel, m):
-    _sb = m._page1_other_misc_area
+    _sb = m._misc_area
     _sb.Create(panel, label = '杂项')
 
-    m._page1_misc_skip_waf_ckbtn.Create(_sb, label = '跳过WAF/IPS侦测')
-    m._page1_misc_list_tampers_ckbtn.Create(_sb, label = '列出可用的tamper脚本')
-    m._page1_misc_sqlmap_shell_ckbtn.Create(_sb, label = '打开sqlmap交互shell')
-    m._page1_misc_disable_color_ckbtn.Create(_sb, label = '禁用终端输出的颜色')
-    m._page1_general_eta_ckbtn.Create(_sb, label = '显示剩余时间')
-    m._page1_misc_update_ckbtn.Create(_sb, label = '更新sqlmap')
-    m._page1_misc_gpage_ckbtn.Create(_sb, label = 'GOOGLEDORK时的页码')
-    m._page1_misc_gpage_spinbtn.Create(_sb, value = '1', min = 1, max = 100)
-    m._page1_misc_beep_ckbtn.Create(_sb, label = '响铃')
-    m._page1_misc_offline_ckbtn.Create(_sb, label = '离线模式(仅使用本地会话数据)')
-    m._page1_misc_purge_ckbtn.Create(_sb, label = '抹除所有本地记录!')
-    m._page1_misc_dependencies_ckbtn.Create(_sb, label = '检查丢失的(非核心的)sqlmap依赖')
-    m._page1_misc_alert_ckbtn.Create(_sb, label = '发现注入时运行本地命令:')
-    m._page1_misc_alert_entry.Create(_sb)
-    m._page1_misc_tmp_dir_ckbtn.Create(_sb, label = '本地临时目录')
-    m._page1_misc_tmp_dir_entry.Create(_sb)
-    m._page1_misc_tmp_dir_chooser.Create(_sb, label = '打开')
-    m._page1_misc_tmp_dir_chooser.Bind(
+    m._misc_area_skip_waf_ckbtn.Create(_sb, label = '跳过WAF/IPS侦测')
+    m._misc_area_list_tampers_ckbtn.Create(_sb, label = '列出可用的tamper脚本')
+    m._misc_area_sqlmap_shell_ckbtn.Create(_sb, label = '打开sqlmap交互shell')
+    m._misc_area_disable_color_ckbtn.Create(_sb, label = '禁用终端输出的颜色')
+    m._general_area_eta_ckbtn.Create(_sb, label = '显示剩余时间')
+    m._misc_area_update_ckbtn.Create(_sb, label = '更新sqlmap')
+    m._misc_area_gpage_ckbtn.Create(_sb, label = 'GOOGLEDORK时的页码')
+    m._misc_area_gpage_spinbtn.Create(_sb, value = '1', min = 1, max = 100)
+    m._misc_area_beep_ckbtn.Create(_sb, label = '响铃')
+    m._misc_area_offline_ckbtn.Create(_sb, label = '离线模式(仅使用本地会话数据)')
+    m._misc_area_purge_ckbtn.Create(_sb, label = '抹除所有本地记录!')
+    m._misc_area_dependencies_ckbtn.Create(_sb, label = '检查丢失的(非核心的)sqlmap依赖')
+    m._misc_area_alert_ckbtn.Create(_sb, label = '发现注入时运行本地命令:')
+    m._misc_area_alert_entry.Create(_sb)
+    m._misc_area_tmp_dir_ckbtn.Create(_sb, label = '本地临时目录')
+    m._misc_area_tmp_dir_entry.Create(_sb)
+    m._misc_area_tmp_dir_chooser.Create(_sb, label = '打开')
+    m._misc_area_tmp_dir_chooser.Bind(
       EVT_BUTTON,
-      lambda evt, data = [m._page1_misc_tmp_dir_entry, '选择 本地临时目录']:
+      lambda evt, data = [m._misc_area_tmp_dir_entry, '选择 本地临时目录']:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._page1_misc_answers_ckbtn.Create(_sb, label = '设置交互时的问题答案:')
-    m._page1_misc_answers_entry.Create(_sb, value = 'quit=N,follow=N')
-    m._page1_misc_z_ckbtn.Create(_sb, label = '使用短的助记符')
-    m._page1_misc_z_entry.Create(_sb, value = 'flu,bat,ban,tec=EU...')
+    m._misc_area_answers_ckbtn.Create(_sb, label = '设置交互时的问题答案:')
+    m._misc_area_answers_entry.Create(_sb, value = 'quit=N,follow=N')
+    m._misc_area_z_ckbtn.Create(_sb, label = '使用短的助记符')
+    m._misc_area_z_entry.Create(_sb, value = 'flu,bat,ban,tec=EU...')
     # 最后一行总是会变矮~, 添加一个无用的widget, 抵消一下~
-    self._dummy = btn(_sb,
-                 label = '一个无用按钮, 如果报GTK警告, 应该是我没显示出来')
-    self._dummy.Disable()
+    # self._dummy = btn(_sb,
+    #              label = '一个无用按钮, 如果报GTK警告, 应该是我没显示出来')
+    # self._dummy.Disable()
 
 
 def main():
@@ -756,7 +754,7 @@ def main():
   win.Show()
   # --------
   end = time.process_time()
-  print('loading cost: %s Seconds' % (end - start))
+  print('loading cost: %.3f Seconds' % (end - start))
   app.MainLoop()
 
 

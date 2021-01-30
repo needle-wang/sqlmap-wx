@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-# encoding: utf-8
 #
-# 2018年 08月 29日 星期三 15:34:10 CST
+# 2018-08-29 15:34:10
 
 import ast
 from os import name as OS_NAME

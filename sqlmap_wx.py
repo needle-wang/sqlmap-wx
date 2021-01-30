@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 #
-# 2019年 05月 05日 星期日 14:50:15 CST
+# 2019-05-05 14:50:15
 
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
 
 from widgets import wx, Panel, Scroll, SplitterWindow, btn, cb, nb, st, tc
+from widgets import BoxSizer, GridSizer, StaticBoxSizer, SizerFlags, EVT_BUTTON
 from widgets import VERTICAL, EXPAND, ALL, TOP, BOTTOM, LEFT, RIGHT, ALIGN_CENTER
 
 from model import Model
@@ -14,26 +15,19 @@ from handlers import Handler, IS_POSIX
 from session import Session
 from tooltips import Widget_Mesg as INIT_MESG
 
-BoxSizer = wx.BoxSizer
-GridSizer = wx.GridSizer
-StaticBoxSizer = wx.StaticBoxSizer
-
-SizerFlags = wx.SizerFlags
-EVT_BUTTON = wx.EVT_BUTTON
-
 
 class Window(wx.Frame):
   def __init__(self, parent):
     super().__init__(parent, title = 'sqlmap-wx')
-    self.SetIcon(wx.Icon('sqlmap_wx.ico'))
+    self.SetIcon(wx.Icon('static/title.ico'))
 
     self.m = Model()
     self._handlers = Handler(self, self.m)  # 需要先设置handler, Bind需要它
     self.initUI()
     self.make_accelerators()  # 要先初始化完成后, 才能设全局键
-    # 添加tooltips, placeholders等
+    # add tooltips, placeholders
     INIT_MESG(self.m)
-    # 读取 上次所有选项
+
     self.session = Session(self.m)
     self.session.load_from_tmp()
 
@@ -122,7 +116,7 @@ class Window(wx.Frame):
     '''
     https://stackoverflow.com/questions/12786471/invoking-a-wxpython-evt-button-event-programmatically
     '''
-    evt = wx.PyCommandEvent(wx.EVT_BUTTON.typeId, btn.GetId())
+    evt = wx.PyCommandEvent(EVT_BUTTON.typeId, btn.GetId())
     # print(evt)
     wx.PostEvent(btn, evt)
 
@@ -163,7 +157,6 @@ class Window(wx.Frame):
     '''
     # print('by ALT-<F4> or click close button.')
     try:
-      # 保存 此次所有选项
       self.session.save_to_tmp()
     except Exception as e:
       raise e
@@ -253,7 +246,7 @@ class Window(wx.Frame):
     # 主构造区
     self._notebook = Notebook(p, m, self._handlers)
 
-    # 构造与执行 和 改善ui的使用体验
+    # 构造与执行
     self.btn_grid = GridSizer(1, 4, 0, 0)
 
     _build_button = btn(p, label = 'A.收集选项(A)')
@@ -404,7 +397,7 @@ class Window(wx.Frame):
     p = Panel(parent)
     m = self.m
 
-    self._get_sqlmap_path_btn = btn(p, label = '获取帮助')
+    self._get_sqlmap_path_btn = btn(p, label = 'sqlmap -hh')
     self._get_sqlmap_path_btn.Disable()
     # 多行文本框的默认size太小了
     # 默认高度太低, 不指定个高度, gtk会报 滚动条相关的size 警告
@@ -440,6 +433,7 @@ class Window(wx.Frame):
     needle注: 操作的共享对象有两个: _get_sqlmap_path_btn, view
               原则一样, 所有对共用对象的操作都要用CallAfter
               这样写是不是很丑?
+              另外, 如果没运行完, 主线程就退出了, 会卡住哦, 属于正常
     '''
     if isClick:
       wx.CallAfter(self._get_sqlmap_path_btn.Disable)
@@ -451,14 +445,14 @@ class Window(wx.Frame):
     # win下的sqlmap -hh有Enter阻塞
     _manual_hh = 'echo y|%s -hh' % self._handlers.get_sqlmap_path()
     try:
-      _subprocess = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, bufsize=1, shell = True)
+      _subp = Popen(_manual_hh, stdout=PIPE, stderr=STDOUT, shell = True)
 
-      for _an_bytes_line_tmp in iter(_subprocess.stdout.readline, b''):
+      for _an_bytes_line_tmp in iter(_subp.stdout.readline, b''):
         wx.CallAfter(view.write,
                      _an_bytes_line_tmp.decode(byte_coding))
 
-      _subprocess.wait()
-      _subprocess.stdout.close()
+      _subp.wait()
+      _subp.stdout.close()
     except FileNotFoundError as e:
       wx.CallAfter(view.write, str(e))
     except Exception as e:
@@ -474,17 +468,26 @@ class Window(wx.Frame):
   def build_page6(self, parent):
     p = Panel(parent)
 
-    _about_str = '''
-    1. VERSION: 0.3.3
-       2019年 10月 16日 星期三 06:54:46 CST
-       required: python3.5+, wxPython4.0+, sqlmap
-       作者: needle wang ( needlewang2011@gmail.com )
-       https://github.com/needle-wang/sqlmap-wx\n
-    2. 使用wxPython重写sqlmap-ui(using PyGObject)\n
-    3. wxpython教程: https://wiki.wxpython.org/
-                     http://zetcode.com/wxpython/
-    4. wxpython API: https://wxpython.org/Phoenix/docs/html/index.html\n\n
-    5. 感谢sqm带来的灵感, 其作者: KINGX ( https://github.com/kxcode ), sqm UI 使用的是python2 + tkinter
+    _version = '0.3.3.1'
+    _timestamp = '2021-01-31 05:12:52'
+
+    _url_self = 'https://github.com/needle-wang/sqlmap-wx'
+    _url_tutorial1 = 'https://wiki.wxpython.org/'
+    _url_tutorial2 = 'http://zetcode.com/wxpython/'
+    _url_api = 'https://wxpython.org/Phoenix/docs/html/index.html'
+    _url_idea = 'https://github.com/kxcode'
+    _about_str = f'''
+    1. Website: {_url_self}
+       VERSION: {_version}
+       {_timestamp}
+       required: python3.6+, wxPython4.0+,
+                 requests, sqlmap\n
+    2. use wxPython4 to recode sqlmap-gtk(driven by PyGObject)
+    3. thanks to the idea from sqm(by python2 + tkinter),
+                 author: KINGX, {_url_idea}\n
+    4. wxPython tutorial: {_url_tutorial1}
+                          {_url_tutorial2}
+    5. wxPython API: {_url_api}
     '''
     hbox = BoxSizer()
     _page6_about = st(p, label = _about_str)
@@ -509,7 +512,7 @@ def main():
   win.Show()
   # --------
   end = time.process_time()
-  print('loading cost: %s Seconds' % (end - start))
+  print('loading cost: %.3f Seconds' % (end - start))
   app.MainLoop()
 
 
