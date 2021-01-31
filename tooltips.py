@@ -12,7 +12,7 @@ class Widget_Mesg(object):
     self.set_all_placeholders(m)
 
   def set_all_placeholders(self, m):
-    # 0.target区
+    # 0.Target
     self._set_placeholder('通常是从 目标url/burp日志/HTTP请求... 中任选一项',
                           m._url_combobox)
     self._set_placeholder('-l: Burp或WebScarab代理的日志文件路径(用来解析目标)',
@@ -27,8 +27,8 @@ class Widget_Mesg(object):
                           m._sitemap_url)
     self._set_placeholder('-g: 将google dork的结果作为目标url',
                           m._google_dork)
-    # 一、选项区(page1)
-    # 1.测试页面
+    # OPTIONS(page1)
+    # 1.Inject(Q)
     self._set_placeholder('id,user-agent',
                           m._inject_area_param_entry)
     self._set_placeholder('user-agent,referer',
@@ -59,7 +59,7 @@ class Widget_Mesg(object):
                           m._tech_area_union_from_entry)
     self._set_placeholder('DNS exfiltration',
                           m._tech_area_dns_entry)
-    # 2.请求页面
+    # 2.Request(W)
     self._set_placeholder('X-Forwarded-For: 127.0.0.1',
                           m._request_area_header_entry)
     self._set_placeholder('Accept-Language: fr\\nETag: 123',
@@ -86,17 +86,17 @@ class Widget_Mesg(object):
                           m._request_area_csrf_token_entry)
     self._set_placeholder('import hashlib;id2=hashlib.md5(id).hexdigest()',
                           m._request_area_eval_entry)
-    # 3.枚举页面
+    # 3.Enumerate(E)
     self._set_placeholder('不包含该行',
                           m._limit_area_start_entry)
     self._set_placeholder('包含该行',
                           m._limit_area_stop_entry)
     self._set_placeholder('id<3',
                           m._meta_area_where_entry)
-    # 4.文件页面
+    # 4.File(R)
     self._set_placeholder('配合 Meterpreter相关 使用',
                           m._os_access_area_msf_path_entry)
-    # 5.其他页面
+    # 5.Other(T)
     self._set_placeholder('sqlmap',
                           m._general_area_table_prefix_entry)
     self._set_placeholder('/var/www',
@@ -113,10 +113,9 @@ class Widget_Mesg(object):
   def set_all_tooltips(self, m):
     '''
     m: model.Model
-    使用gtk3.24时, 有scale组件的行内的tooltip会flicker(闪烁)(GTK3的bug!)
-    只能禁用了
+    gtk3.24: tooltip of row which contained scale causes flicker.(GTK3's bug?)
     '''
-    # 0.target区
+    # 0.target
     self._set_tooltip('必填项, 从 目标url/burp日志/HTTP请求... 任选一项',
                       m._url_combobox)
     self._set_tooltip('-l: Burp或WebScarab代理的日志文件路径(用来解析目标)',
@@ -131,11 +130,11 @@ class Widget_Mesg(object):
                       m._sitemap_url)
     self._set_tooltip('-g: 将google dork的结果作为目标url',
                       m._google_dork)
-    # 一、选项区(page1)
+    # OPTIONS(page1)
     # 0._cmd_entry
     self._set_tooltip('1.勾选, 填写所需的 选项\n2.点击 收集选项\n3.点击 开始',
                       m._cmd_entry)
-    # 1.测试页面
+    # 1.Inject(Q)
     self._set_tooltip('-p\n逗号分隔, 与--level不兼容',
                       m._inject_area_param_ckbtn,
                       m._inject_area_param_entry)
@@ -422,7 +421,7 @@ class Widget_Mesg(object):
                       m._request_area_tor_type_entry)
     self._set_tooltip('--check-tor',
                       m._request_area_check_tor_ckbtn)
-    # 3.枚举页面
+    # 3.Enumerate(E)
     self._set_tooltip('-b\t获取version()/@@version',
                       m._enum_area_opts_ckbtns[0][0])
     self._set_tooltip('--current-user',
@@ -533,7 +532,7 @@ class Widget_Mesg(object):
                       m._brute_force_area_common_columns_ckbtn)
     self._set_tooltip('--common-files',
                       m._brute_force_area_common_files_ckbtn)
-    # 4.文件页面
+    # 4.File(R)
     self._set_tooltip('远程DB所在主机上的文件路径\n'
         '前提: 1.MySQL, PostgreSQL或Microsoft SQL Server\n'
         '      2.当前用户有 读取文件的 相关权限',
@@ -610,7 +609,7 @@ class Widget_Mesg(object):
     self._set_tooltip('--reg-type=',
                       m._registry_area_reg_type_label,
                       m._registry_area_reg_type_entry)
-    # 5.其他页面
+    # 5.Other(T)
     self._set_tooltip('--check-internet',
                       m._general_area_check_internet_ckbtn)
     self._set_tooltip('--fresh-queries',
@@ -721,10 +720,10 @@ class Widget_Mesg(object):
     self._set_tooltip('-z MNEMONICS Use short mnemonics (e.g. "flu,bat,ban,tec=EU")',
                       m._misc_area_z_ckbtn,
                       m._misc_area_z_entry)
-    # 二、日志区(page3)
+    # LOG(page3)
     self._set_tooltip('不会修改文件',
                       m._page3_clear_btn)
-    # 三、API区(page4)
+    # SQLMAPAPI(page4)
     self._set_tooltip('必填项, 不要加http://',
                       m._page4_api_server_label,
                       m._page4_api_server_entry)

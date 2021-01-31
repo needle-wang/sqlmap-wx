@@ -5,6 +5,7 @@
 import time
 from os import name as OS_NAME
 from pathlib import Path
+from shlex import quote as quote_posix
 from subprocess import Popen
 from urllib.parse import urlparse
 
@@ -12,7 +13,6 @@ from widgets import wx
 from handler_api import Api
 
 IS_POSIX = True if OS_NAME == 'posix' else False
-QUOTE = "'%s'" if OS_NAME == 'posix' else '"%s"'  # dos下只能用双引号
 
 
 class Handler(object):
@@ -29,11 +29,10 @@ class Handler(object):
 
   def build_all(self, event):
     _ = self._collect_opts()
-    _ = ''.join(_)
+    _ = ' '.join(_).strip()
     # print(_)
-    if _ is not None:
-      self.m._cmd_entry.SetValue(_.strip())
-      self.w._notebook.SetFocus()
+    self.m._cmd_entry.SetValue(_)
+    self.w._notebook.SetFocus()
 
   def get_tc_value(self, textctrl):
     return textctrl.GetValue().strip()
@@ -46,13 +45,14 @@ class Handler(object):
     _sqlmap_opts = self.get_tc_value(self.m._cmd_entry).strip()
 
     if IS_POSIX:
-      _cmdline_str = f'/usr/bin/env xterm -hold -e {sqlmap_path} {_target} {_sqlmap_opts}'
+      # _ = f'/usr/bin/env x-terminal-emulator --hold -e {sqlmap_path} {_target} {_sqlmap_opts}'
+      _ = f'/usr/bin/env xterm -hold -e {sqlmap_path} {_target} {_sqlmap_opts}'
     else:
-      _cmdline_str = f'start cmd /k {sqlmap_path} {_target} {_sqlmap_opts}'
+      _ = f'start cmd /k {sqlmap_path} {_target} {_sqlmap_opts}'
 
     # self.w.main_notebook.SetSelection(1)
-    # print(_cmdline_str)
-    Popen(_cmdline_str, shell = True)
+    # print(_)
+    Popen(_, shell = True)
 
   def get_sqlmap_path(self, path = 'sqlmap'):
     path_in_tc = self.get_tc_value(self.m.sqlmap_path_entry)
@@ -64,7 +64,7 @@ class Handler(object):
       # sqlmap.exe and sqlmap.py in win
       if path_in_tc:
         if path_in_tc.endswith('.py'):
-          path = 'python "%s"' % path_in_tc
+          path = f'python3 "{path_in_tc}"'
         else:
           path = path_in_tc
 
@@ -99,7 +99,7 @@ class Handler(object):
 
     if _load_url:
       if not _load_url.startswith('http'):
-        _load_url = 'http://%s' % _load_url
+        _load_url = f'http://{_load_url}'
 
       _load_host = urlparse(_load_url).netloc
 
@@ -168,22 +168,19 @@ class Handler(object):
       self._log_view_insert(_dumped_file_path)
 
   def _get_target(self):
-    w = self.w
     m = self.m
-    _pagenum = w._target_notebook.GetSelection()
-    _target_list = [("-u ", m._url_combobox),
-                    ("-l ", m._burp_logfile),
-                    ("-r ", m._request_file),
-                    ("-m ", m._bulkfile),
-                    ("-c ", m._configfile),
-                    ("-x ", m._sitemap_url),
-                    ("-g ", m._google_dork)]
+    _pagenum = self.w._target_notebook.GetSelection()
+    _target_list = [("-u", m._url_combobox),
+                    ("-l", m._burp_logfile),
+                    ("-r", m._request_file),
+                    ("-m", m._bulkfile),
+                    ("-c", m._configfile),
+                    ("-x", m._sitemap_url),
+                    ("-g", m._google_dork)]
 
-    _target_tmp = self.get_tc_value(_target_list[_pagenum][1])
-    if _target_tmp:
-      return _target_list[_pagenum][0] + QUOTE % _target_tmp
-    else:
-      return ''
+    _ = self.get_tc_value(_target_list[_pagenum][1])
+    if _:
+      return '{} {}'.format(_target_list[_pagenum][0], self.quote(_))
 
   def _collect_opts(self):
     m = self.m
@@ -267,7 +264,7 @@ class Handler(object):
                                 m._general_area_eta_ckbtn),
       self._get_text_from_entry("--gpage=",
                                 m._misc_area_gpage_ckbtn,
-                                m._misc_area_gpage_spinbtn, None),
+                                m._misc_area_gpage_spinbtn),
       self._get_text_only_ckbtn("--beep",
                                 m._misc_area_beep_ckbtn),
       self._get_text_only_ckbtn("--offline",
@@ -389,10 +386,10 @@ class Handler(object):
                                 m._dump_area_dump_all_ckbtn),
       self._get_text_from_entry("--start=",
                                 m._limit_area_start_ckbtn,
-                                m._limit_area_start_entry, None),
+                                m._limit_area_start_entry),
       self._get_text_from_entry("--stop=",
                                 m._limit_area_stop_ckbtn,
-                                m._limit_area_stop_entry, None),
+                                m._limit_area_stop_entry),
       self._get_text_from_entry("--first=",
                                 m._blind_area_first_ckbtn,
                                 m._blind_area_first_entry),
@@ -458,7 +455,7 @@ class Handler(object):
                                 m._request_area_headers_entry),
       self._get_text_from_entry("--method=",
                                 m._request_area_method_ckbtn,
-                                m._request_area_method_entry, None),
+                                m._request_area_method_entry),
       self._get_text_from_entry("--param-del=",
                                 m._request_area_param_del_ckbtn,
                                 m._request_area_param_del_entry),
@@ -502,7 +499,7 @@ class Handler(object):
                                 m._request_area_ignore_redirects_ckbtn),
       self._get_text_from_entry("--ignore-code=",
                                 m._request_area_ignore_code_ckbtn,
-                                m._request_area_ignore_code_entry, None),
+                                m._request_area_ignore_code_entry),
       self._get_text_only_ckbtn("--skip-urlencode",
                                 m._request_area_skip_urlencode_ckbtn),
       self._get_text_only_ckbtn("--force-ssl",
@@ -511,13 +508,13 @@ class Handler(object):
                                 m._request_area_hpp_ckbtn),
       self._get_text_from_entry("--delay=",
                                 m._request_area_delay_ckbtn,
-                                m._request_area_delay_entry, None),
+                                m._request_area_delay_entry),
       self._get_text_from_entry("--timeout=",
                                 m._request_area_timeout_ckbtn,
-                                m._request_area_timeout_entry, None),
+                                m._request_area_timeout_entry),
       self._get_text_from_entry("--retries=",
                                 m._request_area_retries_ckbtn,
-                                m._request_area_retries_entry, None),
+                                m._request_area_retries_entry),
       self._get_text_from_entry("--randomize=",
                                 m._request_area_randomize_ckbtn,
                                 m._request_area_randomize_entry),
@@ -538,8 +535,8 @@ class Handler(object):
                                 m._request_area_safe_freq_entry),
       self._get_text_only_ckbtn("--ignore-proxy",
                                 m._request_area_ignore_proxy_ckbtn),
-      self._get_http_proxy(),
-      self._get_http_proxy_cred(),
+      self._get_http_proxy('--proxy='),
+      self._get_http_proxy_cred('--proxy-cred='),
       self._get_text_from_entry("--proxy-file=",
                                 m._request_area_proxy_file_ckbtn,
                                 m._request_area_proxy_file_entry),
@@ -612,7 +609,7 @@ class Handler(object):
                                 m._detection_area_re_entry),
       self._get_text_from_entry("--code=",
                                 m._detection_area_code_ckbtn,
-                                m._detection_area_code_entry, None),
+                                m._detection_area_code_entry),
       self._get_text_only_ckbtn("--text-only",
                                 m._detection_area_text_only_ckbtn),
       self._get_text_only_ckbtn("--titles",
@@ -621,13 +618,13 @@ class Handler(object):
                                 m._detection_area_smart_ckbtn),
       self._get_text_from_entry("--technique=",
                                 m._tech_area_tech_ckbtn,
-                                m._tech_area_tech_entry, None),
+                                m._tech_area_tech_entry),
       self._get_text_from_entry("--time-sec=",
                                 m._tech_area_time_sec_ckbtn,
-                                m._tech_area_time_sec_entry, None),
+                                m._tech_area_time_sec_entry),
       self._get_text_from_entry("--union-cols=",
                                 m._tech_area_union_col_ckbtn,
-                                m._tech_area_union_col_entry, None),
+                                m._tech_area_union_col_entry),
       self._get_text_from_entry("--union-char=",
                                 m._tech_area_union_char_ckbtn,
                                 m._tech_area_union_char_entry),
@@ -647,7 +644,7 @@ class Handler(object):
                                 m._optimize_area_turn_all_ckbtn),
       self._get_text_from_entry("--threads=",
                                 m._optimize_area_thread_num_ckbtn,
-                                m._optimize_area_thread_num_spinbtn, None),
+                                m._optimize_area_thread_num_spinbtn),
       self._get_text_only_ckbtn("--predict-output",
                                 m._optimize_area_predict_ckbtn),
       self._get_text_only_ckbtn("--keep-alive",
@@ -665,26 +662,26 @@ class Handler(object):
                                 m._general_area_batch_ckbtn),
       self._get_text_only_ckbtn("--wizard",
                                 m._misc_area_wizard_ckbtn),
-      self._get_tampers(),
+      self._get_tampers("--tamper=",
+                        m._tamper_area_tamper_view),
     ]
+    # https://stackoverflow.com/questions/3845423/remove-empty-strings-from-a-list-of-strings
+    return filter(None, (_setting_opts
+                        + _request_opts
+                        + _enumeration_opts
+                        + _file_opts
+                        + _other_opts))
 
-    return (_setting_opts
-            + _request_opts
-            + _enumeration_opts
-            + _file_opts
-            + _other_opts)
-
-  def _get_http_proxy_cred(self):
+  def _get_http_proxy_cred(self, opt_str):
     m = self.m
     _use_proxy = m._request_area_proxy_ckbtn.IsChecked()
     _username = self.get_tc_value(m._request_area_proxy_username_entry)
     _pass = self.get_tc_value(m._request_area_proxy_password_entry)
 
     if all((_use_proxy, _username, _pass)) :
-      return ''.join((" --proxy-cred=", QUOTE % '{}:{}'.format(_username, _pass)))
-    return ''
+      return f'{opt_str}{_username}:{_pass}'
 
-  def _get_http_proxy(self):
+  def _get_http_proxy(self, opt_str):
     m = self.m
 
     _use_proxy = m._request_area_proxy_ckbtn.IsChecked()
@@ -694,66 +691,49 @@ class Handler(object):
 
     if _use_proxy and _ip:
       if _port:
-        return "".join((" --proxy=", QUOTE % '{}:{}'.format(_ip, _port)))
-      else:
-        return "".join((" --proxy=", QUOTE % _ip))
-    return ''
+        _port = f':{_port}'
+      return f"{opt_str}{_ip}{_port}"
 
-  def _get_tampers(self):
+  def _get_tampers(self, opt_str, view):
     '''
     简单处理
     '''
-    m = self.m
-    _tamper_textbuffer = self.get_tc_value(m._tamper_area_tamper_view)
-    _tampers = ''
+    _tamper_textbuffer = self.get_tc_value(view)
+    _checked = []
 
-    for _tamper_tmp in _tamper_textbuffer.splitlines():
-      if _tamper_tmp.strip():
-        _tampers = _tampers + _tamper_tmp.strip() + ','
+    for _tamper_line in _tamper_textbuffer.splitlines():
+      if _tamper_line.strip():
+        for _a_tamper in _tamper_line.strip().split(','):
+          _checked.append(_a_tamper.strip())
 
-    if _tampers:
-      return " --tamper=" + QUOTE % _tampers.rstrip(',')
-    return ''
+    _ = ','.join(_checked)
+    if _:
+      return f"{opt_str}{_}"
 
   def _get_text_from_scale(self, opt_str, ckbtn, scale):
     if ckbtn.IsChecked():
-      return ''.join((' ', opt_str, str(scale.GetValue())))
-    return ''
+      return f'{opt_str}{scale.GetValue()}'
 
   def _get_text_only_ckbtn(self, opt_str, ckbtn):
     if ckbtn.IsChecked():
-      return ''.join((' ', opt_str))
-    return ''
+      return opt_str
 
-  def _get_text_from_entry(self, opt_str, ckbtn, entry, quote = QUOTE):
-    _entry_str = str(entry.GetValue()).strip()  # 有的返回int
-    if ckbtn.IsChecked() and _entry_str:
+  def _get_text_from_entry(self, opt_str, ckbtn, entry):
+    _ = str(entry.GetValue()).strip()  # 有的返回int
+    if ckbtn.IsChecked() and _:
+      return '{}{}'.format(opt_str, self.quote(_))
 
-      if quote:
-        return ''.join((' ',
-                        opt_str,
-                        quote % self._escape_quote_in_QUOTE(_entry_str)))
-      else:
-        return ''.join((' ',
-                        opt_str,
-                        self._escape_quote(_entry_str)))
-    return ''
-
-  def _escape_quote_in_QUOTE(self, widget_text):
+  def quote(self, s):
     '''
-    注意bash中, 双单引号内无法使用'(即无法转义)
+    bash: 2个单引号内无法使用'(即无法转义)
     '''
-    if widget_text:
-      if IS_POSIX:
-        return widget_text.replace("'", r"'\''")
-      else:
-        return widget_text.replace('"', r"\"")
-    return widget_text
-
-  def _escape_quote(self, widget_text):
-    if widget_text:
-      return widget_text.replace("'", r"\'").replace('"', r'\"')
-    return widget_text
+    if IS_POSIX:
+      return quote_posix(s)
+    else:
+      if s:
+        # dos下只能用双引号
+        return '"{}"'.format(s.replace('"', r'\"'))
+    return s
 
 
 def main():

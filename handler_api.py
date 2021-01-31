@@ -3,14 +3,9 @@
 # 2018-08-29 15:34:10
 
 import ast
-from os import name as OS_NAME
 import requests
 
-from widgets import wx, btn, st
-
-IS_POSIX = True if OS_NAME == 'posix' else False
-QUOTE = "'%s'" if OS_NAME == 'posix' else '"%s"'  # dos下只能用双引号
-EVT_BUTTON = wx.EVT_BUTTON
+from widgets import wx, btn, st, EVT_BUTTON
 
 
 class Api(object):
@@ -24,7 +19,7 @@ class Api(object):
 
   def task_new(self, event):
     '''
-    rest api获取自: https://github.com/PyxYuYu/MyBlog/issues/69
+    rest api from https://github.com/PyxYuYu/MyBlog/issues/69
     @get("/task/new") 创建新任务
     '''
     _host = self.get_tc_value(self.m._page4_api_server_entry)
@@ -32,16 +27,16 @@ class Api(object):
     _password = self.get_tc_value(self.m._page4_password_entry)
     if _host:
       try:
-        _resp = requests.get('http://%s/task/new' % _host,
+        _resp = requests.get(f'http://{_host}/task/new',
                              auth = (_username, _password))
         if not _resp:
           _resp.raise_for_status()
 
         _resp = _resp.json()
         if _resp['success']:
-          self._task_view_append('%s: 创建成功.' % _resp['taskid'])
+          self.task_view_append('{}: success.'.format(_resp['taskid']))
       except Exception as e:
-        self._task_view_append(e)
+        self.task_view_append(e)
 
   def admin_list(self, event):
     '''
@@ -53,7 +48,7 @@ class Api(object):
     _password = self.get_tc_value(self.m._page4_password_entry)
     if _host and _token:
       try:
-        _resp = requests.get('http://%s/admin/%s/list' % (_host, _token),
+        _resp = requests.get(f'http://{_host}/admin/{_token}/list',
                              auth = (_username, _password))
         if not _resp:
           _resp.raise_for_status()
@@ -61,7 +56,7 @@ class Api(object):
         _resp = _resp.json()
         # print(_resp)
         if _resp['success']:
-          self._task_view_append('总任务数: %s' % _resp['tasks_num'])
+          # self.task_view_append('总任务数: %s' % _resp['tasks_num'])
           p = self.w._api_admin_list_rows
           vbox = p.GetSizer()
           # 清空之前的任务列表
@@ -117,8 +112,8 @@ class Api(object):
                 self.option_set(tid))
 
             _id += 1
-            _a_task_row.Add(st(p, label = '%s. %s' % (_id, _taskid)), flag = wx.ALIGN_CENTER)
-            _a_task_row.Add(st(p, label = '(%s)' % _status), flag = wx.ALIGN_CENTER)
+            _a_task_row.Add(st(p, label = f'{_id}. {_taskid}'), flag = wx.ALIGN_CENTER)
+            _a_task_row.Add(st(p, label = f'({_status})'), flag = wx.ALIGN_CENTER)
             _a_task_row.Add(_task_del_btn, flag = wx.EXPAND)
             _a_task_row.Add(_scan_kill_btn, flag = wx.EXPAND)
             _a_task_row.Add(_scan_stop_btn, flag = wx.EXPAND)
@@ -136,9 +131,9 @@ class Api(object):
           vbox.Layout()
           p.SetupScrolling()
       except Exception as e:
-        self._task_view_append(e)
+        self.task_view_append(e)
     else:
-        self._task_view_append('需要填写API server和admin token.')
+        self.task_view_append('need API server and admin token.')
 
   def option_list(self, taskid):
     '''
@@ -158,9 +153,9 @@ class Api(object):
         if _resp['success']:
           for _key, _value in _resp['options'].items():
             if _value:
-              self._task_view_append('%s: %s' % (_key, _value))
+              self.task_view_append(f'{_key}: {_value}')
       except Exception as e:
-        self._task_view_append(e)
+        self.task_view_append(e)
 
   def option_get(self, taskid):
     '''
@@ -174,7 +169,7 @@ class Api(object):
     for _tmp in _opts_text.split():
       _options[_tmp] = None
     if _host and _options:
-      _mesg = '%s:\n' % taskid
+      _mesg = f'{taskid}:\n'
       try:
         _headers = {'Content-Type': 'application/json'}
         _resp = requests.post('http://%s/option/%s/get' % (_host, taskid),
@@ -195,7 +190,7 @@ class Api(object):
           _mesg += _resp['message']
       except Exception as e:
         _mesg += str(e)
-      self._task_view_append(_mesg.strip())
+      self.task_view_append(_mesg.strip())
 
   def option_set(self, taskid):
     '''
@@ -212,7 +207,7 @@ class Api(object):
     except Exception as e:
       _json = str(e)
 
-    _mesg = '%s: ' % taskid
+    _mesg = f'{taskid}: '
     if _json and isinstance(_json, dict):
       if _host:
         try:
@@ -228,13 +223,13 @@ class Api(object):
 
           _resp = _resp.json()
           if _resp['success']:
-            _mesg += '设置成功'
+            _mesg += 'set success.'
         except Exception as e:
           _mesg += str(e)
     else:
-      _mesg += '需要一个有效的python dict'
+      _mesg += 'need a valid python dict.'
 
-    self._task_view_append(_mesg)
+    self.task_view_append(_mesg)
 
   def admin_flush(self, event):
     '''
@@ -254,9 +249,9 @@ class Api(object):
         _resp = _resp.json()
         if _resp['success']:
           self.w._api_admin_list_rows.GetSizer().Clear(delete_windows = True)
-          self._task_view_append('清空全部任务: 成功')
+          self.task_view_append('flush all tasks: Done.')
       except Exception as e:
-        self._task_view_append(e)
+        self.task_view_append(e)
 
   def task_delete(self, row, taskid):
     '''
@@ -277,9 +272,9 @@ class Api(object):
           # TODO, 要两步哈! 要查下是否真的成功了!
           row.Clear(delete_windows = True)
           self.w._api_admin_list_rows.GetSizer().Remove(row)
-          self._task_view_append('%s: 删除成功' % taskid)
+          self.task_view_append('%s: removed' % taskid)
       except Exception as e:
-        self._task_view_append(e)
+        self.task_view_append(e)
 
   def scan_start(self, taskid):
     '''
@@ -308,7 +303,7 @@ class Api(object):
       except Exception as e:
         _mesg += str(e)
 
-      self._task_view_append(_mesg)
+      self.task_view_append(_mesg)
 
   def scan_stop(self, taskid):
     '''
@@ -332,7 +327,7 @@ class Api(object):
           _mesg += _resp['message']
       except Exception as e:
         _mesg += str(e)
-      self._task_view_append(_mesg)
+      self.task_view_append(_mesg)
 
   def scan_kill(self, taskid):
     '''
@@ -342,7 +337,7 @@ class Api(object):
     _username = self.get_tc_value(self.m._page4_username_entry)
     _password = self.get_tc_value(self.m._page4_password_entry)
     if _host:
-      _mesg = '%s: ' % taskid
+      _mesg = f'{taskid}: '
       try:
         _resp = requests.get('http://%s/scan/%s/kill' % (_host, taskid),
                              auth = (_username, _password))
@@ -357,7 +352,7 @@ class Api(object):
       except Exception as e:
         _mesg += str(e)
 
-      self._task_view_append(_mesg)
+      self.task_view_append(_mesg)
 
   def scan_data(self, taskid):
     '''
@@ -379,10 +374,10 @@ class Api(object):
         # print(_resp)    # _resp['data'], _resp['error'] are list
         if _resp['success']:
           del[_resp['success']]
-          _mesg = '%s%s' % (_mesg, _resp)
+          _mesg = f'{_mesg}{_resp}'
       except Exception as e:
         _mesg += str(e)
-      self._task_view_append(_mesg)
+      self.task_view_append(_mesg)
 
   def scan_log(self, taskid):
     '''
@@ -408,20 +403,20 @@ class Api(object):
           if _logs:
             _mesg += _logs.strip()
           else:
-            _mesg += "没有log."
+            _mesg += "no log."
         else:
           _mesg += _resp['message']
       except Exception as e:
         _mesg += str(e)
-      self._task_view_append(_mesg)
+      self.task_view_append(_mesg)
 
   def get_tc_value(self, textctrl):
     return textctrl.GetValue().strip()
 
-  def _task_view_append(self, output):
+  def task_view_append(self, output):
     _task_view = self.m._page4_task_view
 
-    _task_view.write('%s\n' % output)
+    _task_view.write(f'{output}\n')
 
     _task_view.SetFocus()
     _mark = _task_view.GetInsertionPoint()

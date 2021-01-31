@@ -383,7 +383,7 @@ class Window(wx.Frame):
     row3.SetBackgroundColour(m._page4_option_set_view.GetBackgroundColour())
     row3.SetSashPosition(lpane.GetMinWidth())
 
-    m._page4_task_view.Create(p, value = '此处显示反馈的结果:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
+    m._page4_task_view.Create(p, value = 'response result:\n', style = wx.TE_MULTILINE | wx.TE_READONLY)
 
     vbox = BoxSizer(VERTICAL)
     vbox.Add(row1, flag = EXPAND | ALL, border = 5)
