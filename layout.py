@@ -95,11 +95,11 @@ class Layout_opts(object):
 
     grid = GridSizer(3, 2, 0, 0)
     grid.Add(self.m._inject_area_no_cast_ckbtn)
-    grid.Add(self.m._inject_area_no_escape_ckbtn, flag = LEFT, border = 20)
-    grid.Add(self.nb._inject_area_invalid_label, flag = ALIGN_CENTER)
-    grid.Add(self.m._inject_area_invalid_logic_ckbtn, flag = LEFT, border = 20)
-    grid.Add(self.m._inject_area_invalid_bignum_ckbtn, flag = ALIGN_RIGHT)
-    grid.Add(self.m._inject_area_invalid_str_ckbtn, flag = LEFT, border = 20)
+    grid.Add(self.m._inject_area_no_escape_ckbtn, flag = LEFT)
+    grid.Add(self.nb._inject_area_invalid_label, flag = LEFT)
+    grid.Add(self.m._inject_area_invalid_bignum_ckbtn, flag = LEFT)
+    grid.Add(self.m._inject_area_invalid_logic_ckbtn, flag = ALIGN_RIGHT)
+    grid.Add(self.m._inject_area_invalid_string_ckbtn, flag = LEFT)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 2)
     for _ in _boxes:
@@ -301,10 +301,13 @@ class Layout_opts(object):
     _boxes[_].Add(self.m._request_area_cookie_del_ckbtn, border)
     _boxes[_].Add(self.m._request_area_cookie_del_entry, border)
     _ += 1
+    _boxes[_].Add(self.m._request_area_drop_set_cookie_ckbtn, border)
+    _boxes[_].Add(self.m._request_area_live_cookies_ckbtn, border)
+    _boxes[_].Add(self.m._request_area_live_cookies_entry, proportion = 1, flag = EXPAND)
+    _boxes[_].Add(self.m._request_area_live_cookies_chooser, border)
     _boxes[_].Add(self.m._request_area_load_cookies_ckbtn, border)
     _boxes[_].Add(self.m._request_area_load_cookies_entry, proportion = 1, flag = EXPAND)
     _boxes[_].Add(self.m._request_area_load_cookies_chooser, border)
-    _boxes[_].Add(self.m._request_area_drop_set_cookie_ckbtn, border)
     _ += 1
     _boxes[_].Add(self.m._request_area_auth_type_ckbtn, border)
     _boxes[_].Add(self.m._request_area_auth_type_entry, proportion_border)
@@ -316,6 +319,8 @@ class Layout_opts(object):
     _ += 1
     _boxes[_].Add(self.m._request_area_csrf_method_ckbtn, border)
     _boxes[_].Add(self.m._request_area_csrf_method_entry, border)
+    _boxes[_].Add(self.m._request_area_csrf_retries_ckbtn, border)
+    _boxes[_].Add(self.m._request_area_csrf_retries_entry, border)
     _boxes[_].Add(self.m._request_area_csrf_token_ckbtn, border)
     _boxes[_].Add(self.m._request_area_csrf_token_entry, proportion_border)
     _boxes[_].Add(self.m._request_area_csrf_url_ckbtn, border)
@@ -386,11 +391,13 @@ class Layout_opts(object):
     _boxes[_].Add(self.m._request_area_safe_freq_entry, border)
     _ += 1
     _boxes[_].Add(self.m._request_area_ignore_proxy_ckbtn, border)
-    _boxes[_].Add(self.m._request_area_proxy_ckbtn, border)
+    _boxes[_].Add(self.m._request_area_proxy_freq_ckbtn, border)
+    _boxes[_].Add(self.m._request_area_proxy_freq_entry, border)
     _boxes[_].Add(self.m._request_area_proxy_file_ckbtn, border)
     _boxes[_].Add(self.m._request_area_proxy_file_entry, proportion = 1, flag = EXPAND)
     _boxes[_].Add(self.m._request_area_proxy_file_chooser, border)
     _ += 1
+    _boxes[_].Add(self.m._request_area_proxy_ckbtn, border)
     _boxes[_].Add(self.m._request_area_proxy_ip_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     _boxes[_].Add(self.m._request_area_proxy_ip_entry, proportion_border)
     _boxes[_].Add(self.m._request_area_proxy_port_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
@@ -474,18 +481,16 @@ class Layout_opts(object):
 
     border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
 
-    row1 = BoxSizer()
+    row1, row2 = (BoxSizer() for _ in range(2))
 
     row1.Add(self.m._limit_area_start_ckbtn, border)
-    row1.Add(self.m._limit_area_start_entry)
-    row1.Add(self.nb._limit_area_start_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
-
-    row2 = BoxSizer()
+    row1.Add(self.m._limit_area_start_entry, border)
+    # row1.Add(self.nb._limit_area_start_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
     row2.Add(self.m._limit_area_stop_ckbtn, border)
-    row2.Add(self.m._limit_area_stop_entry)
-    row2.Add(self.nb._limit_area_stop_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    row2.Add(self.m._limit_area_stop_entry, border)
+    # row2.Add(self.nb._limit_area_stop_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
-    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 2)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 10)
     sbSizer.Add(row1, spacing)
     sbSizer.Add(row2, spacing)
     return sbSizer
@@ -498,13 +503,13 @@ class Layout_opts(object):
     row1, row2, row3 = (BoxSizer() for _ in range(3))
     row1.Add(self.m._blind_area_first_ckbtn, border)
     row1.Add(self.m._blind_area_first_entry, border)
-    row1.Add(self.nb._blind_area_first_label, flag = ALIGN_CENTER | LEFT, border = 5)
+    # row1.Add(self.nb._blind_area_first_label, flag = ALIGN_CENTER | LEFT, border = 5)
     row2.Add(self.m._blind_area_last_ckbtn, border)
     row2.Add(self.m._blind_area_last_entry, border)
-    row2.Add(self.nb._blind_area_last_label, flag = ALIGN_CENTER | LEFT, border = 5)
-    row3.Add(self.nb._blind_area_note_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
+    # row2.Add(self.nb._blind_area_last_label, flag = ALIGN_CENTER | LEFT, border = 5)
+    # row3.Add(self.nb._blind_area_note_label, flag = ALIGN_CENTER | LEFT | RIGHT, border = 5)
 
-    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 2)
+    spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 10)
     sbSizer.Add(row1, spacing)
     sbSizer.Add(row2, spacing)
     sbSizer.Add(row3, spacing)
@@ -701,21 +706,28 @@ class Layout_opts(object):
     border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
     # 一定有更好的办法...
-    _boxes = [BoxSizer() for _ in range(10)]
+    _boxes = [BoxSizer() for _ in range(11)]
     _ = 0
     _boxes[_].Add(self.m._general_area_check_internet_ckbtn, border)
     _boxes[_].Add(self.m._general_area_fresh_queries_ckbtn, border)
     _boxes[_].Add(self.m._general_area_forms_ckbtn, border)
     _boxes[_].Add(self.m._general_area_parse_errors_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_cleanup_ckbtn, border)
+    _boxes[_].Add(self.m._general_area_base64_ckbtn, border)
+    _boxes[_].Add(self.m._general_area_base64_entry, border)
+    _boxes[_].Add(self.m._general_area_base64_safe_ckbtn, border)
     _ += 1
     _boxes[_].Add(self.m._general_area_table_prefix_ckbtn, border)
     _boxes[_].Add(self.m._general_area_table_prefix_entry, flag = EXPAND)
     _boxes[_].Add(self.m._general_area_binary_fields_ckbtn, border)
     _boxes[_].Add(self.m._general_area_binary_fields_entry, border)
+    _ += 1
     _boxes[_].Add(self.m._general_area_preprocess_ckbtn, border)
     _boxes[_].Add(self.m._general_area_preprocess_entry, proportion = 1, flag = EXPAND)
     _boxes[_].Add(self.m._general_area_preprocess_chooser, border)
+    _boxes[_].Add(self.m._general_area_postprocess_ckbtn, border)
+    _boxes[_].Add(self.m._general_area_postprocess_entry, proportion = 1, flag = EXPAND)
+    _boxes[_].Add(self.m._general_area_postprocess_chooser, border)
     _ += 1
     _boxes[_].Add(self.m._general_area_charset_ckbtn, border)
     _boxes[_].Add(self.m._general_area_charset_entry, proportion_border)
@@ -775,14 +787,15 @@ class Layout_opts(object):
     border = SizerFlags().Expand().Border(LEFT | RIGHT, 5)
     proportion_border = SizerFlags(1).Border(LEFT | RIGHT, 5)
 
-    _boxes = [BoxSizer() for _ in range(4)]
+    _boxes = [BoxSizer() for _ in range(5)]
     _ = 0
+    _boxes[_].Add(self.m._misc_area_skip_heuristics_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_skip_waf_ckbtn, border)
+    _boxes[_].Add(self.m._misc_area_unstable_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_list_tampers_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_sqlmap_shell_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_disable_color_ckbtn, border)
     _boxes[_].Add(self.m._general_area_eta_ckbtn, border)
-    _boxes[_].Add(self.m._misc_area_update_ckbtn, border)
     _ += 1
     _boxes[_].Add(self.m._misc_area_gpage_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_gpage_spinbtn)
@@ -790,6 +803,7 @@ class Layout_opts(object):
     _boxes[_].Add(self.m._misc_area_offline_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_purge_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_dependencies_ckbtn, border)
+    _boxes[_].Add(self.m._misc_area_update_ckbtn, border)
     _ += 1
     _boxes[_].Add(self.m._misc_area_alert_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_alert_entry, proportion_border)
@@ -801,6 +815,10 @@ class Layout_opts(object):
     _boxes[_].Add(self.m._misc_area_answers_entry, proportion_border)
     _boxes[_].Add(self.m._misc_area_z_ckbtn, border)
     _boxes[_].Add(self.m._misc_area_z_entry, proportion_border)
+    _ += 1
+    _boxes[_].Add(self.m._misc_area_results_file_ckbtn, border)
+    _boxes[_].Add(self.m._misc_area_results_file_entry, proportion = 1, flag = EXPAND)
+    _boxes[_].Add(self.m._misc_area_results_file_chooser, border)
 
     spacing = SizerFlags().Expand().Border(TOP | BOTTOM, 3)
     for _ in _boxes:

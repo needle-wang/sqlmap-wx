@@ -112,12 +112,12 @@ class Notebook(nb):
     m._inject_area_os_entry.Create(_sb)
     m._inject_area_no_cast_ckbtn.Create(_sb, label = '关闭数据类型转换')
     m._inject_area_no_escape_ckbtn.Create(_sb, label = '关掉string转义')
-    self._inject_area_invalid_label = st(_sb, label = '对payload中无效值:')
+    self._inject_area_invalid_label = st(_sb, label = 'payload\'s invalid value:')
     self._inject_area_invalid_label.SetToolTip('默认情况下, 要使原参数值无效时会改成相反数\n'
         '真: id=13 假: id=-13')
-    m._inject_area_invalid_logic_ckbtn.Create(_sb, label = '使用布尔运算')
     m._inject_area_invalid_bignum_ckbtn.Create(_sb, label = '使用大数')
-    m._inject_area_invalid_str_ckbtn.Create(_sb, label = '使用随机字串')
+    m._inject_area_invalid_logic_ckbtn.Create(_sb, label = '使用布尔运算')
+    m._inject_area_invalid_string_ckbtn.Create(_sb, label = '使用随机字串')
 
   def build_page1_setting_detection(self, panel, m):
     _sb = m._detection_area
@@ -135,28 +135,27 @@ class Notebook(nb):
                                         minValue = 1,
                                         maxValue = 3,
                                         style = wx.SL_VALUE_LABEL)
-    m._detection_area_str_ckbtn.Create(_sb, label = '指定字符串')
+    m._detection_area_str_ckbtn.Create(_sb, label = '指定True时的字符串')
     m._detection_area_str_entry.Create(_sb)
-    m._detection_area_not_str_ckbtn.Create(_sb, label = '指定字符串')
+    m._detection_area_not_str_ckbtn.Create(_sb, label = '指定False时的字符串')
     m._detection_area_not_str_entry.Create(_sb)
     m._detection_area_re_ckbtn.Create(_sb, label = '指定正则')
     m._detection_area_re_entry.Create(_sb)
     m._detection_area_code_ckbtn.Create(_sb, label = '指定http状态码')
     m._detection_area_code_entry.Create(_sb)
     m._detection_area_text_only_ckbtn.Create(_sb, label = '仅对比文本')
-    m._detection_area_titles_ckbtn.Create(_sb, label = '仅对比title')
-
     m._detection_area_text_only_ckbtn.Bind(
       EVT_CHECKBOX,
       lambda evt, cbtmp = m._detection_area_titles_ckbtn:
         self.cb_single(evt, cbtmp))
+
+    m._detection_area_titles_ckbtn.Create(_sb, label = '仅对比title')
     m._detection_area_titles_ckbtn.Bind(
       EVT_CHECKBOX,
       lambda evt, cbtmp = m._detection_area_text_only_ckbtn:
         self.cb_single(evt, cbtmp))
 
     m._detection_area_smart_ckbtn.Create(_sb, label = '寻找明显目标并测试')
-
     self._detection_area_hr = wx.StaticLine(_sb)
     self._detection_area_level_note = st(_sb,
         label = 'Level 1(默认): 所有GET, POST参数\n'
@@ -178,7 +177,7 @@ class Notebook(nb):
     m._tech_area_tech_entry.SetInitialSize(
         m._tech_area_tech_entry.GetSizeFromTextSize(
           m._tech_area_tech_entry.GetTextExtent("a" * 15).x))
-    m._tech_area_time_sec_ckbtn.Create(_sb, label = '指定DB延迟多少秒响应')
+    m._tech_area_time_sec_ckbtn.Create(_sb, label = '指定DB延迟几秒响应')
     m._tech_area_time_sec_entry.Create(_sb)
     m._tech_area_union_col_ckbtn.Create(_sb, label = '指定最大union列数')
     m._tech_area_union_col_entry.Create(_sb)
@@ -264,7 +263,7 @@ class Notebook(nb):
     m._request_area_host_entry.Create(_sb)
     m._request_area_referer_ckbtn.Create(_sb, label = 'referer头')
     m._request_area_referer_entry.Create(_sb)
-    m._request_area_header_ckbtn.Create(_sb, label = '额外的header(-H)')
+    m._request_area_header_ckbtn.Create(_sb, label = '--header(-H)')
     m._request_area_header_entry.Create(_sb)
     m._request_area_headers_ckbtn.Create(_sb, label = '额外的headers')
     m._request_area_headers_entry.Create(_sb)
@@ -275,16 +274,25 @@ class Notebook(nb):
 
     m._request_area_method_ckbtn.Create(_sb, label = 'HTTP请求方式')
     m._request_area_method_entry.Create(_sb)
-    m._request_area_param_del_ckbtn.Create(_sb, label = '指定分隔data参数值的字符')
+    m._request_area_param_del_ckbtn.Create(_sb, label = '指定--data=中的参数分隔符')
     m._request_area_param_del_entry.Create(_sb)
     m._request_area_chunked_ckbtn.Create(_sb, label = '"分块传输"发送POST请求')
     m._request_area_post_ckbtn.Create(_sb, label = '通过POST提交data:')
     self._request_data_hr1 = wx.StaticLine(_sb)
     m._request_area_post_entry.Create(_sb)
-    m._request_area_cookie_ckbtn.Create(_sb, label = '请求中要包含的Cookie:')
+    m._request_area_cookie_ckbtn.Create(_sb, label = '要包含的Cookie:')
     m._request_area_cookie_entry.Create(_sb)
     m._request_area_cookie_del_ckbtn.Create(_sb, label = '指定cookie分隔符')
     m._request_area_cookie_del_entry.Create(_sb)
+    m._request_area_drop_set_cookie_ckbtn.Create(_sb, label = '丢弃Set-Cookie头')
+    m._request_area_live_cookies_ckbtn.Create(_sb, label = 'live_cookies')
+    m._request_area_live_cookies_entry.Create(_sb)
+    m._request_area_live_cookies_chooser.Create(_sb, label = '打开')
+    m._request_area_live_cookies_chooser.Bind(
+      EVT_BUTTON,
+      lambda evt, data = [m._request_area_live_cookies_entry]:
+        self._handlers.set_file_entry_text(evt, data))
+
     m._request_area_load_cookies_ckbtn.Create(_sb, label = '本地Cookie文件')
     m._request_area_load_cookies_entry.Create(_sb)
     m._request_area_load_cookies_chooser.Create(_sb, label = '打开')
@@ -293,7 +301,6 @@ class Notebook(nb):
       lambda evt, data = [m._request_area_load_cookies_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
-    m._request_area_drop_set_cookie_ckbtn.Create(_sb, label = '丢弃Set-Cookie头')
     self._request_data_hr2 = wx.StaticLine(_sb)
     m._request_area_auth_type_ckbtn.Create(_sb, label = 'http认证类型')
     m._request_area_auth_type_entry.Create(_sb)
@@ -309,6 +316,8 @@ class Notebook(nb):
 
     m._request_area_csrf_method_ckbtn.Create(_sb, label = 'csrf_method')
     m._request_area_csrf_method_entry.Create(_sb)
+    m._request_area_csrf_retries_ckbtn.Create(_sb, label = 'csrf_retries')
+    m._request_area_csrf_retries_entry.Create(_sb)
     m._request_area_csrf_token_ckbtn.Create(_sb, label = 'csrf_token')
     m._request_area_csrf_token_entry.Create(_sb)
     m._request_area_csrf_url_ckbtn.Create(_sb, label = '获取csrf_token的url')
@@ -350,7 +359,6 @@ class Notebook(nb):
     m._request_area_safe_req_ckbtn.Create(_sb, label = '从文件载入safe HTTP请求')
     m._request_area_safe_req_entry.Create(_sb)
     m._request_area_safe_req_chooser.Create(_sb, label = '打开')
-
     m._request_area_safe_req_chooser.Bind(
       EVT_BUTTON,
       lambda evt, data = [m._request_area_safe_req_entry]:
@@ -360,23 +368,24 @@ class Notebook(nb):
     m._request_area_safe_freq_entry.Create(_sb)
     self._request_proxy_hr = wx.StaticLine(_sb)
     m._request_area_ignore_proxy_ckbtn.Create(_sb, label = '忽略系统默认代理')
-    m._request_area_proxy_ckbtn.Create(_sb, label = '使用代理')
+    m._request_area_proxy_freq_ckbtn.Create(_sb, label = '--proxy-freq')
+    m._request_area_proxy_freq_entry.Create(_sb)
     m._request_area_proxy_file_ckbtn.Create(_sb, label = '代理列表文件')
     m._request_area_proxy_file_entry.Create(_sb)
     m._request_area_proxy_file_chooser.Create(_sb, label = '打开')
-
     m._request_area_proxy_file_chooser.Bind(
       EVT_BUTTON,
       lambda evt, data = [m._request_area_proxy_file_entry]:
         self._handlers.set_file_entry_text(evt, data))
 
+    m._request_area_proxy_ckbtn.Create(_sb, label = '使用代理')
     m._request_area_proxy_ip_label.Create(_sb, label = 'IP:')
     m._request_area_proxy_ip_entry.Create(_sb)
     m._request_area_proxy_port_label.Create(_sb, label = 'PORT:')
     m._request_area_proxy_port_entry.Create(_sb)
     m._request_area_proxy_username_label.Create(_sb, label = 'username:')
     m._request_area_proxy_username_entry.Create(_sb)
-    m._request_area_proxy_password_label.Create(_sb, label = 'password:')
+    m._request_area_proxy_password_label.Create(_sb, label = 'passwd:')
     m._request_area_proxy_password_entry.Create(_sb)
     m._request_area_tor_ckbtn.Create(_sb, label = '使用Tor匿名网络')
     m._request_area_tor_port_ckbtn.Create(_sb, label = 'Tor端口:')
@@ -428,30 +437,30 @@ class Notebook(nb):
     _sb = m._limit_area
     _sb.Create(panel, label = 'limit(dump时的限制)')
 
-    m._limit_area_start_ckbtn.Create(_sb, label = '始于第')
+    m._limit_area_start_ckbtn.Create(_sb, label = '始于第几条')
     m._limit_area_start_entry.Create(_sb)
     m._limit_area_start_entry.SetInitialSize(
         m._limit_area_start_entry.GetSizeFromTextSize(
           m._limit_area_start_entry.GetTextExtent("a" * 15).x))
-    self._limit_area_start_label = st(_sb, label = '行')
-    m._limit_area_stop_ckbtn.Create(_sb, label = '止于第')
+    # self._limit_area_start_label = st(_sb, label = '行')
+    m._limit_area_stop_ckbtn.Create(_sb, label = '止于第几条')
     m._limit_area_stop_entry.Create(_sb)
     m._limit_area_stop_entry.SetInitialSize(
         m._limit_area_stop_entry.GetSizeFromTextSize(
           m._limit_area_stop_entry.GetTextExtent("a" * 15).x))
-    self._limit_area_stop_label = st(_sb, label = '行')
+    # self._limit_area_stop_label = st(_sb, label = '行')
 
   def build_page1_enumeration_blind(self, panel, m):
     _sb = m._blind_area
     _sb.Create(panel, label = '盲注选项')
 
-    m._blind_area_first_ckbtn.Create(_sb, label = '从第')
+    m._blind_area_first_ckbtn.Create(_sb, label = '从第几个字符')
     m._blind_area_first_entry.Create(_sb)
-    self._blind_area_first_label = st(_sb, label = '个字符')
-    m._blind_area_last_ckbtn.Create(_sb, label = '到第')
+    # self._blind_area_first_label = st(_sb, label = '个字符')
+    m._blind_area_last_ckbtn.Create(_sb, label = '到第几个字符')
     m._blind_area_last_entry.Create(_sb)
-    self._blind_area_last_label = st(_sb, label = '个字符')
-    self._blind_area_note_label = st(_sb, label = '只适用于盲注,\n因为报错,union注入要求列数相同')
+    # self._blind_area_last_label = st(_sb, label = '个字符')
+    # self._blind_area_note_label = st(_sb, label = '只适用于盲注,\n因为报错,union注入要求列数相同')
 
   def build_page1_enumeration_meta(self, panel, m):
     _sb = m._meta_area
@@ -491,7 +500,7 @@ class Notebook(nb):
     _sb = m._brute_force_area
     _sb.Create(panel, label = '暴破表名/列名')
 
-    self._brute_force_area_label = st(_sb, label = '检查是否存在:')
+    self._brute_force_area_label = st(_sb, label = 'check existence of:')
     m._brute_force_area_common_tables_ckbtn.Create(_sb, label = '常用表名')
     m._brute_force_area_common_columns_ckbtn.Create(_sb, label = '常用列名')
     m._brute_force_area_common_files_ckbtn.Create(_sb, label = '常用文件')
@@ -608,6 +617,9 @@ class Notebook(nb):
     m._general_area_forms_ckbtn.Create(_sb, label = '获取form表单参数并测试')
     m._general_area_parse_errors_ckbtn.Create(_sb, label = '解析并显示响应中的错误信息')
     m._misc_area_cleanup_ckbtn.Create(_sb, label = '清理DBMS中的入侵痕迹!')
+    m._general_area_base64_ckbtn.Create(_sb, label = '--base64')
+    m._general_area_base64_entry.Create(_sb)
+    m._general_area_base64_safe_ckbtn.Create(_sb, label = '--base64-safe')
     m._general_area_table_prefix_ckbtn.Create(_sb, label = '临时表前缀')
     m._general_area_table_prefix_entry.Create(_sb)
     # size = ()是以px为单位的, 如果想设成以字符长度为宽, 蛋疼如下~~:
@@ -619,18 +631,25 @@ class Notebook(nb):
     m._general_area_binary_fields_entry.SetInitialSize(
         m._general_area_binary_fields_entry.GetSizeFromTextSize(
           m._general_area_binary_fields_entry.GetTextExtent("a" * 16).x))
-    m._general_area_preprocess_ckbtn.Create(_sb, label = '指定预处理响应数据的脚本')
+    m._general_area_preprocess_ckbtn.Create(_sb, label = '处理请求的脚本')
     m._general_area_preprocess_entry.Create(_sb)
     m._general_area_preprocess_chooser.Create(_sb, label = '打开')
     m._general_area_preprocess_chooser.Bind(
       EVT_BUTTON,
       lambda evt, data = [m._general_area_preprocess_entry]:
         self._handlers.set_file_entry_text(evt, data))
+    m._general_area_postprocess_ckbtn.Create(_sb, label = '处理响应的脚本')
+    m._general_area_postprocess_entry.Create(_sb)
+    m._general_area_postprocess_chooser.Create(_sb, label = '打开')
+    m._general_area_postprocess_chooser.Bind(
+      EVT_BUTTON,
+      lambda evt, data = [m._general_area_postprocess_entry]:
+        self._handlers.set_file_entry_text(evt, data))
 
     m._general_area_charset_ckbtn.Create(_sb, label = '盲注所用的字符集合')
     m._general_area_charset_entry.Create(_sb, value = '0123456789abcdef')
     m._general_area_encoding_ckbtn.Create(_sb, label = '字符编码(用于数据获取)')
-    m._general_area_encoding_entry.Create(_sb)
+    m._general_area_encoding_entry.Create(_sb, value = 'GBK')
     m._general_area_web_root_ckbtn.Create(_sb, label = '远程web的根目录')
     m._general_area_web_root_entry.Create(_sb)
     m._general_area_scope_ckbtn.Create(_sb, label = '从代理日志过滤出目标(正则)')
@@ -700,18 +719,20 @@ class Notebook(nb):
     _sb = m._misc_area
     _sb.Create(panel, label = '杂项')
 
+    m._misc_area_skip_heuristics_ckbtn.Create(_sb, label = '--skip-heuristics')
     m._misc_area_skip_waf_ckbtn.Create(_sb, label = '跳过WAF/IPS侦测')
+    m._misc_area_unstable_ckbtn.Create(_sb, label = '--unstable')
     m._misc_area_list_tampers_ckbtn.Create(_sb, label = '列出可用的tamper脚本')
     m._misc_area_sqlmap_shell_ckbtn.Create(_sb, label = '打开sqlmap交互shell')
     m._misc_area_disable_color_ckbtn.Create(_sb, label = '禁用终端输出的颜色')
     m._general_area_eta_ckbtn.Create(_sb, label = '显示剩余时间')
-    m._misc_area_update_ckbtn.Create(_sb, label = '更新sqlmap')
     m._misc_area_gpage_ckbtn.Create(_sb, label = 'GOOGLEDORK时的页码')
     m._misc_area_gpage_spinbtn.Create(_sb, value = '1', min = 1, max = 100)
     m._misc_area_beep_ckbtn.Create(_sb, label = '响铃')
     m._misc_area_offline_ckbtn.Create(_sb, label = '离线模式(仅使用本地会话数据)')
     m._misc_area_purge_ckbtn.Create(_sb, label = '抹除所有本地记录!')
     m._misc_area_dependencies_ckbtn.Create(_sb, label = '检查丢失的(非核心的)sqlmap依赖')
+    m._misc_area_update_ckbtn.Create(_sb, label = '更新sqlmap')
     m._misc_area_alert_ckbtn.Create(_sb, label = '发现注入时运行本地命令:')
     m._misc_area_alert_entry.Create(_sb)
     m._misc_area_tmp_dir_ckbtn.Create(_sb, label = '本地临时目录')
@@ -726,6 +747,13 @@ class Notebook(nb):
     m._misc_area_answers_entry.Create(_sb, value = 'quit=N,follow=N')
     m._misc_area_z_ckbtn.Create(_sb, label = '使用短的助记符')
     m._misc_area_z_entry.Create(_sb, value = 'flu,bat,ban,tec=EU...')
+    m._misc_area_results_file_ckbtn.Create(_sb, label = '--results-file')
+    m._misc_area_results_file_entry.Create(_sb)
+    m._misc_area_results_file_chooser.Create(_sb, label = '打开')
+    m._misc_area_results_file_chooser.Bind(
+      EVT_BUTTON,
+      lambda evt, data = [m._misc_area_results_file_entry]:
+        self._handlers.set_file_entry_text(evt, data))
     # 最后一行总是会变矮~, 添加一个无用的widget, 抵消一下~
     # self._dummy = btn(_sb,
     #              label = '一个无用按钮, 如果报GTK警告, 应该是我没显示出来')

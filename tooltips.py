@@ -23,8 +23,6 @@ class Widget_Mesg(object):
                           m._bulkfile)
     self._set_placeholder('-c: 从一个本地ini配置文件载入选项',
                           m._configfile)
-    self._set_placeholder('-x: 远程sitemap(.xml)文件的url(用来解析目标)',
-                          m._sitemap_url)
     self._set_placeholder('-g: 将google dork的结果作为目标url',
                           m._google_dork)
     # OPTIONS(page1)
@@ -126,8 +124,6 @@ class Widget_Mesg(object):
                       m._bulkfile)
     self._set_tooltip('-c: 从一个本地ini配置文件载入选项',
                       m._configfile)
-    self._set_tooltip('-x: 远程sitemap(.xml)文件的url(用来解析目标)',
-                      m._sitemap_url)
     self._set_tooltip('-g: 将google dork的结果作为目标url',
                       m._google_dork)
     # OPTIONS(page1)
@@ -175,15 +171,15 @@ class Widget_Mesg(object):
         '注: 默认 select \'foobar\'会变成 select char(102)+char(111)...\n'
         '    优点: 转义引号, 绕过; 缺点: 长度变长',
                       m._inject_area_no_escape_ckbtn)
-    self._set_tooltip('--invalid-logical\n'
-        '真: id=13 假: id=13 AND 18=19',
-                      m._inject_area_invalid_logic_ckbtn)
     self._set_tooltip('--invalid-bignum\n'
         '真: id=13 假: id=99999999',
                       m._inject_area_invalid_bignum_ckbtn)
+    self._set_tooltip('--invalid-logical\n'
+        '真: id=13 假: id=13 AND 18=19',
+                      m._inject_area_invalid_logic_ckbtn)
     self._set_tooltip('--invalid-string\n'
         '真: id=13 假: id=akewmc',
-                      m._inject_area_invalid_str_ckbtn)
+                      m._inject_area_invalid_string_ckbtn)
     self._set_tooltip('--string=STRING',
                       m._detection_area_str_ckbtn,
                       m._detection_area_str_entry)
@@ -325,11 +321,14 @@ class Widget_Mesg(object):
     self._set_tooltip('--cookie-del=',
                       m._request_area_cookie_del_ckbtn,
                       m._request_area_cookie_del_entry)
+    self._set_tooltip('--drop-set-cookie=',
+                      m._request_area_drop_set_cookie_ckbtn)
+    self._set_tooltip('--live-cookies=',
+                      m._request_area_live_cookies_ckbtn,
+                      m._request_area_live_cookies_entry)
     self._set_tooltip('--load-cookies=',
                       m._request_area_load_cookies_ckbtn,
                       m._request_area_load_cookies_entry)
-    self._set_tooltip('--drop-set-cookie=',
-                      m._request_area_drop_set_cookie_ckbtn)
     self._set_tooltip('--auth-type=Basic, Digest, NTLM or PKI',
                       m._request_area_auth_type_ckbtn,
                       m._request_area_auth_type_entry)
@@ -343,6 +342,9 @@ class Widget_Mesg(object):
     self._set_tooltip('--csrf-method=',
                       m._request_area_csrf_method_ckbtn,
                       m._request_area_csrf_method_entry)
+    self._set_tooltip('--csrf-retries=',
+                      m._request_area_csrf_retries_ckbtn,
+                      m._request_area_csrf_retries_entry)
     self._set_tooltip('--csrf-token=\n'
         '有的表单中含有隐藏的随机token字段, 来防止csrf攻击',
                       m._request_area_csrf_token_ckbtn,
@@ -403,6 +405,9 @@ class Widget_Mesg(object):
                       m._request_area_proxy_ip_entry,
                       m._request_area_proxy_port_label,
                       m._request_area_proxy_port_entry)
+    self._set_tooltip('--proxy-freq=',
+                      m._request_area_proxy_freq_ckbtn,
+                      m._request_area_proxy_freq_entry)
     self._set_tooltip('--proxy-file=',
                       m._request_area_proxy_file_ckbtn,
                       m._request_area_proxy_file_entry)
@@ -471,7 +476,7 @@ class Widget_Mesg(object):
         '  -T=逗号分隔的表名: 将在所有DB中 搜索指定表名\n'
         '  -D=逗号分隔的数据库名: 将 搜索指定库名\n',
                       m._dump_area_search_ckbtn)
-    self._set_tooltip('--exclude-sysdb\n注: sql server上master库不视为系统库',
+    self._set_tooltip('--exclude-sysdbs\n注: sql server上master库不视为系统库',
                       m._dump_area_no_sys_db_ckbtn)
     self._set_tooltip('--dump-all',
                       m._dump_area_dump_all_ckbtn)
@@ -626,6 +631,11 @@ class Widget_Mesg(object):
     self._set_tooltip('--cleanup\n'
         '清理 DBMS(如临时表sqlmapoutput, udf)及文件系统',
                       m._misc_area_cleanup_ckbtn)
+    self._set_tooltip('Parameter(s) containing Base64 encoded data',
+                      m._general_area_base64_ckbtn,
+                      m._general_area_base64_entry)
+    self._set_tooltip('Use URL and filename safe Base64 alphabet (RFC 4648)',
+                      m._general_area_base64_safe_ckbtn)
     self._set_tooltip('--table-prefix=',
                       m._general_area_table_prefix_ckbtn,
                       m._general_area_table_prefix_entry)
@@ -636,6 +646,9 @@ class Widget_Mesg(object):
     self._set_tooltip('--preprocess=',
                       m._general_area_preprocess_ckbtn,
                       m._general_area_preprocess_entry)
+    self._set_tooltip('--postprocess=',
+                      m._general_area_postprocess_ckbtn,
+                      m._general_area_postprocess_entry)
     self._set_tooltip('--charset=  如获取SHA1密文时, 请求数可减小30%',
                       m._general_area_charset_ckbtn,
                       m._general_area_charset_entry)
@@ -683,10 +696,14 @@ class Widget_Mesg(object):
     self._set_tooltip('--output-dir=',
                       m._general_area_output_dir_ckbtn,
                       m._general_area_output_dir_entry)
+    self._set_tooltip('--skip-heuristics',
+                      m._misc_area_skip_heuristics_ckbtn)
     self._set_tooltip('--skip-waf\n'
         '默认情况, 会发送一个可疑的payload(所以有时明显没有防护还报警告)\n'
         '勾选以禁用此默认机制',
                       m._misc_area_skip_waf_ckbtn)
+    self._set_tooltip('--unstable',
+                      m._misc_area_unstable_ckbtn)
     self._set_tooltip('--list-tampers',
                       m._misc_area_list_tampers_ckbtn)
     self._set_tooltip('--sqlmap-shell',
@@ -720,6 +737,9 @@ class Widget_Mesg(object):
     self._set_tooltip('-z MNEMONICS Use short mnemonics (e.g. "flu,bat,ban,tec=EU")',
                       m._misc_area_z_ckbtn,
                       m._misc_area_z_entry)
+    self._set_tooltip('--results-file=R..  Location of CSV results file in multiple targets mode',
+                      m._misc_area_results_file_ckbtn,
+                      m._misc_area_results_file_entry)
     # LOG(page3)
     self._set_tooltip('不会修改文件',
                       m._page3_clear_btn)

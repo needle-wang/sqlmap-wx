@@ -98,12 +98,18 @@ class Session(object):
     try:
       _checked = self._cfg['CheckButton']['checked'].split(',')
       for _i in _checked:
-        if _i:  # _i could be ''
-          _tmp_ckbtn = getattr(self.m, _i)
-          _tmp_ckbtn.SetValue(True)
-        else:  # if _checked = [''], then use default
+        try:
+          if _i:  # _i could be ''
+            if _i.endswith('_ckbtn'):
+              _tmp_ckbtn = getattr(self.m, _i)
+              _tmp_ckbtn.SetValue(True)
+            # if _i.startswith('tamper_'):
+            #   _tampers[int(_i[len('tamper_'):])].set_active(True)
+          else:  # if _checked = [''], then use default
+            pass
+        except AttributeError:
           pass
-    except KeyError as e:
+    except KeyError:
       # if no checked button, then pass
       pass
 
@@ -118,7 +124,7 @@ class Session(object):
         if isinstance(_tmp_entry, tc) and self._cfg['Entry'][_i]:
           # print(type(self._cfg['Entry'][_i]))
           _tmp_entry.SetValue(self._cfg['Entry'][_i])
-      except AttributeError as e:
+      except AttributeError:
         pass
 
 

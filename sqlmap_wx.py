@@ -220,16 +220,18 @@ class Window(wx.Frame):
     hbox5.Add(m._configfile_chooser, flag = EXPAND)
     p5.SetSizer(hbox5)
 
-    m._sitemap_url.Create(parent)
     m._google_dork.Create(parent)
+    m._direct_connect.Create(parent,
+                             value = 'mysql://USER:PASSWORD@DBMS_IP:DBMS_PORT/DATABASE_NAME or '
+                                     'access://DATABASE_FILEPATH')
 
     parent.AddPage(m._url_combobox, '目标url')
     parent.AddPage(p2, 'burp日志')
     parent.AddPage(p3, 'HTTP请求')
     parent.AddPage(p4, 'BULKFILE')
     parent.AddPage(p5, 'ini文件')
-    parent.AddPage(m._sitemap_url, 'xml_url')
     parent.AddPage(m._google_dork, 'GOOGLEDORK')
+    parent.AddPage(m._direct_connect, '-d DIRECT')
 
   def build_page1(self, parent):
     p = Panel(parent)
@@ -286,7 +288,7 @@ class Window(wx.Frame):
     m._page3_log_view.Create(p,
                              size = (-1, 300),
                              style = wx.TE_MULTILINE | wx.TE_READONLY)
-    # self._handlers.clear_log_view_buffer(None)
+    self._handlers.clear_log_view_buffer(None)
 
     grid = GridSizer(1, 3, 0, 0)
     m._page3_read_target_btn.Create(p, label = '查看target文件')
@@ -365,7 +367,7 @@ class Window(wx.Frame):
     _rbox = BoxSizer(VERTICAL)
 
     m._page4_option_get_entry.Create(rpane, value = 'url risk level')
-    _page4_option_set_view_tip = st(rpane, label = '所有选项见sqlmap目录中的optiondict.py')
+    _page4_option_set_view_tip = st(rpane, label = 'check optiondict.py of sqlmap about options.')
     _options_example = ("{\n"
                         "  'url': 'http://www.site.com/vuln.php?id=1',\n"
                         "  'level': 1, 'risk': 1,\n\n"
