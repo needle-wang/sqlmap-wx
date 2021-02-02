@@ -44,10 +44,12 @@ class Layout_opts(object):
     tamper_area = self._setting_tamper()
     optimize_area = self._setting_optimize()
     offen_area = self._setting_offen()
+    hidden_area = self._setting_hidden()
 
     hbox2.Add(tamper_area, spacing)
     hbox2.Add(optimize_area, spacing)
     hbox2.Add(offen_area, spacing)
+    hbox2.Add(hidden_area, spacing)
 
     vbox = BoxSizer(VERTICAL)
     vbox.Add(hbox0, flag = EXPAND | LEFT, border = 5)
@@ -220,6 +222,41 @@ class Layout_opts(object):
     sbSizer.Add(self.m._general_area_hex_ckbtn, spacing)
     sbSizer.Add(self.m._general_area_batch_ckbtn, spacing)
     sbSizer.Add(self.m._misc_area_wizard_ckbtn, spacing)
+    return sbSizer
+
+  def _setting_hidden(self):
+    sbSizer = StaticBoxSizer(self.m._hidden_area, VERTICAL)
+
+    _boxes = [BoxSizer() for _ in range(6)]
+    _ = 0
+    _boxes[_].Add(self.m._hidden_area_crack_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_debug_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_profile_ckbtn, flag = EXPAND)
+    _ += 1
+    _boxes[_].Add(self.m._hidden_area_disable_precon_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_disable_stats_ckbtn, flag = EXPAND)
+    _ += 1
+    _boxes[_].Add(self.m._hidden_area_force_dbms_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_force_dns_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_force_pivoting_ckbtn, flag = EXPAND)
+    _ += 1
+    _boxes[_].Add(self.m._hidden_area_smoke_test_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_live_test_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_vuln_test_ckbtn, flag = EXPAND)
+    _ += 1
+    _boxes[_].Add(self.m._hidden_area_murphy_rate_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_stop_fail_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_run_case_ckbtn, flag = EXPAND)
+    _ += 1
+    _boxes[_].Add(self.m._hidden_area_dummy_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_api_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_taskid_ckbtn, flag = EXPAND)
+    _boxes[_].Add(self.m._hidden_area_database_ckbtn, flag = EXPAND)
+
+    spacing = SizerFlags().Expand().Border(ALL, 3)
+    for _ in _boxes:
+      sbSizer.Add(_, spacing)
+
     return sbSizer
 
   def request_sizer(self):

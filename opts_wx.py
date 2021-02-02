@@ -75,6 +75,7 @@ class Notebook(nb):
     self.build_page1_setting_tamper(p, m)
     self.build_page1_setting_optimize(p, m)
     self.build_page1_setting_offen(p, m)
+    self.build_page1_setting_hidden(p, m)
 
     vbox = layout.setting_sizer()
     # 不能用SetSizerAndFit, Fit会自适应的, 从而没有滚动条
@@ -233,6 +234,29 @@ class Notebook(nb):
     m._general_area_hex_ckbtn.Create(_sb, label = '响应使用hex转换')
     m._general_area_batch_ckbtn.Create(_sb, label = '非交互模式, 一切皆默认')
     m._misc_area_wizard_ckbtn.Create(_sb, label = '新手向导')
+
+  def build_page1_setting_hidden(self, panel, m):
+    _sb = m._hidden_area
+    _sb.Create(panel, label = 'Hidden')
+
+    m._hidden_area_crack_ckbtn.Create(_sb, label = '--crack')
+    m._hidden_area_debug_ckbtn.Create(_sb, label = '--debug')
+    m._hidden_area_profile_ckbtn.Create(_sb, label = '--profile')
+    m._hidden_area_disable_precon_ckbtn.Create(_sb, label = '--disable-precon')
+    m._hidden_area_disable_stats_ckbtn.Create(_sb, label = '--disable-stats')
+    m._hidden_area_force_dbms_ckbtn.Create(_sb, label = '--force-dbms')
+    m._hidden_area_force_dns_ckbtn.Create(_sb, label = '--force-dns')
+    m._hidden_area_force_pivoting_ckbtn.Create(_sb, label = '--force-pivoting')
+    m._hidden_area_smoke_test_ckbtn.Create(_sb, label = '--smoke-test')
+    m._hidden_area_live_test_ckbtn.Create(_sb, label = '--live-test')
+    m._hidden_area_vuln_test_ckbtn.Create(_sb, label = '--vuln-test')
+    m._hidden_area_murphy_rate_ckbtn.Create(_sb, label = '--murphy-rate')
+    m._hidden_area_stop_fail_ckbtn.Create(_sb, label = '--stop-fail')
+    m._hidden_area_run_case_ckbtn.Create(_sb, label = '--run-case')
+    m._hidden_area_dummy_ckbtn.Create(_sb, label = '--dummy')
+    m._hidden_area_api_ckbtn.Create(_sb, label = '--api')
+    m._hidden_area_taskid_ckbtn.Create(_sb, label = '--taskid')
+    m._hidden_area_database_ckbtn.Create(_sb, label = '--database')
 
   def build_page1_request(self, layout):
     p = Scroll(self, style = wx.BORDER_THEME)
