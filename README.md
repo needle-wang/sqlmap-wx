@@ -25,7 +25,7 @@ sqlmap已经移植到了python3. 来自sqlmap的FAQ:
   - `./sqlmap_wx.py`
 
 #### FUNCTION
-- all sqlmap(1.3.10.7#dev) options(except -d, 不定时更新sqlmap选项)
+- all sqlmap(1.4.12.45#dev) options(except --all, 不定时更新sqlmap选项)
 - sqlmapapi client
 - built-in mini wiki(tooltip and placeholder)
 - session: autosave current options before quit, autoload last used options
