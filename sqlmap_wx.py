@@ -115,7 +115,12 @@ class Window(wx.Frame):
   def make_btn_accel(self, btn):
     '''
     https://stackoverflow.com/questions/12786471/invoking-a-wxpython-evt-button-event-programmatically
+    https://stackoverflow.com/questions/9765718/wxpython-trigger-checkbox-event-while-setting-its-value-in-the-code
     '''
+    # 手动emit事件
+    # evt = wx.CommandEvent(wx.EVT_CHECKBOX.typeId)
+    # evt.SetEventObject(cb)  # 将该evt绑定给cb
+    # wx.PostEvent(cb, evt)
     evt = wx.PyCommandEvent(EVT_BUTTON.typeId, btn.GetId())
     # print(evt)
     wx.PostEvent(btn, evt)
