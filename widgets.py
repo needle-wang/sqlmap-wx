@@ -65,7 +65,7 @@ class NumCtrl(wx.TextCtrl):
   def onChar(self, event):
     keycode = event.GetKeyCode()
     obj = event.GetEventObject()
-    val = obj.GetValue()
+    val = super().GetValue()
     # filter unicode characters
     if keycode == wx.WXK_NONE:
       pass
@@ -88,6 +88,12 @@ class NumCtrl(wx.TextCtrl):
     elif chr(keycode) == '.' and '.' not in val:
       event.Skip()
     return
+
+  def GetValue(self):
+    try:
+      return float(super().GetValue())
+    except Exception as e:
+      return 0.0
 
 
 EVT_BUTTON = wx.EVT_BUTTON
