@@ -73,7 +73,7 @@ class Window(wx.Frame):
     self.accel_entries = [(wx.ACCEL_CTRL, ord('Q'), wx.ID_EXIT),
                           (wx.ACCEL_CTRL, ord('W'), wx.ID_EXIT)]
 
-    main_note_ks = ['1', '2', '3', '4', 'H']
+    main_note_ks = list('1234H')
     for i in range(len(main_note_ks)):
       pageid = self.main_notebook.GetPage(i).GetId()
 
@@ -83,7 +83,7 @@ class Window(wx.Frame):
         lambda evt, page = i: self.main_notebook.SetSelection(page),
         id = pageid)
 
-    _note_keys = ['Q', 'W', 'E', 'R', 'T']
+    _note_keys = list('QWERTY')
     for i in range(len(_note_keys)):
       pageid = self._notebook.GetPage(i).GetId()
 
@@ -95,7 +95,7 @@ class Window(wx.Frame):
             if self.main_notebook.GetSelection() == 0 else evt.Skip(),
         id = pageid)
     # win下, 若焦点没按钮上, 则不响应mnemonic, 只能在这里实现了
-    _btn_keys = ['A', 'S', 'D', 'F']
+    _btn_keys = list('ASDF')
     btns = self.btn_grid.GetChildren()
     for i in range(len(btns)):
       btn = btns[i].GetWindow()

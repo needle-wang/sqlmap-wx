@@ -861,7 +861,7 @@ class Layout_opts(object):
     for _ in _boxes:
       sbSizer.Add(_, spacing)
 
-    # sbSizer.Add(self.nb._dummy, spacing)
+    sbSizer.Add(self.nb._dummy, spacing)
     return sbSizer
 
 

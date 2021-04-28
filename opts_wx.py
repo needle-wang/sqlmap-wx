@@ -21,18 +21,20 @@ class Notebook(nb):
     layout = Layout_opts(self, model)
 
     self._handlers = handlers
-    # OPTIONS - Inject, Request, Enumerate, File, Other
+    # OPTIONS - Inject, Request, Enumerate, File, Other, Tamper
     page1_setting = self.build_page1_setting(layout)
     page1_request = self.build_page1_request(layout)
     page1_enumeration = self.build_page1_enumeration(layout)
     page1_file = self.build_page1_file(layout)
     page1_other = self.build_page1_other(layout)
+    page1_tamper = self.build_page1_tamper(layout)
 
     self.AddPage(page1_setting, '测试(Q)')
     self.AddPage(page1_request, '请求(W)')
     self.AddPage(page1_enumeration, '枚举(E)')
     self.AddPage(page1_file, '文件(R)')
     self.AddPage(page1_other, '其他(T)')
+    self.AddPage(page1_tamper, 'Tamper(Y)')
 
   def cb_single(self, event, checkbox):
     cb = event.GetEventObject()
@@ -778,10 +780,19 @@ class Notebook(nb):
       EVT_BUTTON,
       lambda evt, data = [m._misc_area_results_file_entry]:
         self._handlers.set_file_entry_text(evt, data))
-    # 最后一行总是会变矮~, 添加一个无用的widget, 抵消一下~
-    # self._dummy = btn(_sb,
-    #              label = '一个无用按钮, 如果报GTK警告, 应该是我没显示出来')
-    # self._dummy.Disable()
+    # win10里, 最后一行总是会变矮~, 添加一个无用的widget, 抵消一下~
+    self._dummy = btn(_sb,
+                 label = '一个无用按钮, 如果报GTK警告, 应该是我没显示出来')
+    self._dummy.Disable()
+
+  def build_page1_tamper(self, layout):
+    p = Scroll(self, style = wx.BORDER_THEME)
+    m = self.m
+
+    # vbox = layout.request_sizer()
+    # p.SetSizer(vbox)
+    p.SetupScrolling(scroll_x = False, scrollIntoView = False)
+    return p
 
 
 def main():

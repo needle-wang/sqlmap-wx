@@ -77,10 +77,13 @@ class NumCtrl(wx.TextCtrl):
       event.Skip()  # allow all other special keycode
     # allow '-' for negative numbers
     elif chr(keycode) == '-':
-      if val[0] == '-':
-        obj.SetValue(val[1:])
+      # 负号只能是开头
+      if '-' not in val:
+        obj.SetValue('-' + val)  # 如果是首次输入"-", 则放在开头
+        obj.SetInsertionPointEnd()
       else:
-        obj.SetValue('-' + val)
+        obj.SetValue(val[1:])    # 如果已存在"-", 则去掉
+        obj.SetInsertionPointEnd()
     # allow '.' for float numbers
     elif chr(keycode) == '.' and '.' not in val:
       event.Skip()
