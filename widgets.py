@@ -56,6 +56,31 @@ class CheckBox(wx.CheckBox):
 
 class NumCtrl(wx.TextCtrl):
   '''
+  正整数
+  https://stackoverflow.com/questions/1369086/is-it-possible-to-limit-textctrl-to-accept-numbers-only-in-wxpython
+  '''
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.Bind(wx.EVT_CHAR, self.onChar)
+
+  def onChar(self, event):
+    keycode = event.GetKeyCode()
+    obj = event.GetEventObject()
+    val = self.GetValue()
+    # filter unicode characters
+    if keycode == wx.WXK_NONE:
+      pass
+    # allow digits
+    elif chr(keycode) in string.digits:
+      event.Skip()
+    # allow special, non-printable keycodes
+    elif chr(keycode) not in string.printable:
+      event.Skip()  # allow all other special keycode
+    return
+
+
+class FloatCtrl(wx.TextCtrl):
+  '''
   https://stackoverflow.com/questions/1369086/is-it-possible-to-limit-textctrl-to-accept-numbers-only-in-wxpython
   '''
   def __init__(self, *args, **kwargs):

@@ -73,9 +73,9 @@ class Session(object):
     for _i in dir(self.m):
       if _i.endswith('entry'):
         _tmp_entry = getattr(self.m, _i)
-
-        if isinstance(_tmp_entry, tc) and _tmp_entry.GetValue().strip():
-          self._cfg['Entry'][_i] = _tmp_entry.GetValue()
+        _v = _tmp_entry.GetValue().strip()
+        if isinstance(_tmp_entry, tc) and _v:
+          self._cfg['Entry'][_i] = _v
 
   def _load_from_tmp_target(self):
     if not self._cfg.has_section('Target'):
